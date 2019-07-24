@@ -1,0 +1,263 @@
+%%
+/*
+Date Written: April 08, 2002
+
+Name: bopbu0250.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+04/08/2002             RMG              Data and Text
+08/02/2002             RMG              Adding Code for Edition Date
+===========================
+*/
+
+Program
+  Name = "bopbu0250";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0250.cq";
+ String L_COPY_NAME[20] ;
+ Unsigned Ascii Number L_LINE_COUNTER,
+                       l_line_of_business,
+                       l_state;
+ String L_BOPLOSSPAYEE_ZIP[10];
+ String L_BOPLOSSPAYEE_ZIP2[10];
+ String L_SFPLOCATION_ZIP[10];
+
+ wdate l_eff_date;
+
+ Include "swsut100.var"
+ Include "swsut200.var"
+ Include "swsut300.var"
+ Include "csfonts.inc"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Access bopgeneral,
+   Set bopgeneral:POLICY_NO         = SFPPRINT1:POLICY_NO ,
+       bopgeneral:POL_YEAR           = SFPPRINT1:POL_YEAR ,
+       bopgeneral:END_SEQUENCE = SFPPRINT1:END_SEQUENCE , Generic
+
+Access SFPNAME,
+   Set SFPNAME:POLICY_NO         = SFPPRINT1:POLICY_NO ,
+       SFPNAME:POL_YEAR           = SFPPRINT1:POL_YEAR ,
+       SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE , Generic
+
+Access BOPLOSSPAYEE,
+   Set BOPLOSSPAYEE:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       BOPLOSSPAYEE:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       BOPLOSSPAYEE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic;
+
+Update
+
+  Include "swsut100.inc"
+  I_CODE = "BU0250"
+  Include "swsut200.inc"
+  Include "swsut300.inc"
+
+While BOPLOSSPAYEE:POLICY_NO    = SFPPRINT1:POLICY_NO And
+      BOPLOSSPAYEE:POL_YEAR     = SFPPRINT1:POL_YEAR And
+      BOPLOSSPAYEE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+
+{
+  l_state            = bopgeneral:state
+  L_COMPANY_ID       = sfpname:COMPANY_ID
+  L_LINE_OF_BUSINESS = sfpname:LINE_OF_BUSINESS
+
+  Access SFSOPTEND,
+     Set SFSOPTEND:COMPANY_ID       = L_COMPANY_ID,
+         SFSOPTEND:STATE            = L_STATE,
+         SFSOPTEND:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS,
+         SFSOPTEND:CODE             = I_CODE, generic
+
+   While SFSOPTEND:COMPANY_ID       = L_COMPANY_ID and
+         SFSOPTEND:STATE            = L_STATE and
+         SFSOPTEND:LINE_OF_BUSINESS = l_LINE_OF_BUSINESS and
+         SFSOPTEND:CODE             = I_CODE
+
+     {  --start of sfsoptend check
+       If (sfpname:eff_date >= sfsoptend:eff_date and
+          (sfpname:eff_date < sfsoptend:exp_date or
+           sfsoptend:exp_date = 0)) then
+         {
+           l_eff_date = sfsoptend:eff_date
+         }
+       next sfsoptend
+     }
+
+  Access SFSOPTEND,
+     Set SFSOPTEND:COMPANY_ID       = L_COMPANY_ID,
+         SFSOPTEND:STATE            = L_STATE,
+         SFSOPTEND:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS,
+         SFSOPTEND:CODE             = I_CODE,
+         SFSOPTEND:EFF_DATE         = L_EFF_DATE, exact
+
+  If sfsoptend:edition <> 0 then
+    {
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a420h7080V")
+      Writefile(L_FILE_NAME,"%s","Ed. ")
+      Writefile(L_FILE_NAME,"%n",sfsoptend:edition)
+    }
+
+  Access SFPLOCATION ,
+     Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+         SFPLOCATION:PREM_NO      = BOPLOSSPAYEE:PREM_NO ,
+         SFPLOCATION:BUILD_NO     = BOPLOSSPAYEE:BUILD_NO ,Generic
+
+  L_SFPLOCATION_ZIP = If (Val(SFPLOCATION:STR_ZIPCODE[6,9]) = 0) Then
+                          SFPLOCATION:STR_ZIPCODE[1,5]
+                       Else
+                          SFPLOCATION:STR_ZIPCODE[1,5] + "-" +
+                          SFPLOCATION:STR_ZIPCODE[6,9]
+
+  L_BOPLOSSPAYEE_ZIP = If (Val(BOPLOSSPAYEE:STR_ZIPCODE[1,6,9]) = 0) Then
+                          BOPLOSSPAYEE:STR_ZIPCODE[1,1,5]
+                       Else
+                          BOPLOSSPAYEE:STR_ZIPCODE[1,1,5] + "-" +
+                          BOPLOSSPAYEE:STR_ZIPCODE[1,6,9]
+
+  L_BOPLOSSPAYEE_ZIP2 = If (Val(BOPLOSSPAYEE:STR_ZIPCODE[2,6,9]) = 0) Then
+                        BOPLOSSPAYEE:STR_ZIPCODE[2,1,5]
+                      Else
+                        BOPLOSSPAYEE:STR_ZIPCODE[2,1,5] + "-" +
+                        BOPLOSSPAYEE:STR_ZIPCODE[2,6,9]
+
+  Writefile(L_FILE_NAME,"%s",l_simplex)
+  Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                      L_COPYRIGHT_6,L_ARIAL_9," 2001 MSO, Inc.",
+                      "<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h120V",
+            Trun(SFSOPTEND:FORM_PRINT)," ",L_ARIAL_BOLD_9,SFSOPTEND:EDITION_PRINT,
+            "<NL>")
+  L_LINE_COUNTER =L_LINE_COUNTER + 2
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "LOSS PAYEE ","<033>&a+0h+20V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_BOLD_9," PART I","<NL>")
+  L_LINE_COUNTER =L_LINE_COUNTER +1
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a90h+0V",
+                      "This endorsement establishes methods of payments to ",
+                      "others who have an insurable interest in property ",
+                      "covered by this policy.","<NL>")
+  L_LINE_COUNTER =L_LINE_COUNTER +1
+
+  Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a90h+0V",
+                      "The required information may be shown below or ",
+                      "elsewhere in this policy.","<NL>")
+  L_LINE_COUNTER =L_LINE_COUNTER +1
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+60V",
+                      "The provisions of this endorsement apply only when the ",
+                      "endorsement number is listed in the Declarations.","<NL>")
+  L_LINE_COUNTER =L_LINE_COUNTER +1
+
+  Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a90h+0V",
+                      "Except as provided below, all other provisions in this ",
+                      "policy are unchanged.","<NL>")
+  L_LINE_COUNTER =L_LINE_COUNTER +1
+
+  Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>")           --Horizontal line
+  L_LINE_COUNTER =L_LINE_COUNTER +2
+
+  Writefile(L_FILE_NAME,"%s%s%s%n%s%s",L_ARIAL_9,"<033>&a90h+0V",
+                      "Policy # ",BOPLOSSPAYEE:POLICY_NO,"<NL>","<NL>")
+  L_LINE_COUNTER =L_LINE_COUNTER +2
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s%n%s%s%n%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "SCHEDULE","<033>&a690h+0V","Location ",BOPLOSSPAYEE:PREM_NO,
+                      "<033>&a1390h+0V","Building ",BOPLOSSPAYEE:BUILD_NO,"<NL>")
+  L_LINE_COUNTER =L_LINE_COUNTER +1
+
+  Writefile(L_FILE_NAME,"%s%s","<033>&a90h+0V",
+                      "Designated Person or Organization:")
+
+  Writefile(L_FILE_NAME,"%s%s%s","<033>&a3000h+0V",
+                      "Description/Location of Covered Property:","<NL>")
+
+  Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+
+  Writefile(L_FILE_NAME,"%s","<033>&f0S")
+
+  If BOPLOSSPAYEE:NAME[1] <> "" Then
+    {
+      Writefile(L_FILE_NAME,"%s%s%s","<033>&a90h+0V",
+                      BOPLOSSPAYEE:NAME[1],"<NL>")
+    }
+  If BOPLOSSPAYEE:NAME[2] <> "" Then
+    {
+      Writefile(L_FILE_NAME,"%s%s%s","<033>&a90h+0V",
+                      BOPLOSSPAYEE:NAME[2],"<NL>")
+    }
+  If BOPLOSSPAYEE:NAME[3] <> "" Then
+    {
+      Writefile(L_FILE_NAME,"%s%s%s","<033>&a90h+0V",
+                      BOPLOSSPAYEE:NAME[3],"<NL>")
+    }
+  If BOPLOSSPAYEE:ADDRESS[1] <> "" Then
+    {
+      Writefile(L_FILE_NAME,"%s%s%s","<033>&a90h+0V",
+                      BOPLOSSPAYEE:ADDRESS[1],"<NL>")
+    }
+  If BOPLOSSPAYEE:ADDRESS[2] <> "" Then
+    {
+      Writefile(L_FILE_NAME,"%s%s%s","<033>&a90h+0V",
+                            BOPLOSSPAYEE:ADDRESS[2],"<NL>")
+    }
+  If BOPLOSSPAYEE:ADDRESS[3] <> "" Then
+    {
+      Writefile(L_FILE_NAME,"%s%s%s","<033>&a90h+0V",
+                      BOPLOSSPAYEE:ADDRESS[3],"<NL>")
+    }
+  Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s","<033>&a90h+0V",
+                      Trun(BOPLOSSPAYEE:CITY[1]),", ",BOPLOSSPAYEE:STR_STATE[1],
+                      " ",L_BOPLOSSPAYEE_ZIP,"<NL>")
+
+  Writefile(L_FILE_NAME,"%s","<033>&f1S")
+
+ If SFPLOCATION:ADDRESS <> "" Then
+    {
+      Writefile(L_FILE_NAME,"%s%s%s","<033>&a3000h+0V",SFPLOCATION:ADDRESS,"<NL>")
+    }
+  Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s","<033>&a3000h+0V",
+                        Trun(SFPLOCATION:CITY),", ",SFPLOCATION:STR_STATE,
+                        " ",L_SFPLOCATION_ZIP,"<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+1000V",
+                      "LOSS PAYABLE COVERAGE MODIFICATION","<NL>")
+  L_LINE_COUNTER =L_LINE_COUNTER +1
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                       "With regard to covered property in which both ",
+                       L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,"and the designated ",
+                       "person or organization (Loss","<NL>")
+  L_LINE_COUNTER =L_LINE_COUNTER +1
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+0V",
+                       "Payee) have an insurable interest, ",L_ARIAL_ITALIC_9,
+                       "we ",L_ARIAL_9,"adjust loss with ",L_ARIAL_ITALIC_9,
+                       "you, ",L_ARIAL_9,"and pay any claim for loss jointly to ",
+                       L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,"and","<NL>")
+  L_LINE_COUNTER =L_LINE_COUNTER +1
+
+  Writefile(L_FILE_NAME,"%s%s%s","<033>&a1100h+0V",
+                       "the Loss Payee, as such interests may appear.","<FF>")
+  L_LINE_COUNTER =L_LINE_COUNTER +1
+
+  Next BOPLOSSPAYEE
+}
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

@@ -1,0 +1,224 @@
+%%
+/*
+Date Written: January 23, 2003
+
+Name: scsmim112.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+01/23/2003             RMG
+
+08/11/2004             REL                 fixed the problem with writing over.
+
+===========================
+*/
+
+Program
+  Name = "bopmim112";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopmim112.cq";
+ String L_FONT[35];
+ Unsigned Ascii Number L_LOOP;
+ Unsigned Ascii Number L_LINE_COUNTER;
+ Unsigned Ascii Number L_MAX_LINES=99;
+ String L_SFPLOCATION_ZIP;
+-- String L_V_POSITION;
+-- String L_H_POSITION;
+-- String L_NEWPAGE_WORDING[150];
+
+   Include "csfonts.inc"
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "line_spacing.var"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPEND,
+       Set SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+   Include "swsut100.inc"
+   I_CODE = "MIM112 "
+   Include "swsut200.inc"
+
+While SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO And
+      SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR And
+      SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+  If SFPEND:CODE = "MIM112 " Then
+    {
+
+      Access bopENDORSE,
+         Set bopENDORSE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+             bopENDORSE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+             bopENDORSE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+             bopENDORSE:PREM_NO      = SFPEND:PREM_NO,
+             bopENDORSE:BUILD_NO     = SFPEND:BUILD_NO,
+             bopENDORSE:CODE         = "MIM112 ", Generic
+
+       Access bopDESC,
+          Set bopDESC:POLICY_NO    = SFPPRINT1:POLICY_NO,
+              bopDESC:POL_YEAR     = SFPPRINT1:POL_YEAR,
+              bopDESC:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+              bopDESC:PREM_NO      = SFPEND:PREM_NO,
+              bopDESC:BUILD_NO     = SFPEND:BUILD_NO,
+              bopDESC:CODE         = "MIM112 ", Generic
+
+       Access SFPLOCATION,
+              Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+                  SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+                  SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+                  SFPLOCATION:PREM_NO      = SFPEND:PREM_NO,
+                  SFPLOCATION:BUILD_NO     = SFPEND:BUILD_NO, Generic
+
+       L_SFPLOCATION_ZIP = If (Val(SFPLOCATION:STR_ZIPCODE[6,9]) = 0) Then
+                               SFPLOCATION:STR_ZIPCODE[1,5]
+                               Else
+                               SFPLOCATION:STR_ZIPCODE[1,5] + "-" +
+                               SFPLOCATION:STR_ZIPCODE[6,9]
+
+       Writefile(L_FILE_NAME,"%s","<033>&a420h7000V")
+       Writefile(L_FILE_NAME,"%s",L_COPYRIGHT_12)
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+       Writefile(L_FILE_NAME,"%s"," 1996 MSO, Inc.")
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+       Writefile(L_FILE_NAME,"%s","<033>&a4300h120V")
+       Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+       Writefile(L_FILE_NAME,"%s"," ")
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+       Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+       Writefile(L_FILE_NAME,"%s","<033>&a200h+60V")
+       Writefile(L_FILE_NAME,"%s","MISCELLANEOUS PROPERTY FLOATER")
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+       Writefile(L_FILE_NAME,"%s","<033>&a200h+0V")
+       Writefile(L_FILE_NAME,"%s","This endorsement, together with the Inland Marine Common Provisions Form (MIM 010) provides coverage on miscellaneous")
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       Writefile(L_FILE_NAME,"%s","<033>&a200h+0V")
+       Writefile(L_FILE_NAME,"%s","property. The required information may be shown below or elsewhere in this policy.")
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+       Writefile(L_FILE_NAME,"%s","<033>&a200h+40V")
+       Writefile(L_FILE_NAME,"%s","The provisions of this endorsement apply only when the endorsement number is listed in the Declarations.")
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       Writefile(L_FILE_NAME,"%s","<033>&a200h+0V")
+       Writefile(L_FILE_NAME,"%s","Except as provided below, all other provisions of this policy are unchanged.")
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       Writefile(L_FILE_NAME,"%s","<033>&a200h-60V")
+       Writefile(L_FILE_NAME,"%s","<033>*c5200h5v0P") --Horizontal line
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+       Writefile(L_FILE_NAME,"%s","<033>&a200h+60V")
+       Writefile(L_FILE_NAME,"%s","Policy # ")
+       Writefile(L_FILE_NAME,"%n",SFPPRINT1:POLICY_NO)
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+       Writefile(L_FILE_NAME,"%s","<033>&a200h+60V")
+       Writefile(L_FILE_NAME,"%s","SCHEDULE")
+       Writefile(L_FILE_NAME,"%s","<NL>")
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       Writefile(L_FILE_NAME,"%s","<033>&a200h+0V")
+       Writefile(L_FILE_NAME,"%s","Description of Covered Property:")
+       Writefile(L_FILE_NAME,"%s","<033>&a2600h+0V")
+       Writefile(L_FILE_NAME,"%s","Limit of Liability")
+       Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+       Writefile(L_FILE_NAME,"%s","Deductible")
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+
+       Writefile(L_FILE_NAME,"%s","<033>&f0S")
+
+       Writefile(L_FILE_NAME,"%s","<033>&a200h+0V")
+       Writefile(L_FILE_NAME,"%s",SFPLOCATION:ADDRESS)
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       For L_LOOP = 1 To 3
+         {
+           If SFPLOCATION:ADDRESS1[L_LOOP] <> "" Then
+             {
+               Writefile(L_FILE_NAME,"%s","<033>&a200h+0V")
+               Writefile(L_FILE_NAME,"%s",SFPLOCATION:ADDRESS1[L_LOOP])
+               Writefile(L_FILE_NAME,"%s","<NL>")
+             }
+         }
+
+       Writefile(L_FILE_NAME,"%s","<033>&a200h+0V")
+       Writefile(L_FILE_NAME,"%s",Trun(SFPLOCATION:CITY))
+       Writefile(L_FILE_NAME,"%s",", ")
+       Writefile(L_FILE_NAME,"%s",SFPLOCATION:STR_STATE)
+       Writefile(L_FILE_NAME,"%s"," ")
+       Writefile(L_FILE_NAME,"%s",L_SFPLOCATION_ZIP)
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       Writefile(L_FILE_NAME,"%s","<033>&f1S")
+
+       Writefile(L_FILE_NAME,"%s","<033>&a2600h+0V")
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+       Writefile(L_FILE_NAME,"%s","$")
+       Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+       Writefile(L_FILE_NAME,"%s",Str(bopENDORSE:LIMIT[1],"ZZ,ZZZ,ZZZ"))
+       Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+       Writefile(L_FILE_NAME,"%s","$")
+       Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+       Writefile(L_FILE_NAME,"%s",Str(bopENDORSE:DEDUCTIBLE[1],"ZZ,ZZZ,ZZZ"))
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+
+       Writefile(L_FILE_NAME,"%s","<033>&a200h+600V")
+       Writefile(L_FILE_NAME,"%s","ADDITIONAL COVERAGE MODIFICATIONS:")
+       Writefile(L_FILE_NAME,"%s","<NL>")
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+
+       L_FONT             = L_ARIAL_9
+       L_V_POSITION       = "+0"
+       L_H_POSITION       = "200"
+       L_CHARACTER_STRING = bopDESC:DESCRIPTION
+       L_MAX_CHAR         = 120
+
+       Include "line_spacing.inc"
+       Writefile(L_FILE_NAME,"%s","<FF>")
+     }
+  Next SFPEND
+}
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

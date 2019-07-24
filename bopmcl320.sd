@@ -1,0 +1,193 @@
+%%
+/*
+Date Written: November 01, 2002
+
+Name: bopmcl320.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+11/01/2002             RMG              Starting Form
+
+===========================
+*/
+
+Program
+  Name         = "bopmcl320";
+  Type         = "File";
+  Domain       = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopmcl320.cq";
+ String L_COPY_NAME[20] ;
+ String L_BOPADDIN_ZIP;
+ Unsigned Ascii Number L_LOOP;
+
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "csfonts.inc"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPEND,
+       Set SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE , Generic
+
+Access BOPADDIN,
+       Set BOPADDIN:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           BOPADDIN:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           BOPADDIN:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Include "swsut100.inc"
+I_CODE = "MCL320 "
+Include "swsut200.inc"
+
+While BOPADDIN:POLICY_NO    = SFPPRINT1:POLICY_NO And
+      BOPADDIN:POL_YEAR     = SFPPRINT1:POL_YEAR And
+      BOPADDIN:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+  If BOPADDIN:CODE = "MCL320 " Then
+    {
+      L_BOPADDIN_ZIP = If (Val(BOPADDIN:STR_ZIPCODE[6,9]) = 0) Then
+                        BOPADDIN:STR_ZIPCODE[1,5]
+                      Else
+                        BOPADDIN:STR_ZIPCODE[1,5] + "-" +
+                        BOPADDIN:STR_ZIPCODE[6,9]
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a420h7000V")
+      Writefile(L_FILE_NAME,"%s",L_COPYRIGHT_6)
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s"," 1991 MSO, Inc.")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+      Writefile(L_FILE_NAME,"%s","<033>&a4300h120V")
+      Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+      Writefile(L_FILE_NAME,"%s"," ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a100h+0V")
+      Writefile(L_FILE_NAME,"%s","ADDITIONAL INSUREDS")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a100h+0V")
+      Writefile(L_FILE_NAME,"%s","This endorsement extends the definition of ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","insureds ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+      Writefile(L_FILE_NAME,"%s","to include the designated person or")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a100h+0V")
+      Writefile(L_FILE_NAME,"%s","organization. The required information may be shown below or elsewhere here.")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a100h+60V")
+      Writefile(L_FILE_NAME,"%s","Except as provided below, all other provisions here are unchanged.")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a100h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a100h+0V")
+      Writefile(L_FILE_NAME,"%s","PERSONS INSURED EXTENSION")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a1500h+0V")
+      Writefile(L_FILE_NAME,"%s","The definition of ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","insured ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","the glossary is amended to include the following as an ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","insured")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a1500h+0V")
+      Writefile(L_FILE_NAME,"%s","here.")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a1500h+0V")
+      Writefile(L_FILE_NAME,"%s","Insured ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","includes the designated person or organization but only with respect to liability arising out")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a1500h+0V")
+      Writefile(L_FILE_NAME,"%s","of ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+      Writefile(L_FILE_NAME,"%s","your ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","business / operations or ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+      Writefile(L_FILE_NAME,"%s","your premises.")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a100h+0V")
+      Writefile(L_FILE_NAME,"%s","DESIGNATED PERSON OR ORGANIZATION:")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+
+      For L_LOOP = 1 To 3
+        {
+          If BOPADDIN:NAME[L_LOOP] <> "" Then
+            {
+              Writefile(L_FILE_NAME,"%s","<033>&a100h+0V")
+              Writefile(L_FILE_NAME,"%s",BOPADDIN:NAME[L_LOOP])
+              Writefile(L_FILE_NAME,"%s","<NL>")
+            }
+        }
+      For L_LOOP = 1 To 3
+        {
+          If BOPADDIN:ADDRESS[L_LOOP] <> "" Then
+            {
+              Writefile(L_FILE_NAME,"%s","<033>&a100h+0V")
+              Writefile(L_FILE_NAME,"%s",BOPADDIN:ADDRESS[L_LOOP])
+              Writefile(L_FILE_NAME,"%s","<NL>")
+            }
+        }
+      Writefile(L_FILE_NAME,"%s","<033>&a100h+0V")
+      Writefile(L_FILE_NAME,"%s",Trun(BOPADDIN:CITY))
+      Writefile(L_FILE_NAME,"%s",", ")
+      Writefile(L_FILE_NAME,"%s",BOPADDIN:STR_STATE)
+      Writefile(L_FILE_NAME,"%s"," ")
+      Writefile(L_FILE_NAME,"%s",L_BOPADDIN_ZIP)
+      Writefile(L_FILE_NAME,"%s","<FF>")
+
+    }
+  Next BOPADDIN
+}
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

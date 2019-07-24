@@ -1,0 +1,201 @@
+%%
+/*
+Date Written: February 22, 2002
+
+Name: bopbu0192.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+03/13/2002             RMG              Upgrade to VCS from VCQ
+08/09/2002             RMG              Adding Code for Edition Date
+===========================
+*/
+
+Program
+  Name         = "bopbu0192";
+  Type         = "File";
+  Domain       = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0192.cq";
+ String L_COPY_NAME[20] ;
+ String L_READ;
+ Number L_START_PRINT;       --first character printed
+ Number L_END_PRINT;         --last character printed when l_break reaches 40C
+ Number L_BREAK = 40;       --number of characters printed before break
+ Number L_BREAK_POINT;      --where the break occurs and newline is inserted
+ Number L_LOOP;
+ Number L_PAGE_NUMBER = 1;
+ Number L_ITEM_NO = 1;
+ Unsigned Ascii Number L_ITEM_COUNTER;
+ Unsigned Ascii Number L_LINE_COUNTER;
+ String L_SFPLOCATION_ZIP;
+
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "swsut300.var"
+   Include "csfonts.inc"
+
+Initialization
+
+  Deletefile (L_FILE_NAME);
+
+
+Access PLPENDORSE,
+       Set PLPENDORSE:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           PLPENDORSE:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           PLPENDORSE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic;
+
+Access SFPEND1,
+       Set SFPEND1:POLICY_NO       = SFPPRINT1:POLICY_NO ,
+           SFPEND1:POL_YEAR        = SFPPRINT1:POL_YEAR ,
+           SFPEND1:END_SEQUENCE    = SFPPRINT1:END_SEQUENCE , Generic;
+
+Access PLPDESC,
+       Set PLPDESC:POLICY_NO       = SFPPRINT1:POLICY_NO ,
+           PLPDESC:POL_YEAR        = SFPPRINT1:POL_YEAR ,
+           PLPDESC:END_SEQUENCE    = SFPPRINT1:END_SEQUENCE , Generic;
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,Generic;
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO         = SFPPRINT1:POLICY_NO ,
+           SFPNAME:POL_YEAR           = SFPPRINT1:POL_YEAR ,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE , Generic
+
+Access PLPWORKERSCOMP,
+       Set PLPWORKERSCOMP:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           PLPWORKERSCOMP:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           PLPWORKERSCOMP:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,Generic;
+
+Update
+
+If (Val(SFPLOCATION:STR_ZIPCODE[6,9]) = 0) Then
+  {
+    L_SFPLOCATION_ZIP =  SFPLOCATION:STR_ZIPCODE[1,5]
+  }
+Else
+  {
+    L_SFPLOCATION_ZIP = SFPLOCATION:STR_ZIPCODE[1,5] + "-" +
+                        SFPLOCATION:STR_ZIPCODE[6,9]
+  }
+
+Include "swsut100.inc"
+I_CODE = "BU0192 "
+Include "swsut200.inc"
+Include "swsut300.inc"
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                      L_COPYRIGHT_6,L_ARIAL_9," 1996 MSO, Inc.",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h120V",
+          Trun(SFSOPTEND:FORM_PRINT)," ",L_ARIAL_BOLD_9,SFSOPTEND:EDITION_PRINT,
+          "<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER + 2
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_14,"<033>&a1600h+0V",
+                      "BUSINESSOWNERS ENDORSEMENT",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "OPTICAL / HEARING AID SERVICES PROFESSIONAL LIABILITY ",
+                      "<033>&a+0h+20V",L_BULLET_6,"<033>&a+0h-20V",
+                      L_ARIAL_BOLD_9," PART II","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "When made part of this insurance contract, ",
+                      "the following applies to Part II.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "The provisions of this endorsement apply only ",
+                      "when the endorsement number is listed in the","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "Declarations. Except as provided below, all ",
+                      "other provisions in this policy remain unchanged.",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a1100h+0V","A.",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Coverage E is extended to include optical or hearing ",
+                      "services professional liability in","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "connection with ",L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,
+                      "business / operations described in the Declarations.",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a1100h+0V","B.",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Liability Not Insured","<033>&a+25h-30V<033>*c75h3v0P",
+                      "<033>&a+100h+30V",L_ARIAL_ITALIC_9,"We ",L_ARIAL_9,
+                      "do not provide insurance for the following:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+0V",
+                      "1.",L_ARIAL_9,"<033>&a1500h+0V","Liability arising out ",
+                      "of any ophthalmology or optometry services;","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+40V",
+                      "2.",L_ARIAL_9,"<033>&a1500h+0V","Acts of unlicensed ",
+                      "practitioners required to be licensed;","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+40V",
+                      "3.",L_ARIAL_9,"<033>&a1500h+0V","Acts of anyone ",
+                      "employed in violation of any law or regulation;","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+40V",
+                      "4.",L_ARIAL_9,"<033>&a1500h+0V","Liability assumed ",
+                      "under contract, except as described below.","<NL>",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V","C.",
+                      L_ARIAL_9,"<033>&a1300h+0V",
+                      "Professional liability includes error or omission, ",
+                      "malpractice, or mistake in connection with","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "rendering or failure to render professional services ",
+                      L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,"are authorized to ",
+                      "perform as a licensed ","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "optician or audiologist in accordance with the laws ",
+                      "of the jurisdictions in which ",L_ARIAL_ITALIC_9,"you ",
+                      L_ARIAL_9,"practice.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "These services include the demonstrating, ",
+                      "distributing, fitting, or preparing of ophthalmic",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "lenses and similar products or hearing aid devices.",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "This includes services rendered away from the ",
+                      "described premises which are necessary and",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "incidental to services performed at the described ",
+                      "premises. This also includes a warranty of","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "the fitness of ",L_ARIAL_ITALIC_9,"your products ",
+                      L_ARIAL_9,"or goods.","<NL>")
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

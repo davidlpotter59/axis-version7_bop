@@ -1,0 +1,201 @@
+%%
+/*
+Date Written: February 22, 2002
+
+Name: bopbu0282.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+03/21/2002             RMG              Upgrade to VCS from VCQ
+04/11/2002             RMG              Data Added
+08/02/2002             RMG              Adding Code for Edition Date
+===========================
+*/
+
+Program
+  Name = "bopbu0282";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0282.cq";
+ String L_COPY_NAME[20] ;
+ Number L_PAGE_NUMBER = 1;
+ Number L_ITEM_NO = 1;
+ Unsigned Ascii Number L_ITEM_COUNTER;
+ Unsigned Ascii Number L_LINE_COUNTER;
+ String L_SFPLOCATION_ZIP;
+
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "swsut300.var"
+   Include "csfonts.inc"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+
+Update
+
+Access SFPEND,
+   Set SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic;
+
+Access SFPLOCATION,
+   Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,Generic
+
+Access SFPNAME,
+   Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE , Generic
+
+Include "swsut100.inc"
+I_CODE = "BU0282"
+Include "swsut200.inc"
+--Include "swsut300.inc"
+
+While  SFPEND:POLICY_NO         = SFPPRINT1:POLICY_NO And
+       SFPEND:POL_YEAR          = SFPPRINT1:POL_YEAR And
+       SFPEND:END_SEQUENCE      = SFPPRINT1:END_SEQUENCE
+{
+  Access BOPDISHONESTY,
+     Set BOPDISHONESTY:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+         BOPDISHONESTY:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+         BOPDISHONESTY:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+         BOPDISHONESTY:PREM_NO      = SFPEND:PREM_NO ,
+         BOPDISHONESTY:BUILD_NO     = SFPEND:BUILD_NO, Exact
+
+  If SFPEND:CODE = I_CODE Then
+    {
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                      L_COPYRIGHT_6,L_ARIAL_9," 1993 MSO, Inc.",
+                      "<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h120V",
+                Trun(SFSOPTEND:FORM_PRINT)," ",L_ARIAL_BOLD_9,SFSOPTEND:EDITION_PRINT,
+                "<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_14,"<033>&a1600h+0V",
+                      "BUSINESSOWNERS ENDORSEMENT",
+                      "<NL>","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "EMPLOYEE DISHONESTY COVERAGE ",
+                      "<033>&a+0h+20V",L_BULLET_6,"<033>&a+0h-20V",
+                      L_ARIAL_BOLD_9," PART I","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "When made part of this insurance contract, ",
+                      "the following applies to Part I.","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "Except as provided below, all other provisions here ",
+                      "remain unchanged.","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "The required information may be shown below or ",
+                      "elsewhere here.","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "$",L_LETTER_GOTHIC_BOLD_10,
+                      Str(BOPDISHONESTY:LIMIT,"ZZ,ZZZ,ZZZ"),L_ARIAL_BOLD_9,
+                      "<033>&a1100h+0V","<","<033>&a1300h+0V",
+                      "Limit of Liability","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "$",L_LETTER_GOTHIC_BOLD_10,Str(BOPDISHONESTY:DEDUCTIBLE,"ZZ,ZZZ,ZZZ"),
+                      L_ARIAL_BOLD_9,"<033>&a1100h+0V","<","<033>&a1300h+0V",
+                      "Deductible","<NL>","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "A.",L_ARIAL_ITALIC_9,"<033>&a1300h+0V","We ",L_ARIAL_9,
+                      "will pay up to the limit of liability shown above, ")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,
+                      "loss of ",L_ARIAL_ITALIC_9,"money, securities ",
+                      L_ARIAL_9,"and other","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "business personal property because of dishonest or ",
+                      "fraudulent acts involving ",L_ARIAL_ITALIC_9,"your ",
+                      L_ARIAL_9,"employees","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "(whether acting alone or in collusion with others). A ",
+                      "series of similar or related acts is one","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "occurrence.","<NL>","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "B.",L_ARIAL_9,"<033>&a1300h+0V","The limit is not ",
+                      "cumulative from year to year even if the acts take ",
+                      "place over a period of years.","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1300h+0V",
+                      "We ",L_ARIAL_9,"cover loss discovered during the ",
+                      "policy year, or within one year from the end of the",
+                      "<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "policy period or the expiration date of a prior bond ",
+                      "covering the loss (but only if recovery","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "cannot be made under the prior bond).","<NL>","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "C.",L_ARIAL_9,"<033>&a1300h+0V","This does not cover ",
+                      "loss where proof is dependent upon a profit and loss ",
+                      "or inventory","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "computation. But, such can be used to support a ",
+                      "claim which ",L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,
+                      "otherwise prove.","<NL>","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "D.",L_ARIAL_9,"<033>&a1300h+0V","This insurance is ",
+                      "automatically cancelled on any employee immediately ",
+                      "upon discovery by","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1300h+0V",
+                      "you ",L_ARIAL_9,"or ",L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,
+                      "directors, officers, partners or trustees of such ",
+                      "dishonesty or fraud by the","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "employee, whether or not ",L_ARIAL_ITALIC_9,"you ",
+                      L_ARIAL_9,"make claim or report such to ",
+                      L_ARIAL_ITALIC_9,"us.","<NL>","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "E.",L_ARIAL_9,"<033>&a1300h+0V","A $200 deductible per ",
+                      "occurrence applies, unless a greater deductible amount ",
+                      "is shown","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                        "for this coverage.","<FF>")
+/*
+If sfpend:PREM_NO  >= 1 or
+   sfpend:BUILD_NO >= 1 then
+  {
+    Writefile(L_FILE_NAME,"%s","<FF>")
+  }
+*/
+    }
+  Next SFPEND
+}
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

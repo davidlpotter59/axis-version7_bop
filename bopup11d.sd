@@ -1,0 +1,489 @@
+%%
+Program
+        Name = "bopUP11D" ;
+        Type = "File" ;
+        Padcharacter = Space ;
+        Domain = "FLAT" ;
+
+        Global Unsigned Ascii Number G_policy_no[9] ,
+                                     g_year[4],
+                                     g_end_sequence[4] ;
+
+        local string l_str_state[2] ,
+                     l_zip_code_5[5] ,
+                     l_enter,
+                     l_policy_wide_first[1];
+
+        Local Signed Ascii Number l_reins_premium[9]=0,
+                                  l_bi_factor[4]=0/dec=2 ,
+                                  l_premium[9]=0 ,
+                                  l_premium_1[9]=0,
+                                  l_premium_2[9]=0,
+                                  l_end_premium[8]=0,
+                                  l_territory_rating[8],
+                                  l_territory_rating_1[8],
+                                  l_irpm[8]=0/dec=4,
+                                  l_total_18[9]=0/dec=2,
+                                  l_total_19[9]=0/dec=2,
+                                  l_total_2[9]=0/dec=2,
+                                  l_terrorism[9]=0/dec=2;
+
+        Local Unsigned Ascii Number L_MINIMUM[4]=0 ,
+                                    l_property_limit1[8]=0,
+                                    l_no_locations[2],
+                                    l_percentage[8]=0/dec=4,
+                                    l_total_fac_limit[8]=0,
+                                    l_protection[2]=0,
+                                    l_force_to_subject[1]=0,
+                                    l_split[5]=0/dec=3,
+                                    l_key_risk_limit[8]=0,
+                                    l_key_risk_prem_no[4]=0,
+                                    l_key_risk_build_no[4]=0,
+                                    l_reins_factor[5]=0/dec=4,
+                                    l_reins_limit[8]=0,
+                                    l_reins_limit1[8]=0 ,
+                                    l_reins_percentage[8]=0/dec=4 ;
+
+initialisation
+g_policy_no        = val(commandline[1,9])
+g_Year             = val(commandline[10,13])
+g_end_sequence     = val(commandline[14,17])
+l_territory_rating = val(commandline[18,25])
+
+do reinsurance
+
+update
+
+Procedure Definition
+
+procedure reinsurance
+begin
+access sfpreins, set sfpreins:policy_no    = g_policy_no,
+                     sfpreins:pol_year     = g_year,
+                     sfpreins:end_sequence = g_end_sequence, generic
+
+access bopgeneral_alias, set bopgeneral_alias:policy_no    = g_policy_no,
+                             bopgeneral_alias:pol_year     = g_Year,
+                             bopgeneral_alias:end_sequence = g_end_sequence, generic
+
+access sfpname, set sfpname:policy_no    = g_policy_no,
+                    sfpname:pol_Year     = g_year,
+                    sfpname:end_sequence = g_end_sequence, generic
+
+access sfsline, set sfsline:company_id = sfpname:company_id,
+                    sfsline:line_of_business = sfpname:line_of_business,
+                    sfsline:lob_subline = "00", generic
+
+if sfsline:lob_code one of "CPORTFOLIO" then
+    begin
+    access sfpmastsupp, set sfpmastsupp:policy_no = g_policy_no,
+                            sfpmastsupp:pol_Year = g_year,
+                            sfpmastsupp:end_sequence = g_end_sequence,
+                            sfpmastsupp:line_of_business = bopgeneral_alias:line_of_business, generic
+
+    l_total_18  = sfpmastsupp:total[18]
+    l_total_19  = sfpmastsupp:total[19]
+    l_total_2   = sfpmastsupp:total[2]
+    l_terrorism = sfpmastsupp:terrorism_premium
+    end
+else
+    begin
+    access sfpmaster, set sfpmaster:policy_no = g_policy_no,
+                          sfpmaster:pol_year = g_year,
+                          sfpmaster:end_sequence = g_end_sequence, generic
+
+    l_total_18  = sfpmaster:total[18]
+    l_total_19  = sfpmaster:total[19]
+    l_total_2   = sfpmaster:total[2]
+    l_terrorism = sfpmaster:terrorism_premium
+    end
+
+access sfpreins, set sfpreins:policy_no = g_policy_no,
+                     sfpreins:pol_Year = g_Year,
+                     sfpreins:end_sequence = g_end_sequence, generic
+
+l_property_limit1 = 0
+l_key_risk_limit = 0
+l_key_risk_prem_no = 0
+l_key_risk_build_no = 0
+while bopgeneral_alias:policy_no = g_policy_no and
+      bopgeneral_alias:pol_year = g_year and
+      bopgeneral_alias:end_sequence = g_end_sequence
+    begin
+    access prsreinsplit, set prsreinsplit:company_id       = bopgeneral_alias:company_id,
+                             prsreinsplit:line_of_business = bopgeneral_alias:line_of_business, generic
+
+    l_split = 0
+    l_total_fac_limit = 0
+    while prsreinsplit:company_id       = bopgeneral_alias:company_id and
+          prsreinsplit:line_of_business = bopgeneral_alias:line_of_business
+            begin
+            if (sfpname:eff_date >= prsreinsplit:reff_date and
+               (sfpname:eff_date <= prsreinsplit:rexp_date or
+               prsreinsplit:rexp_date = 0)) then
+                begin
+                l_split = prsreinsplit:property
+                l_total_fac_limit = prsreinsplit:total_fac_limit
+                end
+
+            next prsreinsplit
+            end
+
+    access prsreinbi, set prsreinbi:company_id       = bopgeneral_alias:company_id,
+                          prsreinbi:line_of_business = bopgeneral_alias:line_of_business, generic
+
+    l_bi_factor = 0
+    while prsreinbi:company_id       = bopgeneral_alias:company_id and
+          prsreinbi:line_of_business = bopgeneral_alias:line_of_business
+            begin
+            if (sfpname:eff_date >= prsreinbi:reff_date and
+               (sfpname:eff_date <= prsreinbi:rexp_date or
+               prsreinbi:rexp_date = 0)) then
+                begin
+                l_bi_factor = prsreinbi:business_income_factor
+                end
+
+            next prsreinbi
+            end
+
+    l_property_limit1 = 0
+    if sfpname:reinsurance = "Y" then
+        begin
+        l_property_limit1 = bopgeneral_alias:building_limit +
+                            bopgeneral_alias:property_limit +
+                            l_property_limit1
+        if bopgeneral_alias:delete_loss_income = "N" then
+            begin
+            if bopgeneral_alias:loss_income_limit <> 0 then
+                l_property_limit1 = l_property_limit1 + bopgeneral_alias:loss_income_limit
+            else
+                l_property_limit1 = ((l_property_limit1 * l_bi_factor)  +
+                                    l_property_limit1)
+            end
+
+        if l_property_limit1 > l_key_risk_limit then
+            begin
+            l_key_risk_limit    = l_property_limit1
+            l_key_risk_prem_no  = bopgeneral_alias:prem_no
+            l_key_risk_build_no = bopgeneral_alias:build_no
+            end
+
+        end
+
+    next bopgeneral_alias
+    end
+
+do set_key_risk
+
+access bopgeneral_alias, set bopgeneral_alias:policy_no    = g_policy_no,
+                             bopgeneral_alias:pol_year     = g_Year,
+                             bopgeneral_alias:end_sequence = g_end_sequence, generic
+
+l_no_locations = 0
+while bopgeneral_alias:policy_no    = g_policy_no and
+      bopgeneral_alias:pol_year     = g_Year and
+      bopgeneral_alias:end_sequence = g_end_sequence
+     begin
+     l_no_locations = l_no_locations + 1
+
+     next bopgeneral_alias
+     end
+
+access bopgeneral_alias, set bopgeneral_alias:policy_no    = g_policy_no,
+                             bopgeneral_alias:pol_year     = g_Year,
+                             bopgeneral_alias:end_sequence = g_end_sequence, generic
+
+l_irpm = (1 + (sfpmaster:irpm * 0.01))
+if l_irpm = 0 then
+    l_irpm = 1
+--l_territory_rating_1 = l_territory_rating divide l_no_locations
+l_reins_limit1 = 0
+l_premium_1 = 0
+while bopgeneral_alias:policy_no    = g_policy_no and
+      bopgeneral_alias:pol_year     = g_Year and
+      bopgeneral_alias:end_sequence = g_end_sequence
+    begin
+    if sfpname:reinsurance = "Y" then
+        begin
+        l_property_limit1 = 0
+        l_force_to_subject = 0
+        if bopgeneral_alias:key_risk = 1 then
+            begin
+            l_property_limit1 = bopgeneral_alias:building_limit +
+                                bopgeneral_alias:property_limit +
+                                l_property_limit1
+            if bopgeneral_alias:delete_loss_income = "N" then
+                begin
+                if bopgeneral_alias:loss_income_limit <> 0 then
+                    l_property_limit1 = l_property_limit1 + bopgeneral_alias:loss_income_limit
+                else
+                    l_property_limit1 = ((l_property_limit1 * l_bi_factor) +
+                                        l_property_limit1)
+                end
+
+            do get_endorsement_premium
+            l_premium = bopgeneral_alias:bop_premium +
+                        bopgeneral_alias:optional_total -
+                        bopgeneral_alias:boilers_premium +
+                        l_end_premium +
+                        bopgeneral_alias:liability_charge
+
+            l_premium = l_premium * bopgeneral_alias:rating_territory_factor
+
+            l_premium = l_premium * l_irpm * l_split
+            l_reins_limit1 = l_reins_limit1 + l_property_limit1
+            l_premium_1 = l_premium_1 + l_premium
+            do update_sfpreins1_property
+            end
+        else
+        if bopgeneral_alias:key_risk = 0 then
+            begin
+            access sfplocation, set sfplocation:policy_no = bopgeneral_alias:policy_no,
+                                    sfplocation:pol_year = bopgeneral_alias:pol_year,
+                                    sfplocation:end_sequence = bopgeneral_alias:end_sequence,
+                                    sfplocation:prem_no = bopgeneral_alias:prem_no,
+                                    sfplocation:build_no = bopgeneral_alias:build_no, generic
+
+            l_property_limit1 = 0
+            l_force_to_subject = 0
+            if sfplocation:force_to_subject = 1 then
+                begin
+                l_force_to_subject = 1
+                l_property_limit1 = bopgeneral_alias:building_limit +
+                                    bopgeneral_alias:property_limit +
+                                    l_property_limit1
+                if bopgeneral_alias:delete_loss_income = "N" then
+                    begin
+                    if bopgeneral_alias:loss_income_limit <> 0 then
+                        l_property_limit1 = l_property_limit1 + bopgeneral_alias:loss_income_limit
+                    else
+                        l_property_limit1 = ((l_property_limit1 * l_bi_factor) +
+                                            l_property_limit1)
+                    end
+
+                do get_endorsement_premium
+                l_premium = bopgeneral_alias:bop_premium +
+                            bopgeneral_alias:optional_total -
+                            bopgeneral_alias:boilers_premium +
+                            l_end_premium +
+                            bopgeneral_alias:liability_charge
+
+                l_premium = l_premium * bopgeneral_alias:rating_territory_factor
+                l_premium = l_premium * l_irpm * l_split
+                l_reins_limit1 = l_reins_limit1 + l_property_limit1
+                l_premium_1 = l_premium_1 + l_premium
+                do update_sfpreins1_property
+                end
+            else
+                begin
+                access sfpreins1, set sfpreins1:policy_no = bopgeneral_alias:policy_no,
+                                      sfpreins1:pol_year = bopgeneral_alias:pol_year,
+                                      sfpreins1:end_sequence = bopgeneral_alias:end_sequence,
+                                      sfpreins1:prem_no = bopgeneral_alias:prem_no,
+                                      sfpreins1:build_no = bopgeneral_alias:build_no, generic
+
+                if sfpreins1:policy_no = bopgeneral_alias:policy_no and
+                   sfpreins1:pol_year = bopgeneral_alias:pol_year and
+                   sfpreins1:end_sequence = bopgeneral_alias:end_sequence and
+                   sfpreins1:prem_no = bopgeneral_alias:prem_no and
+                   sfpreins1:build_no = bopgeneral_alias:build_no then
+                    begin
+                    delete sfpreins1
+                    end
+                end
+
+/*            else
+            if sfplocation:force_to_subject = 0 then
+                begin
+                do get_endorsement_premium
+                l_premium = bopgeneral_alias:bop_premium +
+                            bopgeneral_alias:optional_total -
+                            bopgeneral_alias:boilers_premium +
+                            l_end_premium +
+                            bopgeneral_alias:liability_charge +
+                            l_territory_rating_1
+                l_premium = l_premium * l_irpm
+                end*/
+            end
+
+        end
+
+    next bopgeneral_alias
+    end
+
+access sfplocation, set sfplocation:policy_no = bopgeneral_alias:policy_no,
+                        sfplocation:pol_year = bopgeneral_alias:pol_year,
+                        sfplocation:end_sequence = bopgeneral_alias:end_sequence,
+                        sfplocation:prem_no = l_key_risk_prem_no,
+                        sfplocation:build_no = l_key_risk_build_no, generic
+
+l_str_state  = sfplocation:str_state
+l_zip_code_5 = sfplocation:str_zipcode[1,5]
+l_protection = bopgeneral_alias:protection
+if l_reins_limit1 <> 0 then
+    begin
+    if sfpmaster:total[19] <> 0 then
+        l_premium_2 = ((sfpmaster:total[19] - sfpmaster:total[2] - sfpmaster:terrorism_premium) * l_split)
+    else
+        l_premium_2 = ((sfpmaster:total[18] - sfpmaster:total[2] - sfpmaster:terrorism_premium) * l_split)
+    if l_premium_1 <> l_premium_2 then
+        l_premium_1 = l_premium_2
+    l_reins_limit = l_reins_limit1 - l_total_fac_limit
+    l_percentage  = l_reins_limit divide l_reins_limit1
+    l_reins_premium = l_premium_1 * l_percentage
+
+    if sfpreins:policy_no = g_policy_no and
+       sfpreins:pol_Year = g_Year and
+       sfpreins:end_sequence = g_end_sequence then
+        begin
+        change sfpreins
+            begin
+            sfpreins:limit         = l_reins_limit1
+            sfpreins:premium       = l_premium_1
+            sfpreins:retention     = l_reins_limit
+            sfpreins:percentage    = l_percentage
+            sfpreins:eff_date      = sfpname:eff_date
+            sfpreins:reins_premium = l_reins_premium
+            if sfpname:previous_policy_no = 0 then
+                sfpreins:trans_code = 10
+            else
+                sfpreins:trans_code = 14
+            sfpreins:total_premium[1] = l_reins_premium
+            sfpreins:amt_due[1] = l_reins_premium
+            sfpreins:str_state = l_str_state
+            sfpreins:zip_code_5 = l_zip_code_5
+            sfpreins:protection = l_protection
+            end
+        end
+    end
+else
+    begin
+    if sfpreins:policy_no = g_policy_no and
+       sfpreins:pol_Year = g_year and
+       sfpreins:end_sequence = g_end_sequence and
+       l_reins_limit1 = 0 then
+        delete sfpreins
+    end
+end
+
+procedure get_endorsement_premium
+begin
+access sfpend, set sfpend:policy_no = g_policy_no,
+                   sfpend:pol_Year = g_year,
+                   sfpend:end_sequence = g_end_sequence, generic
+
+l_end_premium = 0
+while sfpend:policy_no = g_policy_no and
+      sfpend:pol_year = g_year and
+      sfpend:end_sequence = g_end_sequence
+    begin
+    if sfpend:form_edition = "" then
+        delete sfpend
+
+    if sfpend:prem_no  = 0 and
+       sfpend:build_no = 0 and
+       l_policy_wide_first = "Y" then
+        begin
+        if sfpend:terrorism_form = 0 then
+            l_end_premium = l_end_premium + sfpend:premium
+        end
+
+    next sfpend
+    end
+
+l_policy_wide_first = "N"
+access sfpend, set sfpend:policy_no = g_policy_no,
+                   sfpend:pol_Year = g_year,
+                   sfpend:end_sequence = g_end_sequence,
+                   sfpend:prem_no  = bopgeneral_alias:prem_no,
+                   sfpend:build_no = bopgeneral_alias:build_no, generic
+
+while sfpend:policy_no = g_policy_no and
+      sfpend:pol_Year = g_year and
+      sfpend:end_sequence = g_end_sequence and
+      sfpend:prem_no  = bopgeneral_alias:prem_no and
+      sfpend:build_no = bopgeneral_alias:build_no
+        begin
+        if sfpend:form_edition = "" then
+            delete sfpend
+
+        l_end_premium = l_end_premium + sfpend:premium
+
+        next sfpend
+        end
+
+end
+
+procedure set_key_risk
+begin
+access bopgeneral_alias, set bopgeneral_alias:policy_no    = g_policy_no,
+                             bopgeneral_alias:pol_year     = g_Year,
+                             bopgeneral_alias:end_sequence = g_end_sequence, generic
+
+while bopgeneral_alias:policy_no = g_policy_no and
+      bopgeneral_alias:pol_year     = g_Year and
+      bopgeneral_alias:end_sequence = g_end_sequence
+    begin
+    if bopgeneral_alias:prem_no = l_key_risk_prem_no and
+       bopgeneral_alias:build_no = l_key_risk_build_no then
+        begin
+        change bopgeneral_alias
+            begin
+            bopgeneral_alias:key_risk = 1
+            end
+        end
+    else
+        begin
+        change bopgeneral_alias
+            begin
+            bopgeneral_alias:key_risk = 0
+            end
+        end
+
+    next bopgeneral_alias
+    end
+
+end
+
+procedure update_sfpreins1_property
+begin
+access sfpreins1, set sfpreins1:policy_no = bopgeneral_alias:policy_no,
+                      sfpreins1:pol_year = bopgeneral_alias:pol_Year,
+                      sfpreins1:end_sequence = bopgeneral_alias:end_sequence,
+                      sfpreins1:prem_no  = bopgeneral_alias:prem_no,
+                      sfpreins1:build_no = bopgeneral_alias:build_no, generic
+
+if sfpreins1:policy_no = bopgeneral_alias:policy_no and
+   sfpreins1:pol_year = bopgeneral_alias:pol_year and
+   sfpreins1:end_sequence = bopgeneral_alias:end_sequence and
+   sfpreins1:prem_no  = bopgeneral_alias:prem_no and
+   sfpreins1:build_no = bopgeneral_alias:build_no then
+    begin
+    change sfpreins1
+        begin
+        sfpreins1:property_limit            = l_property_limit1
+        sfpreins1:property_fire_total       = l_premium
+        sfpreins1:key_risk                  = bopgeneral_alias:key_risk
+        sfpreins1:force_to_subject          = l_force_to_subject
+        end
+    end
+else
+    begin
+    add sfpreins1
+        begin
+        sfpreins1:policy_no                 = bopgeneral_alias:policy_no
+        sfpreins1:pol_year                  = bopgeneral_alias:pol_year
+        sfpreins1:end_sequence              = bopgeneral_alias:end_sequence
+        sfpreins1:prem_no                   = bopgeneral_alias:prem_no
+        sfpreins1:build_no                  = bopgeneral_alias:build_no
+        sfpreins1:property_limit            = l_property_limit1
+        sfpreins1:property_fire_total       = l_premium
+        sfpreins1:key_risk                  = bopgeneral_alias:key_risk
+        sfpreins1:force_to_subject          = l_force_to_subject
+        end
+
+    end
+
+end
+
+End

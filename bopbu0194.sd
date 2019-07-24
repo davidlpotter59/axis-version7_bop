@@ -1,0 +1,153 @@
+%%
+/*
+Date Written: February 22, 2002
+
+Name: bopbu0194.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+03/17/2002             RMG              Upgrade to VCS from VCQ
+08/09/2002             RMG              Adding Code for Edition Date
+===========================
+*/
+
+Program
+  Name         = "bopbu0194";
+  Type         = "File";
+  Domain       = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0194.cq";
+ String L_COPY_NAME[20] ;
+ String L_READ;
+ Number L_START_PRINT;       --first character printed
+ Number L_END_PRINT;         --last character printed when l_break reaches 40C
+ Number L_BREAK = 40;       --number of characters printed before break
+ Number L_BREAK_POINT;      --where the break occurs and newline is inserted
+ Number L_LOOP;
+ Number L_PAGE_NUMBER = 1;
+ Number L_ITEM_NO = 1;
+ Unsigned Ascii Number L_ITEM_COUNTER;
+ Unsigned Ascii Number L_LINE_COUNTER;
+ String L_SFPLOCATION_ZIP;
+
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "swsut300.var"
+   Include "csfonts.inc"
+
+Initialization
+
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO         = SFPPRINT1:POLICY_NO ,
+           SFPLOCATION:POL_YEAR           = SFPPRINT1:POL_YEAR ,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,Generic
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO         = SFPPRINT1:POLICY_NO ,
+           SFPNAME:POL_YEAR           = SFPPRINT1:POL_YEAR ,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE , Generic
+
+If (Val(SFPLOCATION:STR_ZIPCODE[6,9]) = 0) Then
+  {
+    L_SFPLOCATION_ZIP =  SFPLOCATION:STR_ZIPCODE[1,5]
+  }
+Else
+  {
+    L_SFPLOCATION_ZIP = SFPLOCATION:STR_ZIPCODE[1,5] + "-" +
+                        SFPLOCATION:STR_ZIPCODE[6,9]
+  }
+
+Include "swsut100.inc"
+I_CODE = "BU0194 "
+Include "swsut200.inc"
+Include "swsut300.inc"
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                      L_COPYRIGHT_6,L_ARIAL_9," 1993 MSO, Inc.",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h120V",
+          Trun(SFSOPTEND:FORM_PRINT)," ",L_ARIAL_BOLD_9,SFSOPTEND:EDITION_PRINT,
+          "<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER + 2
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_14,"<033>&a1600h+0V",
+                      "BUSINESSOWNERS ENDORSEMENT",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "DRUGGISTS PROFESSIONAL LIABILITY ",
+                      "<033>&a+0h+20V",L_BULLET_6,"<033>&a+0h-20V",
+                      L_ARIAL_BOLD_9," PART II","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "When made part of this insurance contract, ",
+                      "the following applies to Part II.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "Except as provided below, all other provisions here ",
+                      "remain unchanged.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "A.",L_ARIAL_9,"<033>&a1300h+0V","Coverage E is extended to ",
+                      "Include professional liability in connection with ",
+                      L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,"business /","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "operations described in the Declarations.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a1100h+0V","B.",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Liability Not Insured","<033>&a+25h-30V<033>*c75h3v0P",
+                      "<033>&a+100h+30V",L_ARIAL_ITALIC_9,"We ",L_ARIAL_9,
+                      "do not provide insurance for the following:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+0V",
+                      "1.",L_ARIAL_9,"<033>&a1500h+0V","Acts of unlicensed ",
+                      "practitioners required to be licensed;","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+40V",
+                      "2.",L_ARIAL_9,"<033>&a1500h+0V","Liability assumed ",
+                      "under contract, except as described below.","<NL>",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "C.",L_ARIAL_9,"<033>&a1300h+0V","Professional liability ",
+                      "includes error or omission, malpractice, or mistake in ",
+                      "connection with","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "rendering or failure to render professional services at ",
+                      L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,
+                      "retail drug store. This includes","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "distribution, handling, sale, or use of goods or ",
+                      "products of another by an ",L_ARIAL_ITALIC_9,
+                      "insured ",L_ARIAL_9,"when the","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "occurrence takes place after the ",L_ARIAL_ITALIC_9,
+                      "insured ",L_ARIAL_9,"has relinquished physical ",
+                      "possession of such to","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "others. This also includes a warranty of the fitness of ",
+                      L_ARIAL_ITALIC_9,"your products ",L_ARIAL_9,"or goods.",
+                      "<NL>")
+
+Screen Exit
+Closefile(L_FILE_NAME)
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+End

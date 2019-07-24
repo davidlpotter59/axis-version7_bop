@@ -1,0 +1,344 @@
+%%
+/*
+Date Written: May 5, 2008
+
+Name: bopmgk011.sd
+
+
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+05/05/2008             JLB           Bop version of form created
+===========================
+*/
+
+Program
+  Name = "bopmgk011";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+  String L_FILE_NAME[12] = "bopmgk011.cq",
+         l_company_id[10];
+  Unsigned ascii number l_max_lines;
+  Unsigned Ascii Number L_YEAR[4];
+  Unsigned Ascii number L_LINE_OF_BUSINESS[4];
+  Unsigned ascii number l_found[1];
+  Unsigned Ascii Number L_ITEM_COUNTER;
+  Unsigned Ascii Number L_STATE[2]=0;
+  wdate L_EFF_DATE;
+  Unsigned Ascii Number L_LINE_COUNTER;
+  Unsigned Ascii Number L_PAGE_NUMBER;
+  unsigned ascii number l_counter[4]= 1;
+  unsigned ascii number l_location_counter[4]= 1;
+  unsigned ascii number l_do_ones[1]= 0;
+  unsigned ascii number l_vert_pos = 0;
+  unsigned ascii number l_loop = 0;
+  unsigned ascii number l_new_page = 1;
+  unsigned ascii number l_type[1] ;
+  String L_SFPLOCATION_ZIP[10];
+  string l_code[7] ;
+
+   Include "csfonts.inc"
+   Include "swsut100.var"
+   Include "swsut200.var"
+ --Include "swsut300.var"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPNAME,
+   Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access bopgeneral,
+   Set bopgeneral:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       bopgeneral:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       bopgeneral:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access bopgaragekeepers,
+   Set bopgaragekeepers:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       bopgaragekeepers:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       bopgaragekeepers:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPLOCATION,
+   Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access sfpend_alias,
+   Set sfpend_alias:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       sfpend_alias:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       sfpend_alias:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+   Include "swsut100.inc"
+   I_CODE = "MGK011"
+   Include "swsut200.inc"
+ --Include "swsut300.var"
+
+Access bopgaragekeepers,
+   Set bopgaragekeepers:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       bopgaragekeepers:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       bopgaragekeepers:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+ While bopgaragekeepers:POLICY_NO    = SFPPRINT1:POLICY_NO And
+       bopgaragekeepers:POL_YEAR     = SFPPRINT1:POL_YEAR And
+       bopgaragekeepers:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+    {
+    l_state            = bopgeneral:state
+    L_COMPANY_ID       = sfpname:COMPANY_ID
+    L_LINE_OF_BUSINESS = sfpname:LINE_OF_BUSINESS
+
+    l_type = 1
+    access bpsgaragededuct, set bpsgaragededuct:company_id       = l_company_id,
+                                bpsgaragededuct:state            = l_state,
+                                bpsgaragededuct:line_of_business = l_line_of_business,
+                                bpsgaragededuct:type             = l_type,
+                                bpsgaragededuct:deductible       = bopgaragekeepers:comp_deductible, generic
+
+      Access SFSOPTEND,
+         Set SFSOPTEND:COMPANY_ID       = L_COMPANY_ID,
+             SFSOPTEND:STATE            = L_STATE,
+             SFSOPTEND:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS,
+             SFSOPTEND:CODE             = I_CODE, generic
+
+       While SFSOPTEND:COMPANY_ID       = L_COMPANY_ID and
+             SFSOPTEND:STATE            = L_STATE and
+             SFSOPTEND:LINE_OF_BUSINESS = l_LINE_OF_BUSINESS and
+             SFSOPTEND:CODE             = I_CODE
+
+         {  --start of sfsoptend check
+           If (sfpname:eff_date >= sfsoptend:eff_date and
+              (sfpname:eff_date < sfsoptend:exp_date or
+               sfsoptend:exp_date = 0)) then
+             {
+               l_eff_date = sfsoptend:eff_date
+             }
+           next sfsoptend
+         }
+
+      Access SFSOPTEND,
+         Set SFSOPTEND:COMPANY_ID       = L_COMPANY_ID,
+             SFSOPTEND:STATE            = L_STATE,
+             SFSOPTEND:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS,
+             SFSOPTEND:CODE             = I_CODE,
+             SFSOPTEND:EFF_DATE         = L_EFF_DATE, exact
+
+      If sfsoptend:edition <> 0 then
+        {
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a420h7080V")
+          Writefile(L_FILE_NAME,"%s","Ed. ")
+          Writefile(L_FILE_NAME,"%n",sfsoptend:edition)
+        }
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a420h7200V")
+      Writefile(L_FILE_NAME,"%s",l_copyright_6)
+      Writefile(L_FILE_NAME,"%s"," ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s",sfsoptend:COPYRIGHT)
+      Writefile(L_FILE_NAME,"%s","<033>&a200h+120V")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a0h120V")
+      Writefile(L_FILE_NAME,"%s","<033>*c5500h8v0p") --Horizontal line
+      Writefile(L_FILE_NAME,"%s","<033>&a720h+120V")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+      Writefile(L_FILE_NAME,"%s","SUPPLEMENTAL DECLARATIONS - GARAGEKEEPERS' - ")
+      Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+      Writefile(L_FILE_NAME,"%s"," ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD)
+      Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      Writefile(L_FILE_NAME,"%s","<033>&a0h-90V")
+      Writefile(L_FILE_NAME,"%s","<033>*c5500h8v0p") --Horizontal line
+
+      Writefile(L_FILE_NAME,"%s","<033>&a2400h+360V")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","SCHEDULE")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a0h+40V<033>*c5500h8v0P")   --Horizontal line
+      Writefile(L_FILE_NAME,"%s",l_push)
+
+      Writefile(L_FILE_NAME,"%s","<033>&a0h+0V<033>*c4a795b0P")   -- vertical
+      Writefile(L_FILE_NAME,"%s","<033>&a450h+0V<033>*c4a460b0P")   -- vertical
+      Writefile(L_FILE_NAME,"%s","<033>&a1500h+0V<033>*c4a460b0P")   -- vertical
+      Writefile(L_FILE_NAME,"%s","<033>&a4500h+0V<033>*c4a460b0P")   -- vertical
+      Writefile(L_FILE_NAME,"%s","<033>&a5490h+0V<033>*c4a795b0P")   -- vertical
+      Writefile(L_FILE_NAME,"%s","<033>&a0h+250V<033>*c5500h8v0P")   --Horizontal line
+      Writefile(L_FILE_NAME,"%s","<033>&a0h+40V<033>*c5500h8v0P")   --Horizontal line
+
+      Writefile(L_FILE_NAME,"%s","<033>&a450h+520V<033>*c5050h8v0P")   --Horizontal line
+      Writefile(L_FILE_NAME,"%s","<033>&a0h+300V<033>*c5500h8v0P")   --Horizontal line
+
+      Writefile(L_FILE_NAME,"%s","<033>&a0h+180V<033>*c5500h8v0P")   --Horizontal line
+      Writefile(L_FILE_NAME,"%s","<033>&a450h+0V<033>*c4a260b0P")   -- vertical
+      Writefile(L_FILE_NAME,"%s","<033>&a0h+250V<033>*c5500h8v0P")   --Horizontal line
+      Writefile(L_FILE_NAME,"%s","<033>&a0h+360V<033>*c5500h8v0P")   --Horizontal line
+
+      writefile(l_file_name,"%s",l_pop)
+      Writefile(L_FILE_NAME,"%s","<033>&a20h+120V")
+      Writefile(L_FILE_NAME,"%s","Location")
+      Writefile(L_FILE_NAME,"%s","<033>&a120h+120V")
+      Writefile(L_FILE_NAME,"%s","No.")
+      Writefile(L_FILE_NAME,"%s","<033>&a600h-60V")
+      Writefile(L_FILE_NAME,"%s","Coverages")
+      Writefile(L_FILE_NAME,"%s","<033>&a2200h+0V")
+      Writefile(L_FILE_NAME,"%s","Limit of Liability For Each Location")
+      Writefile(L_FILE_NAME,"%s","<033>&a4700h+0V")
+      Writefile(L_FILE_NAME,"%s","Premium")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a1550h+240V")
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      writefile(l_file_name,"%s","$")
+
+       Writefile(L_FILE_NAME,"%s",L_letter_gothic_bold_10)
+       Writefile(L_FILE_NAME,"%s","<033>&a1600h+0V")
+       writefile(l_file_name,"%s",Str(bopgaragekeepers:limit,"ZZZ,ZZZ,ZZZ"))
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+       Writefile(L_FILE_NAME,"%s","<033>&a2250h+0V")
+       writefile(l_file_name,"%s","MINUS")
+
+       Writefile(L_FILE_NAME,"%s","<033>&a2600h+0V")
+       writefile(l_file_name,"%s","$")
+
+       Writefile(L_FILE_NAME,"%s",L_letter_gothic_bold_10)
+       Writefile(L_FILE_NAME,"%s","<033>&a2650h+0V")
+       writefile(l_file_name,"%s",Str(bopgaragekeepers:comp_deductible,"ZZZ,ZZZ"))
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+       Writefile(L_FILE_NAME,"%s","<033>&a3300h+0V")
+       Writefile(L_FILE_NAME,"%s","DEDUCTIBLE FOR EACH")
+       Writefile(L_FILE_NAME,"%s","<033>&a3400h+120V")
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+       Writefile(L_FILE_NAME,"%s","COVERED ")
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_italic_9)
+       Writefile(L_FILE_NAME,"%s","AUTO")
+
+       Writefile(L_FILE_NAME,"%s","<033>&a500h+40V")
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+       writefile(l_file_name,"%s","Comprehensive*")
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+       Writefile(L_FILE_NAME,"%s","<033>&a2250h+80V")
+       writefile(l_file_name,"%s","MINUS")
+
+       Writefile(L_FILE_NAME,"%s","<033>&a2600h+0V")
+       writefile(l_file_name,"%s","$")
+
+       Writefile(L_FILE_NAME,"%s",L_letter_gothic_bold_10)
+       Writefile(L_FILE_NAME,"%s","<033>&a2650h+0V")
+       writefile(l_file_name,"%s",Str(bpsgaragededuct:deductible_per_loss,"ZZZ,ZZZ"))
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+       Writefile(L_FILE_NAME,"%s","<033>&a3300h+00V")
+       Writefile(L_FILE_NAME,"%s","DEDUCTIBLE FOR")
+
+Access bopgeneral,
+   Set bopgeneral:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       bopgeneral:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       bopgeneral:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+--if bopgeneral:prem_no
+            Writefile(L_FILE_NAME,"%s","<033>&a125h+120V")
+            Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+            writefile(l_file_name,"%n",l_counter)
+
+
+       Writefile(L_FILE_NAME,"%s","<033>&a3400h+0V")
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+       Writefile(L_FILE_NAME,"%s","EACH LOSS")
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+       Writefile(L_FILE_NAME,"%s","<033>&a600h+160V")
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_bold_9)
+       writefile(l_file_name,"%s","Collision")
+
+       Writefile(L_FILE_NAME,"%s","<033>&a1550h+0V")
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+       writefile(l_file_name,"%s","$")
+
+       Writefile(L_FILE_NAME,"%s",L_letter_gothic_bold_10)
+       Writefile(L_FILE_NAME,"%s","<033>&a1600h+0V")
+       writefile(l_file_name,"%s",Str(bopgaragekeepers:limit,"ZZZ,ZZZ,ZZZ"))
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+       Writefile(L_FILE_NAME,"%s","<033>&a2250h+0V")
+       writefile(l_file_name,"%s","MINUS")
+
+       Writefile(L_FILE_NAME,"%s","<033>&a2600h+0V")
+       writefile(l_file_name,"%s","$")
+
+       Writefile(L_FILE_NAME,"%s",L_letter_gothic_bold_10)
+       Writefile(L_FILE_NAME,"%s","<033>&a2650h+0V")
+       writefile(l_file_name,"%s",Str(bopgaragekeepers:coll_deductible,"ZZZ,ZZZ"))
+
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+       Writefile(L_FILE_NAME,"%s","<033>&a3300h+0V")
+       Writefile(L_FILE_NAME,"%s","DEDUCTIBLE FOR EACH")
+       Writefile(L_FILE_NAME,"%s","<033>&a3400h+120V")
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+       Writefile(L_FILE_NAME,"%s","COVERED ")
+       Writefile(L_FILE_NAME,"%s",L_ARIAL_italic_9)
+       Writefile(L_FILE_NAME,"%s","AUTO")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a20h+200V")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_bold_9)
+      Writefile(L_FILE_NAME,"%s","LOCATIONS WHERE THE NAMED ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_italic_bold_9)
+      Writefile(L_FILE_NAME,"%s","INSURED ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_bold_9)
+      Writefile(L_FILE_NAME,"%s","CONDUCTS ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_italic_bold_9)
+      Writefile(L_FILE_NAME,"%s","GARAGE OPERATIONS:")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a20h+140V")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_bold_9)
+      Writefile(L_FILE_NAME,"%s","Location")
+      Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+      Writefile(L_FILE_NAME,"%s","Address")
+      Writefile(L_FILE_NAME,"%s","<033>&a120h+120V")
+      Writefile(L_FILE_NAME,"%s","No.")
+      Writefile(L_FILE_NAME,"%s","<033>&a1600h+0V")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","State named ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_italic_9)
+      Writefile(L_FILE_NAME,"%s","insured's ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","main business location as Location No. 1.")
+
+            Writefile(L_FILE_NAME,"%s","<033>&a125h+120V")
+            Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+            writefile(l_file_name,"%n",l_counter)
+
+      l_counter = l_counter + 1
+
+  For l_loop = 1 to 3
+    {
+      If bopgaragekeepers:vacant_land[l_loop] <> "0" then
+        {
+          Writefile(L_FILE_NAME,"%s","<033>&a500h+0V")
+          Writefile(L_FILE_NAME,"%s",Trun(bopgaragekeepers:vacant_land[l_loop]))
+          Writefile(L_FILE_NAME,"%s","<NL>")
+        }
+    }
+
+      Writefile(L_FILE_NAME,"%s","<033>&a20h+240V")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","* Comprehensive deductible applies to Theft, Vandalism, or Malicious Mischief losses only.")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      Writefile(L_FILE_NAME,"%s","<FF>")
+
+      next bopgaragekeepers
+      }---bopgaragekeepers
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

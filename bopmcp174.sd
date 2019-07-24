@@ -1,0 +1,255 @@
+%%
+/*
+Date Written: December 27, 2002
+
+Name: bopmcp174.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+12/27/2002             RMG            Converting form from VCQ to VCS
+
+===========================
+*/
+
+Program
+  Name = "bopmcp174";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopmcp174.cq";
+ String L_SFPLOCATION_ZIP[10];
+ Unsigned Ascii Number L_LOOP;
+
+   Include "csfonts.inc"
+   Include "swsut100.var"
+   Include "swsut200.var"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPEND,
+       Set SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+   Include "swsut100.inc"
+   I_CODE = "MCP174 "
+   Include "swsut200.inc"
+
+While SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO And
+      SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR And
+      SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+  If SFPEND:CODE = "MCP174 " Then
+    {
+      Access BOPENDORSE,
+         Set BOPENDORSE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+             BOPENDORSE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+             BOPENDORSE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+             BOPENDORSE:PREM_NO      = SFPEND:PREM_NO,
+             BOPENDORSE:BUILD_NO     = SFPEND:BUILD_NO,
+             BOPENDORSE:CODE         = "MCP174 ", Generic
+
+      Access SFPLOCATION,
+         Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+             SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+             SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+             SFPLOCATION:PREM_NO      = SFPEND:PREM_NO,
+             SFPLOCATION:BUILD_NO     = SFPEND:BUILD_NO, Generic
+
+      L_SFPLOCATION_ZIP =  If (Val(SFPLOCATION:STR_ZIPCODE[6,9]) = 0) Then
+                                   SFPLOCATION:STR_ZIPCODE[1,5]
+                           Else
+                                   SFPLOCATION:STR_ZIPCODE[1,5] + "-" +
+                                   SFPLOCATION:STR_ZIPCODE[6,9]
+
+      Writefile(L_FILE_NAME,"%s","<033>&a420h7000V")
+      Writefile(L_FILE_NAME,"%s",L_COPYRIGHT_12)
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s"," 1996 MSO, Inc.")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+      Writefile(L_FILE_NAME,"%s","<033>&a4300h120V")
+      Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+      Writefile(L_FILE_NAME,"%s"," ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+      Writefile(L_FILE_NAME,"%s","REDUCED LIMIT WHEN PREMISES CLOSED FOR BUSINESS")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+      Writefile(L_FILE_NAME,"%s","This endorsement establishes a reduced limit for inside the premises money and securities")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+      Writefile(L_FILE_NAME,"%s","coverage when the premises is not open for business. The required information may be shown")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+      Writefile(L_FILE_NAME,"%s","below or elsewhere in this policy.")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+      Writefile(L_FILE_NAME,"%s","The provisions of this endorsement apply only when the endorsement number is listed in the")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+      Writefile(L_FILE_NAME,"%s","Declarations. Except as provided below, all other provisions in this policy are unchanged.")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a300h-60V<033>*c5000h5v0P")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+      Writefile(L_FILE_NAME,"%s","Policy # ")
+      Writefile(L_FILE_NAME,"%n",SFPPRINT1:POLICY_NO)
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+      Writefile(L_FILE_NAME,"%s","SCHEDULE")
+      Writefile(L_FILE_NAME,"%s","<033>&a1000h+0V")
+      Writefile(L_FILE_NAME,"%s","Location ")
+      Writefile(L_FILE_NAME,"%s",Str(SFPEND:PREM_NO,"ZZZZ"))
+      Writefile(L_FILE_NAME,"%s","<033>&a1800h+0V")
+      Writefile(L_FILE_NAME,"%s","Building ")
+      Writefile(L_FILE_NAME,"%s",Str(SFPEND:BUILD_NO,"ZZZZ"))
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+      Writefile(L_FILE_NAME,"%s","Number *")
+      Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+      Writefile(L_FILE_NAME,"%s","Limit")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+      Writefile(L_FILE_NAME,"%s",SFPLOCATION:ADDRESS)
+      Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","$")
+      Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+      Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:LIMIT[1],"ZZ,ZZZ,ZZZ"))
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+
+      For L_LOOP = 1 To 3
+        {
+          If SFPLOCATION:ADDRESS1[L_LOOP] <> "" Then
+            {
+              Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+              Writefile(L_FILE_NAME,"%s",SFPLOCATION:ADDRESS1[L_LOOP])
+              Writefile(L_FILE_NAME,"%s","<NL>")
+            }
+        }
+
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+      Writefile(L_FILE_NAME,"%s",Trun(SFPLOCATION:CITY))
+      Writefile(L_FILE_NAME,"%s",", ")
+      Writefile(L_FILE_NAME,"%s",SFPLOCATION:STR_STATE)
+      Writefile(L_FILE_NAME,"%s"," ")
+      Writefile(L_FILE_NAME,"%s",L_SFPLOCATION_ZIP)
+
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+1000V")
+      Writefile(L_FILE_NAME,"%s","* Item No. or Location / Building No. as Shown in the Declarations.")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+      Writefile(L_FILE_NAME,"%s","COVERAGE MODIFICATION")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a1400h+0V")
+      Writefile(L_FILE_NAME,"%s","With regard to the described ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+      Writefile(L_FILE_NAME,"%s","premises ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","shown in the Schedule, the Limit of Liability shown in the")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a1400h+0V")
+      Writefile(L_FILE_NAME,"%s","Crime Declarations for Inside the ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+      Writefile(L_FILE_NAME,"%s","Premises Money and Securities ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","coverage (MCP 173) is reduced")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a1400h+0V")
+      Writefile(L_FILE_NAME,"%s","to the limit shown in this endorsement (MCP 174) while such premises are closed for business")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a1400h+0V")
+      Writefile(L_FILE_NAME,"%s","and a custodian is not on duty.")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+      Writefile(L_FILE_NAME,"%s","ADDITIONAL DEFINITION")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a1400h+0V")
+      Writefile(L_FILE_NAME,"%s","Custodian ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","means ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+      Writefile(L_FILE_NAME,"%s","you, ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","any of your partners or any employee while having care and custody of")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a1400h+0V")
+      Writefile(L_FILE_NAME,"%s","the subject property inside the ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+      Writefile(L_FILE_NAME,"%s","premises, ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","other than while acting as a janitor or watchperson. A")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a1400h+0V")
+      Writefile(L_FILE_NAME,"%s","watchperson means any person you retain specifically to have care and custody of property inside")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s","<033>&a1400h+0V")
+      Writefile(L_FILE_NAME,"%s","the ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+      Writefile(L_FILE_NAME,"%s","premises ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","and who has no other duties.")
+      Writefile(L_FILE_NAME,"%s","<FF>")
+    }
+  Next SFPEND
+}
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

@@ -1,0 +1,125 @@
+%%
+Program
+        Name = "bopup11c"
+        Type = "File" ;
+        Padcharacter = Space ;
+        Domain = "FLAT" ;
+
+        Local Unsigned Ascii Number l_policy_no[9],
+                                    l_end_sequence[4],
+                                    L_PREM_NO[4],
+                                    L_BUILD_NO[4],
+                                    L_SUB[2] ,
+                                    l_eq_construction[1]=0,
+                                    l_eq_building_rate[5]=0/dec=3,
+                                    l_eq_contents_rate[5]=0/dec=3,
+                                    l_eq_deductible[5]=0,
+                                    l_deductible_rate[4]=0/dec=2,
+                                    l_deductible_per[2]=0 ,
+                                    l_eq_deduct_rate[4]=0/dec=2 ,
+                                    l_per[4] ;
+
+        local signed ascii number l_eq_building_premium[9]=0/dec=2,
+                                  l_eq_contents_premium[9]=0/dec=2 ;
+
+
+        Local String L_SFPEND_MINIMUM_PREMIUM[1] ;
+
+        Include "plprate.var"
+
+Initialisation
+l_policy_no = Val(COMMANDLINE[1,9])
+l_year = val(commandline[10,13])
+l_end_sequence = val(commandline[14,17])
+L_PREM_NO = Val(COMMANDLINE[18,21])
+L_BUILD_NO = Val(COMMANDLINE[22,25])
+L_CODE = COMMANDLINE[26,32]
+
+Do earthquake
+
+update
+
+Procedure Definition
+
+Procedure earthquake
+Begin
+access sfpname, set sfpname:policy_no = l_policy_no,
+                    sfpname:pol_year = l_year,
+                    sfpname:end_sequence = l_end_sequence, generic
+
+access bopgeneral, set bopgeneral:policy_no = l_policy_no,
+                       bopgeneral:pol_year = l_year,
+                       bopgeneral:end_sequence = l_end_sequence,
+                       bopgeneral:prem_no  = l_prem_no,
+                       bopgeneral:build_no = l_build_no, generic
+
+access bopendorse, set bopendorse:policy_no = l_policy_no,
+                       bopendorse:pol_year = l_year,
+                       bopendorse:end_sequence = l_end_sequence,
+                       bopendorse:prem_no  = l_prem_no,
+                       bopendorse:build_no = l_build_no, generic
+
+l_state = bopgeneral:state
+l_eq_construction = bopendorse:construction
+access bpsearthquake, set bpsearthquake:company_id = sfpname:company_id,
+                          bpsearthquake:state = l_state,
+                          bpsearthquake:line_of_business = sfpname:line_of_business,
+                          bpsearthquake:construction = l_eq_construction, generic
+
+while bpsearthquake:company_id = sfpname:company_id and
+      bpsearthquake:state = l_state and
+      bpsearthquake:line_of_business = sfpname:line_of_business and
+      bpsearthquake:construction = l_eq_construction
+        begin
+        if sfpname:eff_date >= bpsearthquake:reff_date then
+            begin
+            l_eq_building_rate = bpsearthquake:building_rate
+            switch(bopendorse:rate_class)
+              case 1  : l_eq_contents_rate = bpsearthquake:contents_rate[1]
+              case 2  : l_eq_contents_rate = bpsearthquake:contents_rate[2]
+              default : l_eq_contents_rate = bpsearthquake:contents_rate[3]
+              end
+            l_deductible_rate = bpsearthquake:deductible_rate
+            l_deductible_per = bpsearthquake:deductible_per
+            l_per = bpsearthquake:per
+            l_eq_deductible = bpsearthquake:deductible
+            end
+
+        next bpsearthquake
+        end
+
+write("%c%n",1005,l_eq_deductible)
+if bopendorse:deductible[1] > l_eq_deductible then
+    begin
+/*    l_eq_deduct_rate   = (((bopendorse:deductible[1] -
+                         l_eq_deductible) divide l_deductible_per) *
+                         l_deductible_rate)*/
+    l_eq_deduct_rate   = ((100 - ((((bopendorse:deductible[1] -
+                         l_eq_deductible) divide l_deductible_per) *
+                         l_deductible_rate) * 100)) divide 100)
+
+    l_eq_building_rate = l_eq_building_rate * l_eq_deduct_rate
+    l_eq_contents_rate = l_eq_contents_rate * l_eq_deduct_rate
+    end
+
+if bopgeneral:building_limit <> 0 then
+    l_eq_building_premium = ((bopgeneral:building_limit divide l_per) *
+                            l_eq_building_rate)
+if bopgeneral:property_limit <> 0 then
+    l_eq_contents_premium = ((bopgeneral:property_limit divide l_per) *
+                            l_eq_contents_rate)
+
+write("%c%n",1015,l_eq_building_premium)
+pause(2000)
+change bopendorse
+    begin
+    bopendorse:eq_deduct_rate = l_eq_deduct_rate
+    bopendorse:eq_premium[1]  = l_eq_building_premium
+    bopendorse:eq_premium[2]  = l_eq_contents_premium
+    bopendorse:premium        = l_eq_building_premium +
+                                l_eq_contents_premium
+    end
+
+end
+
+End

@@ -1,0 +1,163 @@
+%%
+/*
+Date Written: November 13, 2002
+
+Name: bopbu0405.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+11/13/2002             RMG              Upgrade to VCS from VCQ
+
+===========================
+*/
+
+Program
+  Name         = "bopbu0405";
+  Type         = "File";
+  Domain       = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0405.cq";
+ String L_COPY_NAME[20] ;
+ Unsigned Ascii Number L_LINE_COUNTER;
+ String L_SFPLOCATION_ZIP;
+ String L_BOPADDIN_ZIP;
+ Unsigned Ascii Number L_LOOP;
+
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "sfsrevname.var"
+   Include "csfonts.inc"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+
+Update
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPEND,
+       Set SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFSCOMPANY,
+       Set SFSCOMPANY:COMPANY_ID = SFPNAME:COMPANY_ID, Exact
+
+Include "swsut100.inc"
+I_CODE = "BU0405 "
+Include "swsut200.inc"
+
+While SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO And
+      SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR And
+      SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+  Access BOPBU0405,
+     Set BOPBU0405:POLICY_NO = SFPPRINT1:POLICY_NO,
+         BOPBU0405:POL_YEAR  = SFPPRINT1:POL_YEAR,
+         BOPBU0405:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+         BOPBU0405:PREM_NO      = SFPEND:PREM_NO,
+         BOPBU0405:BUILD_NO     = SFPEND:BUILD_NO, Generic
+
+  If SFPEND:CODE = "BU0405 " Then
+    {
+      If sfsoptend:edition <> 0 then
+        {
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a420h7080V")
+          Writefile(L_FILE_NAME,"%s","Ed. ")
+          Writefile(L_FILE_NAME,"%n",sfsoptend:edition)
+        }
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7200V",
+                             L_COPYRIGHT_6,L_ARIAL_9," 1994 MSO, Inc.")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+      Writefile(L_FILE_NAME,"%s","<033>&a4400h120V")
+      Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+      Writefile(L_FILE_NAME,"%s"," ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+      Writefile(L_FILE_NAME,"%s","<033>&a1400h+0V")
+      Writefile(L_FILE_NAME,"%s","-->MISCELLANEOUS CHANGE ENDORSEMENT FORM")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a200h+0V")
+      Writefile(L_FILE_NAME,"%s","Policy Number: ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%n",SFPPRINT1:POLICY_NO)
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+      Writefile(L_FILE_NAME,"%s","Effective Date: ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s",Str(SFPNAME:EFF_DATE,"mm/dd/yyyy"))
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a200h+0V")
+      Writefile(L_FILE_NAME,"%s","Named Insured:")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+
+      For L_LOOP = 1 To 3
+        {
+          If SFPNAME:NAME[L_LOOP] <> "" Then
+            {
+              I_NAME = SFPNAME:NAME[L_LOOP]
+              Include "sfsrevname.pro"
+              Writefile(L_FILE_NAME,"%s","<033>&a900h+0V")
+              Writefile(L_FILE_NAME,"%s",I_REV_NAME)
+              Writefile(L_FILE_NAME,"%s","<NL>")
+            }
+        }
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a200h+0V")
+      Writefile(L_FILE_NAME,"%s","It is hereby agree and understood that:")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+
+      While  BOPBU0405:POLICY_NO = SFPPRINT1:POLICY_NO And
+             BOPBU0405:POL_YEAR  = SFPPRINT1:POL_YEAR And
+             BOPBU0405:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+        {
+          Writefile(L_FILE_NAME,"%s","<033>&a200h+0V")
+          Writefile(L_FILE_NAME,"%s",BOPBU0405:COMMENTS)
+          Writefile(L_FILE_NAME,"%s","<NL>")
+
+          Next BOPBU0405
+        }
+      Writefile(L_FILE_NAME,"%s","<FF>")
+    }
+  Next SFPEND
+}
+
+Screen Exit
+  Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+  Closefile(L_FILE_NAME)
+End

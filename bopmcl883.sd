@@ -1,0 +1,161 @@
+%%
+/*
+Date Written: May 14, 2002
+
+Name: bopmcl883.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+05/14/2002             RMG          Converting from VCQ to VCS
+08/09/2002             RMG          Adding Code for Edition Date
+12/26/2002             RMG          Fixed Errors
+===========================
+*/
+
+Program
+        Name = "bopmcl883";
+        Type = "File";
+        Domain = "SFPPRINT1";
+        Padcharacter = Space;
+
+        String L_FILE_NAME[12] = "bopmcl883.cq";
+
+        unsigned ascii number l_state[2] ;
+
+        Include "swsut100.var"
+        Include "swsut200.var"
+        Include "swsut300.var"
+        Include "csfonts.inc"
+
+Initialization
+Deletefile (L_FILE_NAME);
+
+Update
+Access SFPNAME, Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+                    SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+                    SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPLOCATION, Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO,
+                        SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR,
+                        SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPEND, Set SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO,
+                   SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR,
+                   SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Include "swsut100.inc"
+I_CODE = "MCL883 "
+Include "swsut200.inc"
+include "swsut300.inc"
+
+While  SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO And
+       SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR And
+       SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+    begin
+    if SFPEND:CODE = i_code Then
+        begin
+        Access BOPGENERAL, Set BOPGENERAL:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+                               BOPGENERAL:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+                               BOPGENERAL:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+                               BOPGENERAL:PREM_NO      = SFPEND:PREM_NO,
+                               BOPGENERAL:BUILD_NO     = SFPEND:BUILD_NO, Generic
+
+        access bopendorse, set bopendorse:policy_no = sfpprint1:policy_no,
+                               bopendorse:pol_year = sfpprint1:pol_year,
+                               bopendorse:end_sequence = sfpprint1:end_sequence,
+                               bopendorse:prem_no = sfpend:prem_no,
+                               bopendorse:build_no = sfpend:build_no,
+                               bopendorse:code = i_code, generic
+
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                              L_COPYRIGHT_6,L_ARIAL_9,sfsoptend:copyright,"<NL>")
+
+        Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+        Writefile(L_FILE_NAME,"%s","<033>&a4300h120V")
+        Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+        Writefile(L_FILE_NAME,"%s"," ")
+        Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+        Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+        Writefile(L_FILE_NAME,"%s","<NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_BOLD_9,"<033>&a90h+0V",
+                      "FUNGI",l_arial_bold_9," / MOLD LIMITATIONS - LIABILITY","<033>&a+0h+20V",
+                      L_BULLET_6,"<033>&a+0h-20V",L_ARIAL_BOLD_9," PART II - NEW JERSEY","<NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a90h+0V","This endorsement extends the Part II exclusions to any occurrence or injury arising out of fungi or mold as described, but","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a90h+0V","provides a limited coverage for injury arising out of fungi or mold.","<NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "The provisions of this endorsement apply only when the endorsement number is listed in the Declarations.",
+                      "<NL>","<033>&a90h+0V","Except as provided below, all other provisions in this policy are unchanged.","<NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a90h+0V","Policy # ",
+                      L_LETTER_GOTHIC_BOLD_10,Str(sfpprint1:policy_no),"<NL>","<NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a90h+0V",l_arial_bold_9,"SCHEDULE","<NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1100h+0V",l_arial_9,"Limit of Liability ","<NL><NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1100h+0V",L_LETTER_GOTHIC_BOLD_10,"$ ",str(bopendorse:limit[1],"ZZ,ZZZ,ZZ9"))
+        Writefile(L_FILE_NAME,"%s%s%s%s%s","<033>&a2000h+0V",l_arial_9,"General Aggregate / Total Limit","<NL>","<NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s","<033>&a90h+0V",l_arial_italic_bold_9,"1.  FUNGI ",l_arial_bold_9,"/ MOLD SUPPLEMENTAL COVERAGE","<NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1100h+0V",l_arial_bold_9,"A.  Coverage ","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s","<033>&a1200h+0V",l_arial_italic_9,"  We",l_arial_9," pay for the benefit of",l_arial_italic_9," insureds,",l_arial_9," up to the limit of liability shown in the Schedule of this","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s","<033>&a1200h+0V",l_arial_9,"  endorsement, those sums that",l_arial_italic_9," insureds ",l_arial_9,"become legally liable to pay as damages because of",l_arial_italic_9," bodily","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s","<033>&a1200h+0V",l_arial_italic_9,"  injury, property damage, advertising injury ",l_arial_9,"or",l_arial_italic_9," personal injury",l_arial_9," resulting from or caused by the","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1200h+0V",l_arial_9,"  actual, alleged, or threatened absorption of, contact with, existence of, exposure to, inhalation of,","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s","<033>&a1200h+0V",l_arial_9,"  ingestion of, or presence of any",l_arial_italic_9," fungi.","<NL><NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1100h+0V",l_arial_bold_9,"B.  Aggregate / Total Limits ","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s","<033>&a1200h+0V",l_arial_italic_9,"  Our",l_arial_9," aggregate / total maximum limit of liability payable under this coverage for all damages for","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s","<033>&a1200h+0V",l_arial_9,"  all",l_arial_italic_9," occurrences ",l_arial_9,"or offenses is the General Aggregate / Total Limit shown in the Schedule. This","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1200h+0V",l_arial_9,"  limit does not increase any limit of liability provided in this policy. If the policy provides an","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1200h+0V",l_arial_9,"  aggregate limit, this coverage limit does not increase, but is subject to, that limit.","<NL><NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s","<033>&a90h+0V",l_arial_bold_9,"2.  ADDITIONAL EXCLUSION - ",l_arial_italic_bold_9,"FUNGI ",l_arial_bold_9,"/ MOLD","<NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1100h+0V",l_arial_9,"Part II C is extended to include the following:","<NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s","<033>&a1100h+0V",l_arial_bold_9,"A.  ",l_arial_9,"Except as provided in",l_arial_italic_9," Fungi ",l_arial_9,"/ Mold Supplemental Coverage (Item 1 above),")
+        writefile(l_file_name,"%s%s%s%s%s",l_arial_italic_9," we ",l_arial_9,"do not cover","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s","<033>&a1200h+0V",l_arial_italic_9,"  bodily injury, property damage, advertising injury, personal injury;",l_arial_9," or medical payments","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1200h+0V",l_arial_9,"  resulting from or caused by the actual, alleged, or threatened absorption of, contact with,","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s","<033>&a1200h+0V",l_arial_9,"  existence of, exposure to, inhalation of, ingestion of, or presence of any ",l_arial_italic_9,"fungi.","<NL><NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s","<033>&a1100h+0V",l_arial_bold_9,"B.  ",l_arial_italic_9,"We ",l_arial_9,"do not insure any cost, expense, liability or loss arising out of any of the following:","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s","<033>&a1200h+0V",l_arial_bold_9,"  1.  ",l_arial_9,"Any demand, directive, order, or request that any",l_arial_italic_9," insured ",l_arial_9,"or others clean up, contain,","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1300h+0V",l_arial_9,"   detoxify, monitor, neutralize, remove, test for, or treat, or in any way assess the effects of or","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s","<033>&a1300h+0V",l_arial_9,"   respond to",l_arial_italic_9," fungi.","<NL><NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s","<033>&a1200h+0V",l_arial_bold_9,"  2.  ",l_arial_9,"Any claim or suit by, or on behalf of, any governmental authority for damages or","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1300h+0V",l_arial_9,"   reimbursement because of cleaning up, containing, detoxifying, monitoring, neutralizing,","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s","<033>&a1300h+0V",l_arial_9,"   removing, testing for, treating, or in any way assessing the effects of or responding to",l_arial_italic_9," fungi.","<NL><NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s","<033>&a1100h+0V",l_arial_9,"However, these exclusions do not apply to",l_arial_italic_9," bodily injury ",l_arial_9,"resulting form the ingestion of foods, goods or","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1100h+0V",l_arial_9,"products intended for human consumption.","<NL><NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a90h+0V",l_arial_bold_9,"3.  ADDITIONAL DEFINITIONS","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1100h+0V",l_arial_9,"The following special definitions apply:","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s","<033>&a1100h+0V",l_arial_italic_9,"Fungi ",l_arial_9,"means any type or form of fungus, mold, mildew, spores, algae, smut, protists, rusts or ",l_arial_italic_9,"rot and","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s","<033>&a1100h+0V",l_arial_italic_9,"decay organisms, ",l_arial_9,"and any similar or related organisms and any mycotoxin, substance, compounds,","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s","<033>&a1100h+0V",l_arial_9,"chemicals, mist or vapor produced by any ",l_arial_italic_9,"fungi ",l_arial_9,"in any form, or any by-products or waste produced by","<NL>")
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+0V",l_arial_italic_9,"fungi, ",l_arial_9,"but does not include any ",l_arial_italic_9,"fungi ",l_arial_9,"intended to be edible.","<NL><NL>")
+
+        Writefile(L_FILE_NAME,"%s%s%s%s%s%s","<033>&a1100h+0V",l_arial_italic_9,"Rot and decay organisms ",l_arial_9,"means any living organism that causes decomposition of physical property.","<NL>")
+        end
+
+    Next SFPEND
+    end
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

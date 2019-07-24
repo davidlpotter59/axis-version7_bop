@@ -1,0 +1,135 @@
+%%
+Program
+        Name = "bopUP11i" ;
+        Type = "File" ;
+        Padcharacter = Space ;
+        Domain = "FLAT" ;
+
+        Global Unsigned Ascii Number G_policy_no[9] ,
+                                     g_year[4],
+                                     g_end_sequence[4],
+                                     g_prem_no[4],
+                                     g_build_no[4] ;
+
+        Local unsigned ascii number l_limit[8],
+                                    l_liability_code[2],
+                                    l_barber_premium[6],
+                                    l_beauty_full_premium[6],
+                                    l_beauty_part_premium[6],
+                                    l_manicurists_premium[6],
+                                    l_update_sfpend_premium[6];
+
+        wdate l_eff_date ;
+
+initialisation
+g_policy_no   = val(commandline[1,9])
+g_year        = val(commandline[10,13])
+g_end_sequence = val(commandline[14,17])
+g_prem_no     = val(commandline[18,21])
+g_build_no    = val(commandline[22,25])
+
+access sfpmaster, set sfpmaster:policy_no    = g_policy_no,
+                      sfpmaster:pol_year     = g_year,
+                      sfpmaster:end_sequence = g_end_sequence, generic
+
+access sfpname, set sfpname:policy_no    = g_policy_no,
+                    sfpname:pol_year     = g_year,
+                    sfpname:end_sequence = g_end_sequence, generic
+
+access bopgeneral, set bopgeneral:policy_no    = g_policy_no,
+                       bopgeneral:pol_year     = g_year,
+                       bopgeneral:end_sequence = g_end_sequence,
+                       bopgeneral:prem_no      = g_prem_no,
+                       bopgeneral:build_no     = g_build_no, generic
+
+
+do rate_coverages
+
+update
+
+Procedure Definition
+
+procedure rate_coverages
+begin
+l_liability_code = sfpmaster:liability_code
+access sfsliability, set sfsliability:company_id       = bopgeneral:company_id,
+                         sfsliability:state            = bopgeneral:state,
+                         sfsliability:line_of_business = bopgeneral:line_of_business,
+                         sfsliability:liability_code   = l_liability_code, generic
+
+l_limit = sfsliability:limit
+access bpsbarber, set bpsbarber:company_id       = bopgeneral:company_id,
+                      bpsbarber:state            = bopgeneral:state,
+                      bpsbarber:limit            = l_limit,
+                      bpsbarber:line_of_business = bopgeneral:line_of_business, generic
+
+while bpsbarber:company_id       = bopgeneral:company_id and
+      bpsbarber:state            = bopgeneral:state and
+      bpsbarber:limit            = l_limit and
+      bpsbarber:line_of_business = bopgeneral:line_of_business
+        begin
+        if (sfpname:eff_date >= bpsbarber:eff_date and
+           (sfpname:eff_date <= bpsbarber:exp_date or
+           bpsbarber:exp_date = 0)) then
+            l_eff_date = bpsbarber:eff_date
+
+        next bpsbarber
+        end
+
+access bpsbarber, set bpsbarber:company_id       = bopgeneral:company_id,
+                      bpsbarber:state            = bopgeneral:state,
+                      bpsbarber:line_of_business = bopgeneral:line_of_business,
+                      bpsbarber:limit            = l_limit,
+                      bpsbarber:eff_date         = l_eff_date, generic
+
+access bopbshop, set bopbshop:policy_no = g_policy_no,
+                     bopbshop:pol_year = g_year,
+                     bopbshop:end_sequence = g_end_sequence,
+                     bopbshop:prem_no  = g_prem_no,
+                     bopbshop:build_no = g_build_no, generic
+
+If bopBSHOP:BARBER_FULL_TIME > 0 Then
+    L_BARBER_PREMIUM = bpsbarber:first_barber
+
+If bopBSHOP:BARBER_FULL_TIME > 1 Then
+    L_BARBER_PREMIUM = (L_BARBER_PREMIUM + ((bopBSHOP:BARBER_FULL_TIME - 1) *
+                        bpsbarber:each_addl_barber))
+
+If bopBSHOP:BEAUTY_FULL_TIME > 0 Then
+    L_BEAUTY_FULL_PREMIUM = bopBSHOP:BEAUTY_FULL_TIME * bpsbarber:each_full_time_operator
+
+If bopBSHOP:BEAUTY_PART_TIME > 0 Then
+    L_BEAUTY_PART_PREMIUM = bopBSHOP:BEAUTY_PART_TIME * bpsbarber:each_part_time_operator
+
+If bopBSHOP:MANICURISTS > 0 Then
+    L_MANICURISTS_PREMIUM = bopBSHOP:MANICURISTS * bpsbarber:manicurists
+
+L_UPDATE_SFPEND_PREMIUM = L_BARBER_PREMIUM + L_BEAUTY_FULL_PREMIUM +
+                          L_BEAUTY_PART_PREMIUM + L_MANICURISTS_PREMIUM
+
+access sfpend, set sfpend:policy_no = g_policy_no,
+                   sfpend:pol_year = g_year,
+                   sfpend:end_sequence = g_end_sequence,
+                   sfpend:prem_no  = g_prem_no,
+                   sfpend:build_no = g_build_no, generic
+
+while sfpend:policy_no = g_policy_no and
+      sfpend:pol_year = g_year and
+      sfpend:end_sequence = g_end_sequence and
+      sfpend:prem_no  = g_prem_no and
+      sfpend:build_no = g_build_no
+        begin
+        if sfpend:code = "BU0193" then
+            begin
+            change sfpend
+                begin
+                sfpend:premium = l_update_sfpend_premium
+                end
+            end
+
+        next sfpend
+        end
+
+End
+
+End

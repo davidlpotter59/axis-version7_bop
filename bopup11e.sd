@@ -1,0 +1,126 @@
+%%
+Program
+        Name = "BOPUP11E" ;
+        Type = "File" ;
+        Padcharacter = Space ;
+        Domain = "FLAT" ;
+
+        Global Unsigned Ascii Number G_policy_NO[9] ,
+                                     g_year[4],
+                                     g_end_sequence[4] ,
+                                     g_prem_no[4],
+                                     g_build_no[4] ;
+
+        local string l_company_id[10] ;
+
+        local date l_eff_date[8] ;
+
+        Local Unsigned Ascii Number l_state[2],
+                                    l_line_of_business[4],
+                                    l_liability_code[1],
+                                    l_limit[8] ,
+                                    l_charge[4],
+                                    l_per[4] ;
+
+initialisation
+g_policy_no    = val(commandline[1,9])
+g_year         = val(commandline[10,13])
+g_end_sequence = val(commandline[14,17])
+g_prem_no      = val(commandline[18,21])
+g_build_no     = val(commandline[22,25])
+
+access sfpname, set sfpname:policy_no    = g_policy_no,
+                    sfpname:pol_year     = g_year,
+                    sfpname:end_sequence = g_end_sequence, generic
+
+access sfpmaster, set sfpmaster:policy_no    = g_policy_no,
+                      sfpmaster:pol_year     = g_year,
+                      sfpmaster:end_sequence = g_end_sequence, generic
+
+access bopgeneral, set bopgeneral:policy_no    = g_policy_no,
+                       bopgeneral:pol_year     = g_year,
+                       bopgeneral:end_sequence = g_end_sequence,
+                       bopgeneral:prem_no      = g_prem_no,
+                       bopgeneral:build_no     = g_build_no, generic
+do pools
+
+update
+
+Procedure Definition
+
+procedure pools
+begin
+if bopgeneral:no_pools <> 0 then
+     begin
+     do rate_pools
+     end
+else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year  = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:pool_PREMIUM = 0
+        End
+    End
+
+end
+
+Procedure RATE_pools
+Begin
+L_COMPANY_ID = sfpname:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_EFF_DATE = sfpNAME:EFF_DATE
+switch(sfpmaster:liability_code)
+  case 1  : l_limit = 300000
+  case 2  : l_limit = 500000
+  default : l_limit = 1000000
+  end
+
+access bpspools, set bpspools:company_id       = l_company_id,
+                     bpspools:state            = l_state,
+                     bpspools:line_of_business = l_line_of_business,
+                     bpspools:limit            = l_limit, generic
+
+while bpspools:company_id       = l_company_id and
+      bpspools:state            = l_state and
+      bpspools:line_of_business = l_line_of_business and
+      bpspools:limit            = l_limit
+        begin
+        if (sfpname:eff_date >= bpspools:eff_date and
+           (sfpname:eff_date <= bpspools:exp_date or
+           bpspools:exp_date = 0)) then
+            begin
+            l_charge = bpspools:charge
+            l_per    = bpspools:per
+            end
+
+        next bpspools
+        end
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year  = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year  = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:pool_PREMIUM = ((bopgeneral_alias:no_pools divide
+                                        l_per) *
+                                        l_charge)
+        End
+
+End
+
+End

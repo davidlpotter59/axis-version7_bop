@@ -1,0 +1,177 @@
+%%
+Screen
+        Name            = "bopmt194" ;
+        Type            = "Detail" ;
+        Padcharacter    = Space ;
+        Highlite        = Underscore ;
+        Screensize      = "dynamic" ;
+        Windowtitle = "%a     %s Premium - Ver 7.00     %m" ;
+        Domain          = "bopENDORSE" ;
+        iconline        = 0;
+
+        Global Unsigned Ascii Number G_policy_no[9] ;
+        Global Unsigned Ascii Number G_year[4] ;
+        Global Unsigned Ascii Number G_end_sequence[4] ;
+        Global Unsigned Ascii Number G_PREM_NO[4] ;
+        Global Unsigned Ascii Number G_BUILD_NO[4] ;
+        Global String G_CODE[7] ;
+
+        local string l_company_id[10] ;
+
+        Local Unsigned Ascii Number L_SUB_CODE[4] ,
+                                    l_state[2],
+                                    l_line_of_Business[4],
+                                    l_percent[3];
+
+        Access bopENDORSE,
+           Set bopENDORSE:policy_no = G_policy_no ,
+               bopendorse:pol_year = g_year,
+               bopendorse:end_sequence = g_end_sequence,
+               bopENDORSE:PREM_NO = G_PREM_NO ,
+               bopENDORSE:BUILD_NO = G_BUILD_NO ,
+               bopENDORSE:CODE = G_CODE ;
+
+        Include "STDKEYS7.INC"
+
+style definition
+
+        include "styles.inc"
+
+Functions
+
+        Include "STDFUNC7.INC"
+
+menu definition
+
+        include "stdmenu7.inc"
+
+}
+
+toolbar definition
+
+        include "stdtoolbar7.inc"
+
+}
+
+access validation
+if bopendorse:policy_no <> g_policy_no or
+   bopendorse:pol_year <> g_year or
+   bopendorse:end_sequence <> g_end_sequence or
+   bopendorse:prem_no <> g_prem_no or
+   bopendorse:build_no <> g_build_no or
+   bopendorse:code <> g_code then
+    error 1000 ;
+
+
+screen at 1,1 to 20,80
+Properties
+        {
+        Layouttype = column
+        }
+{
+Panel
+Properties
+        {
+        Borderstyle     = raised
+        }
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| ___ % Green Upgrade Coverage - Increase Cost                                 |
+| ___ % of Green Upgrade Coverage for Green Building Related Costs             |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            bopENDORSE:policy_no    = G_policy_no
+            bopendorse:pol_year     = g_year
+            bopendorse:end_sequence = g_end_sequence
+            bopENDORSE:PREM_NO      = G_PREM_NO
+            bopENDORSE:BUILD_NO     = G_BUILD_NO
+            do subcode
+            bopendorse:sub_code     = l_sub_code
+            bopENDORSE:CODE         = G_CODE
+            End
+
+        access bopgeneral, set bopgeneral:policy_no    = g_policy_no,
+                               bopgeneral:pol_year     = g_year,
+                               bopgeneral:end_sequence = g_end_sequence, generic
+
+        l_company_id       = sfpname:company_id
+        l_state            = bopgeneral:state
+        l_line_of_business = bopgeneral:line_of_business
+        access bpsgreen_alias, set bpsgreen_alias:company_id       = l_company_id,
+                                   bpsgreen_alias:state            = l_state,
+                                   bpsgreen_alias:line_of_business = l_line_of_business, generic
+
+        End
+        bopendorse:percent[1]
+        l_percent = bopendorse:percent[1]
+        access bpsgreen, set bpsgreen:company_id       = l_company_id,
+                             bpsgreen:state            = l_state,
+                             bpsgreen:line_of_business = l_line_of_business,
+                             bpsgreen:percent          = l_percent, generic
+
+        if bopendorse:percent[1] <> bpsgreen:percent then
+            error "Invalid percent entered"
+
+        activehelp bpsgreen_alias:percent ;
+401     begin
+        access bopgeneral, set bopgeneral:policy_no    = g_policy_no,
+                               bopgeneral:pol_year     = g_year,
+                               bopgeneral:end_sequence = g_end_sequence, generic
+
+        l_company_id       = sfpname:company_id
+        l_state            = bopgeneral:state
+        l_line_of_business = bopgeneral:line_of_business
+        l_percent = bopendorse:percent[1]
+        access bpsgreen, set bpsgreen:company_id       = l_company_id,
+                             bpsgreen:state            = l_state,
+                             bpsgreen:line_of_business = l_line_of_business,
+                             bpsgreen:percent          = l_percent, generic
+
+        end
+        bopendorse:percent[2]
+        if bopendorse:percent[2] > bpsgreen:related_cost_percent then
+            error "Up to 25% supplemental limit may be used for Green Building Related Costs";
+
+}
+
+}
+
+Procedure Definition
+
+Procedure SUBCODE
+Begin
+Access bopENDORSE_ALIAS, Set bopENDORSE_ALIAS:policy_no    = G_policy_no,
+                             bopendorse_alias:pol_year     = g_year,
+                             bopendorse_alias:end_sequence = g_end_sequence,
+                             bopENDORSE_ALIAS:PREM_NO      = G_PREM_NO,
+                             bopENDORSE_ALIAS:BUILD_NO     = G_BUILD_NO,
+                             bopENDORSE_ALIAS:CODE         = G_CODE, Generic
+
+L_SUB_CODE = 0
+While bopENDORSE_ALIAS:policy_no    = G_policy_no And
+      bopendorse_alias:pol_year     = g_year and
+      bopendorse_alias:end_sequence = g_end_sequence and
+      bopENDORSE_ALIAS:PREM_NO      = G_PREM_NO And
+      bopENDORSE_ALIAS:BUILD_NO     = G_BUILD_NO And
+      bopENDORSE_ALIAS:CODE         = G_CODE
+        Begin
+        L_SUB_CODE = bopENDORSE_ALIAS:SUB_CODE
+
+        Next bopENDORSE_ALIAS
+        End
+
+l_sub_code = l_sub_code + 10
+End
+
+End

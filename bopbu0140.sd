@@ -1,0 +1,409 @@
+%%
+/*
+Date Written: February 22, 2002
+
+Name: bopbu0140.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+03/14/2002             RMG              Updating form to vcs
+
+===========================
+*/
+
+Program
+  Name = "bopbu0140";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0140.cq";
+ String L_COPY_NAME[20] ;
+ String L_READ;
+ Number L_START_PRINT;       --first character printed
+ Number L_END_PRINT;         --last character printed when l_break reaches 40C
+ Number L_BREAK = 40;       --number of characters printed before break
+ Number L_BREAK_POINT;      --where the break occurs and newline is inserted
+ Number L_LOOP;
+ Number L_PAGE_NUMBER = 1;
+ Number L_ITEM_NO = 1;
+ Unsigned Ascii Number L_ITEM_COUNTER;
+ Unsigned Ascii Number L_LINE_COUNTER;
+ String L_SFPLOCATION_ZIP;
+
+  Include "swsut100.var"
+  Include "swsut200.var"
+  Include "swsut300.var"
+  Include "csfonts.inc"
+
+Initialization
+
+  Deletefile (L_FILE_NAME);
+
+Update
+
+If (Val(SFPLOCATION:STR_ZIPCODE[6,9]) = 0) Then
+  {
+    L_SFPLOCATION_ZIP =  SFPLOCATION:STR_ZIPCODE[1,5]
+  }
+Else
+  {
+    L_SFPLOCATION_ZIP = SFPLOCATION:STR_ZIPCODE[1,5] + "-" +
+                        SFPLOCATION:STR_ZIPCODE[6,9]
+  }
+
+Access SFPLOCATION,
+   Set SFPLOCATION:POLICY_NO         = SFPPRINT1:POLICY_NO ,
+       SFPLOCATION:POL_YEAR           = SFPPRINT1:POL_YEAR ,
+       SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,Generic
+
+Access SFPNAME,
+   Set SFPNAME:POLICY_NO         = SFPPRINT1:POLICY_NO ,
+       SFPNAME:POL_YEAR           = SFPPRINT1:POL_YEAR ,
+       SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE , Generic
+
+Include "swsut100.inc"
+I_CODE = "BU0140 "
+Include "swsut200.inc"
+Include "swsut300.inc"
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%n%s",L_ARIAL_9,"<033>&a420h7000V",
+                      L_COPYRIGHT_6,L_ARIAL_9," 1993 MSO, Inc.",L_ARIAL_BOLD_9,
+                      "<033>&a4850h7000V","Page ",L_PAGE_NUMBER,"<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+Writefile(L_FILE_NAME,"%s","<033>&a4300h120V")
+Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+Writefile(L_FILE_NAME,"%s"," ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_14,"<033>&a1600h+0V",
+                      "BUSINESSOWNERS ENDORSEMENT",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "HIRED / NON-OWNED AUTOMOBILE LIABILITY ",
+                      "<033>&a+0h+20V",L_BULLET_6,"<033>&a+0h-20V",
+                      L_ARIAL_BOLD_9," PART II",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a850h+0V",
+                      "This endorsement extends liability coverage to hired ",
+                      "and non-owned autos.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a850h+0V",
+                      "Except as provided below, all other provisions here ",
+                      "are unchanged.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "COVERAGE EXTENSIONS","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "The Employer's Liability for Non-Owned ",
+                      L_ARIAL_ITALIC_BOLD_9,"Automobiles ",L_ARIAL_BOLD_9,
+                      "Coverage in Part II B is replaced","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "by the following:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "Coverage E is extended to include ",L_ARIAL_ITALIC_9,
+                      "bodily injury ",L_ARIAL_9,"and ",L_ARIAL_ITALIC_9,
+                      "property damage ",L_ARIAL_9,"arising out of:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V","1.",
+                      L_ARIAL_9,"<033>&a1300h+0V","The ",L_ARIAL_ITALIC_9,
+                      "loading or unloading, ")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,
+                      "maintenance, operation or use of a ",L_ARIAL_ITALIC_9,
+                      "hired automobile ",L_ARIAL_9,"by ",L_ARIAL_ITALIC_9,
+                      "you ",L_ARIAL_9,"or ","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1300h+0V",
+                      "your ",L_ARIAL_9,"employees in the course of ",
+                      L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,
+                      "business / operations.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+60V","2.",
+                      L_ARIAL_9,"<033>&a1300h+0V","The ",L_ARIAL_ITALIC_9,
+                      "loading or unloading, ")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"operation or use of a ",
+                      L_ARIAL_ITALIC_9,"non-owned automobile ",L_ARIAL_9,
+                      "in the course of ",L_ARIAL_ITALIC_9,"your","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "business / operations by any person other than ",
+                      L_ARIAL_ITALIC_9,"you.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "GLOSSARY","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "As respects this coverage extension, the definition of ",
+                      L_ARIAL_ITALIC_BOLD_9,"insured ",L_ARIAL_BOLD_9,
+                      "in the Glossary is","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "replaced by the following:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1100h+0V",
+                      "Insured ",L_ARIAL_9,"means the following:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s","<033>&a1100h+30V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_ITALIC_9,"<033>&a1300h+0V","You;",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+20V",
+                      L_BULLET_6,"<033>&a+0h-20V",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Any person using a ",L_ARIAL_ITALIC_9,"hired automobile ",
+                      L_ARIAL_9,"with ",L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,
+                      "permission;","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+30V",
+                      L_BULLET_6,"<033>&a+0h-20V",L_ARIAL_ITALIC_9,
+                      "<033>&a1300h+0V","Your ",L_ARIAL_9,
+                      "partners or executive officers for ",L_ARIAL_ITALIC_9,
+                      "non-owned automobiles ",L_ARIAL_9,"but only while such",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,
+                      "<033>&a1300h+0V","non-owned automobiles ",L_ARIAL_9,
+                      "are being used in the course of ",L_ARIAL_ITALIC_9,
+                      "your ",L_ARIAL_9,"business / operations;",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s","<033>&a1100h+30V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_9,"<033>&a1300h+0V","Any other ",
+                      "person or organization but only with respect to their ",
+                      "liability because of acts or","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "omissions of an ",L_ARIAL_ITALIC_9,"insured ",L_ARIAL_9,
+                      "listed above.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+40V",
+                      "However, none of the following is an ",
+                      L_ARIAL_ITALIC_9,"insured ",L_ARIAL_9,
+                      "as respects this coverage extension:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+30V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_ITALIC_9,"<033>&a1300h+0V",
+                      "Your ",L_ARIAL_9,"partner or executive officer for an ",
+                      L_ARIAL_ITALIC_9,"automobile ",L_ARIAL_9,
+                      "owned by such partner or executive","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "officer or any member of their household.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s","<033>&a1100h+30V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Any person while employed in a business of parking, ",
+                      "repairing, selling, servicing or storing","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1300h+0V",
+                      "automobiles, ",L_ARIAL_9,"other than such business ",
+                      "operated by ",L_ARIAL_ITALIC_9,"you.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+30V",
+                      L_BULLET_6,"<033>&a+0h-20V",L_ARIAL_9,"<033>&a1300h+0V",
+                      "The owner or lessee (of whom ",L_ARIAL_ITALIC_9,"you ",
+                      L_ARIAL_9,"are a sublessee) of a ",L_ARIAL_ITALIC_9,
+                      "hired automobile; ",L_ARIAL_9,"the owner of a","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1300h+0V",
+                      "non-owned automobile; ",L_ARIAL_9,
+                      "any agent or employee of such owner or lessee.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+30V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Any partnership or joint venture, of which the ",
+                      L_ARIAL_ITALIC_9,"insured ",L_ARIAL_9,
+                      "is a partner or member, not named","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "here or those responsible for such.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+60V",
+                      "The Glossary is amended to include the following ",
+                      "definitions:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1100h+0V",
+                      "Hired automobile ",L_ARIAL_9,"means any ",
+                      L_ARIAL_ITALIC_9,"automobile you ",L_ARIAL_9,
+                      "borrow, hire, lease or rent. This does not include",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "any ",L_ARIAL_ITALIC_9,"automobile you ",L_ARIAL_9,
+                      "borrow, hire, lease or rent from:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+20V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Any of ",L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,
+                      "employees or members of their households;","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+30V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_ITALIC_9,"<033>&a1300h+0V",
+                      "Your ",L_ARIAL_9,"partners or executive officers or ",
+                      "members of their households;","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+30V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_9,"<033>&a1300h+0V",
+                      "A person or organization that requires ",
+                      L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,
+                      "to provide auto insurance.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1100h+60V",
+                      "Non-owned automobile ",L_ARIAL_9,"means any ",
+                      L_ARIAL_ITALIC_9,"automobile you ",L_ARIAL_9,
+                      "do not borrow, hire, lease, own or rent that",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "is used in connection with ",L_ARIAL_ITALIC_9,"your ",
+                      L_ARIAL_9,"business / operations. This includes ",
+                      L_ARIAL_ITALIC_9,"automobiles you ",L_ARIAL_9,"borrow,",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "hire, lease or rent from ",L_ARIAL_ITALIC_9,"your ",
+                      L_ARIAL_9,"employees, executive officers or partners ",
+                      "or member of their","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "households but only while used in connection with ",
+                      L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,"business / operations.",
+                      "<NL>")
+
+                      --End of Page one
+
+Writefile(L_FILE_NAME,"%s%s","<FF>","<NL>")
+
+                      --Top of Page two
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a420h7000V",
+                      "Page 2","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h240V",
+                      "EXCLUSIONS","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "None of the exclusions in Part II C, except ",
+                      "exclusions 4, 5, 6, 8 and 9, apply to this insurance.",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+80V",
+                      "Exclusion 5. B does not apply to ",L_ARIAL_ITALIC_9,
+                      "bodily injury ",L_ARIAL_9,"arising out of and in the ",
+                      "course of domestic","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "employment by ",L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,
+                      "unless benefits for such injury are in whole or in ",
+                      "part either payable or","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "required to be provided under any workers' ",
+                      "compensation law.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1100h+60V",
+                      "We ",L_ARIAL_9,"also do not insure ",L_ARIAL_ITALIC_9,
+                      "property damage ",L_ARIAL_9,"to property:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+20V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_9,"<033>&a1300h+0V",
+                      "In the care, control, or custody of any ",
+                      L_ARIAL_ITALIC_9,"insured; ",L_ARIAL_9,"or","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s","<033>&a1100h+30V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Borrowed, owned, rented or transported by any ",
+                      L_ARIAL_ITALIC_9,"insured.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1100h+40V",
+                      "Exclusion 8. A does not apply to: ","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+20V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Exhaust, fluids, fuels, lubricants or other similar ",
+                      L_ARIAL_ITALIC_9,"pollutants ",L_ARIAL_9,
+                      "that are necessary to or result from","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "the normal electrical, hydraulic or mechanical ",
+                      "functioning of a ",L_ARIAL_ITALIC_9,"hired ",L_ARIAL_9,
+                      "or ",L_ARIAL_ITALIC_9,"non-owned","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1300h+0V",
+                      "automobile ",L_ARIAL_9,"provided the discharge, ",
+                      "dispersal, emission, escape, flowing, leakage, ",
+                      "migration,","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "release, or seepage of such ",L_ARIAL_ITALIC_9,
+                      "pollutants ",L_ARIAL_9,"is directly from an ",
+                      L_ARIAL_ITALIC_9,"automobile ",L_ARIAL_9,
+                      "part designed by its","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "manufacturer to dispose of, hold, receive, or ",
+                      "store such ",L_ARIAL_ITALIC_9,"pollutants.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s","<033>&a1100h+30V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_9,"<033>&a1300h+0V",
+                      "The discharge, dispersal, emission, escape, ",
+                      "flowing, leakage, migration, release or seepage","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "of ",L_ARIAL_ITALIC_9,"pollutants:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+0V",
+                      "1.",L_ARIAL_9,"<033>&a1500h+0V","Occurring away from ",
+                      L_ARIAL_ITALIC_9,"your premises;","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a1300h+20V","2.",L_ARIAL_9,"<033>&a1500h+0V",
+                      "Caused directly by the upset, overturn or collision of a ",
+                      L_ARIAL_ITALIC_9,"hired ",L_ARIAL_9,"or ",L_ARIAL_ITALIC_9,
+                      "non-owned automobile;","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1500h+0V","and","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+20V",
+                      "3.",L_ARIAL_9,"<033>&a1500h+0V","Not being ",
+                      L_ARIAL_ITALIC_9,"loaded, unloaded, ")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"or transported by such ",
+                      L_ARIAL_ITALIC_9,"hired ",L_ARIAL_9,"or ",
+                      L_ARIAL_ITALIC_9,"non-owned automobile","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1500h+0V",
+                      "or otherwise in the course of transit by an ",
+                      L_ARIAL_ITALIC_9,"insured.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "LIMITS OF LIABILITY","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "If an aggregate limit is indicated as ",
+                      "applicable in the Declarations, such aggregate limit ",
+                      "does ","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "not apply to the Hired / Non-Owned Automobile ",
+                      "Liability Insurance provided under BU 01 40","<NL>")
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

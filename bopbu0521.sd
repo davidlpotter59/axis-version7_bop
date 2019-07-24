@@ -1,0 +1,147 @@
+%%
+/*
+Date Written: March 26, 2002
+
+Name: bopbu0521.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+03/26/2002             RMG              Upgrade to VCS from VCQ
+08/09/2002             RMG              Adding Code for Edition Date
+===========================
+*/
+
+Program
+  Name         = "bopbu0521";
+  Type         = "File";
+  Domain       = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0521.cq";
+ String L_COPY_NAME[20] ;
+ String L_READ;
+ Number L_START_PRINT;       --first character printed
+ Number L_END_PRINT;         --last character printed when l_break reaches 40C
+ Number L_BREAK = 40;       --number of characters printed before break
+ Number L_BREAK_POINT;      --where the break occurs and newline is inserted
+ Number L_LOOP;
+ Number L_PAGE_NUMBER = 1;
+ Number L_ITEM_NO = 1;
+ Unsigned Ascii Number L_ITEM_COUNTER;
+ Unsigned Ascii Number L_LINE_COUNTER;
+ String L_SFPLOCATION_ZIP;
+
+  Include "swsut100.var"
+  Include "swsut200.var"
+  Include "swsut300.var"
+  Include "csfonts.inc"
+
+Initialization
+
+  Deletefile (L_FILE_NAME);
+
+Access PLPENDORSE,
+       Set PLPENDORSE:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           PLPENDORSE:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           PLPENDORSE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic;
+
+Access SFPEND1,
+       Set SFPEND1:POLICY_NO       = SFPPRINT1:POLICY_NO ,
+           SFPEND1:POL_YEAR        = SFPPRINT1:POL_YEAR ,
+           SFPEND1:END_SEQUENCE    = SFPPRINT1:END_SEQUENCE , Generic;
+
+Access PLPDESC,
+       Set PLPDESC:POLICY_NO       = SFPPRINT1:POLICY_NO ,
+           PLPDESC:POL_YEAR        = SFPPRINT1:POL_YEAR ,
+           PLPDESC:END_SEQUENCE    = SFPPRINT1:END_SEQUENCE , Generic;
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,Generic;
+
+Access PLPWORKERSCOMP,
+       Set PLPWORKERSCOMP:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           PLPWORKERSCOMP:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           PLPWORKERSCOMP:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,Generic;
+
+
+Update
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+L_SFPLOCATION_ZIP = If (Val(SFPLOCATION:STR_ZIPCODE[6,9]) = 0) Then
+                      SFPLOCATION:STR_ZIPCODE[1,5]
+                    Else
+                      SFPLOCATION:STR_ZIPCODE[1,5] + "-" +
+                      SFPLOCATION:STR_ZIPCODE[6,9]
+
+Include "swsut100.inc"
+I_CODE = "BU0521 "
+Include "swsut200.inc"
+Include "swsut300.inc"
+
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                      L_COPYRIGHT_6,L_ARIAL_9," 08 93 MSO, Inc.",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+Writefile(L_FILE_NAME,"%s","<033>&a4300h120V")
+Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+Writefile(L_FILE_NAME,"%s"," ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_14,"<033>&a1600h+0V",
+                      "BUSINESSOWNERS ENDORSEMENT",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "THEFT EXCLUSION",
+                      "<033>&a+30h+20V",L_BULLET_6,"<033>&a+30h-20V",
+                      L_ARIAL_BOLD_9,"PART I","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "When made part of this insurance contract, ",
+                      "the following applies to Part I.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "Except as provided below, all other provisions in this ",
+                      "policy are unchanged. ","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>")           --Horizontal line
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "Loss Not Insured is extended as follows:","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1100h+0V",
+                      "We ",L_ARIAL_9,"do not insure loss to business ",
+                      "personal property covered under Coverage B and ",
+                      L_ARIAL_ITALIC_9,"money ","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "and ",L_ARIAL_ITALIC_9,"securities ",L_ARIAL_9,
+                      "covered under Coverage D caused by theft (theft also ",
+                      "includes ",L_ARIAL_ITALIC_9,"burglary ",L_ARIAL_9,"or",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1100h+0V","robbery).")
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

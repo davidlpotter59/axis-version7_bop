@@ -1,0 +1,64 @@
+                                                        _______________
+*------------------------------------------------------------------------------*
+|            Split Commission (A)gency or (B)oth: __                           |
+*------------------------------------------------------------------------------*
+
+%%
+Screen
+        Name = "BOPMT11e" ;
+        Type = "Detail" ;
+        Padcharacter=Space ;
+        Highlight=Underscore ;
+        Screensize="dynamic";
+        Windowtitle="%a     %s Split Commission     %m";
+        Domain="SFPMASTER" ;
+
+/*
+
+        Date Written: 08/18/2000
+
+        Copyright 2000, SCIPS.com, Inc.
+
+        Modify
+        Date            By            Comment
+        ---------------------------------------------------------------------
+        08/18/2000      jmm           added scips print and include files.
+        10/31/2000      dap           changed the look of the screen, so it can
+                                      use sfpmt001, also changed rate file names
+                                      to new names allowing for MSO as well as
+                                      ISO rates.
+        =====================================================================
+*/
+
+
+        Global Unsigned Ascii Number G_POLICY_NO[9] ,
+                                     G_YEAR[4] ,
+                                     G_END_SEQUENCE[4] ;
+
+        Access SFPMASTER, Set SFPMASTER:POLICY_NO = G_POLICY_NO ,
+                              SFPMASTER:POL_YEAR = G_YEAR,
+                              SFPMASTER:END_SEQUENCE = G_END_SEQUENCE ;
+
+        Include "stdkeys4.INC"
+
+Functions
+
+--        Include "boqmsomenu.inc"
+
+        Include "bopmsofunc2.inc"
+
+Access Validation
+If SFPMASTER:POLICY_NO <> G_POLICY_NO Or
+   SFPMASTER:POL_YEAR <> G_YEAR Or
+   SFPMASTER:END_SEQUENCE  <> G_END_SEQUENCE  Then
+    Error 1000 ;
+
+Fields
+101     FUNCTION;
+301     SFPMASTER:SPLIT_COMM/uppercase
+        If SFPMASTER:SPLIT_COMM <> "A" And
+           SFPMASTER:SPLIT_COMM <> "B" And
+           SFPMASTER:SPLIT_COMM <> "" Then
+            Error 1324 ;
+
+End

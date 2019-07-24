@@ -1,0 +1,207 @@
+%%
+/*
+Date Written: December 26, 2002
+
+Name: bopmcl428.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+12/26/2002             RMG            Converting form from VCQ to VCS
+
+===========================
+*/
+
+Program
+  Name = "bopmcl428";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopmcl428.cq";
+
+   Include "csfonts.inc"
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "center2.var"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPEND,
+       Set SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+   Include "swsut100.inc"
+   I_CODE = "MCL428 "
+   Include "swsut200.inc"
+
+While SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO And
+      SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR And
+      SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+  If SFPEND:CODE = "MCL428 " Then
+    {
+
+Access BOPENDORSE,
+       Set BOPENDORSE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           BOPENDORSE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           BOPENDORSE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+           BOPENDORSE:PREM_NO      = SFPEND:PREM_NO,
+           BOPENDORSE:BUILD_NO     = SFPEND:BUILD_NO,
+           BOPENDORSE:CODE         = "MCL428 ", Generic
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a510h7000V")
+Writefile(L_FILE_NAME,"%s","Ed. 1.1")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<033>&a420h-20V")
+Writefile(L_FILE_NAME,"%s",L_COPYRIGHT_12)
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s"," 1998 MSO, Inc.")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+Writefile(L_FILE_NAME,"%s","<033>&a4300h120V")
+Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+Writefile(L_FILE_NAME,"%s"," ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V<033>*c5000h5v0P")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+Writefile(L_FILE_NAME,"%s","<033>&a1250h+0V")
+Writefile(L_FILE_NAME,"%s","CONDOMINIUM ASSOCIATION ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_BOLD_12)
+Writefile(L_FILE_NAME,"%s","DIRECTORS' & OFFICERS'")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+L_STRING = "LIABILITY - SUPPLEMENTAL DECLARATIONS"
+L_FONT = L_ARIAL_BOLD_12
+L_PITCH_HALF = 6
+L_PITCH_FULL = 12
+L_VERTICAL_POS = "-10"
+Include "center2.pro"
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h-90V<033>*c5000h5v0P")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","The following special limits and information apply to the designated coverage, in accordance with the provisions")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","of the Condominium Association Directors' and Officers' Liability Coverage Form (MCL 427).")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h-80V<033>*c5000h5v0P")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","Policy #")
+Writefile(L_FILE_NAME,"%n",SFPPRINT1:POLICY_NO)
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","SCHEDULE")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","Limits of Liability")
+Writefile(L_FILE_NAME,"%s","<033>&a2100h+0V")
+Writefile(L_FILE_NAME,"%s","Premium Basis   ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s",BOPENDORSE:PREMIUM_BASIS)
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a4100h+0V")
+Writefile(L_FILE_NAME,"%s","Premium")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+60V")
+Writefile(L_FILE_NAME,"%s","Each Claim ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:LIMIT[1],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a2100h+0V")
+Writefile(L_FILE_NAME,"%s","No. Of")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a4100h+0V")
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(SFPEND:PREMIUM,"ZZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a2100h+0V")
+Writefile(L_FILE_NAME,"%s","Units  ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:NO_UNITS,"ZZZZ"))
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","Aggregate ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:LIMIT[2],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","Each claim subject to Deductible ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:DEDUCTIBLE[1],"ZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","RETROACTIVE DATE: ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:EFF_DATE,"mm/dd/yyyy"))
+    }
+  Next SFPEND
+}
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

@@ -1,0 +1,166 @@
+%%
+Screen
+        Name = "bopmt195"
+        Type = "Detail" ;
+        Highlight = Underscore ;
+        Padcharacter = Space ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Designated Premises - Ver 7.00     %m" ;
+        Domain="bopENDORSE" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Global Unsigned Ascii Number G_policy_NO[9],
+                                     g_year[4],
+                                     g_end_sequence[4],
+                                     G_PREM_NO[4],
+                                     G_BUILD_NO[4],
+                                     G_SUB_CODE[4],
+                                     g_opt[2] ;
+
+        Global String G_CODE[7] ;
+
+        Local Unsigned Ascii Number L_SUB_CODE[4] ;
+
+        Local string l_username[15],
+                     l_system_id[15] ;
+
+        Access bopENDORSE, Set bopENDORSE:policy_NO = G_policy_NO,
+                               bopendorse:pol_year = g_Year,
+                               bopendorse:end_sequence = g_end_sequence,
+                               bopENDORSE:PREM_NO  = G_PREM_NO,
+                               bopENDORSE:BUILD_NO = G_BUILD_NO ,
+                               bopENDORSE:CODE     = G_CODE, Generic
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen entry
+l_username      = username/spacefill
+l_system_id     = "bop"/spacefill
+
+access sfpname, set sfpname:policy_no = g_policy_no,
+                    sfpname:pol_year = g_year,
+                    sfpname:end_sequence = g_end_sequence, generic
+
+access sfssecurity_rating, set sfssecurity_rating:company_id = sfpname:company_id,
+                               sfssecurity_rating:user_id    = l_username,
+                               sfssecurity_rating:system_id  = l_system_id, generic
+
+if g_opt = 99 and
+   sfssecurity_rating:allow_to_change_in_inquiry = 0 then
+    begin
+    disable(add_fn)
+    disable(change_fn)
+    disable(delete_fn)
+    end
+
+Access Validation
+If bopENDORSE:policy_NO <> G_policy_NO Or
+   bopendorse:pol_Year <> g_year or
+   bopendorse:end_sequence <> g_end_sequence or
+   bopENDORSE:PREM_NO  <> G_PREM_NO Or
+   bopENDORSE:BUILD_NO <> G_BUILD_NO Or
+   bopENDORSE:CODE     <> G_CODE Then
+    Error 1000 ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+|               ______________________________________________                 |
+|               ______________________________________________                 |
+|               ______________________________________________                 |
+|               ______________________________________________                 |
+|               ______________________________________________                 |
+|               ______________________________________________                 |
+|               ______________________________________________                 |
+|               ______________________________________________                 |
+|               ______________________________________________                 |
+|               ______________________________________________                 |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext;
+301     begin
+        if function one of "ADD" then
+            begin
+            do subcode
+            bopendorse:sub_code = l_sub_code
+            end
+        end
+        bopENDORSE:description[1] ;
+401     bopENDORSE:description[2] ;
+501     bopENDORSE:description[3] ;
+601     bopENDORSE:description[4] ;
+701     bopENDORSE:description[5] ;
+801     bopENDORSE:description[6] ;
+901     bopENDORSE:description[7] ;
+1001    bopENDORSE:description[8] ;
+1101    bopENDORSE:description[9] ;
+1201    bopENDORSE:description[10] ;
+
+}
+
+Assignments
+If FUNCTION = "ADD" Then
+    Begin
+    bopENDORSE:policy_NO = G_policy_NO
+    bopendorse:pol_Year = g_Year
+    bopendorse:end_Sequence = g_end_sequence
+    bopENDORSE:PREM_NO  = G_PREM_NO
+    bopENDORSE:BUILD_NO = G_BUILD_NO
+    bopENDORSE:CODE     = G_CODE
+    End
+
+Procedure Definition
+
+Procedure SUBCODE
+Begin
+Access bopENDORSE_ALIAS, Set bopENDORSE_ALIAS:policy_NO = G_policy_NO,
+                             bopendorse_alias:pol_Year = g_year,
+                             bopendorse_alias:end_sequence = g_end_sequence,
+                             bopENDORSE_ALIAS:PREM_NO  = G_PREM_NO,
+                             bopENDORSE_ALIAS:BUILD_NO = G_BUILD_NO,
+                             bopENDORSE_ALIAS:CODE     = G_CODE, Generic
+
+L_SUB_CODE = 0
+While bopENDORSE_ALIAS:policy_NO = G_policy_NO And
+      bopendorse_alias:pol_year = g_year and
+      bopendorse_alias:end_sequence = g_end_sequence and
+      bopENDORSE_ALIAS:PREM_NO  = G_PREM_NO And
+      bopENDORSE_ALIAS:BUILD_NO = G_BUILD_NO And
+      bopENDORSE_ALIAS:CODE     = G_CODE
+        Begin
+        L_SUB_CODE = bopENDORSE_ALIAS:SUB_CODE
+
+        Next bopENDORSE_ALIAS
+        End
+
+L_SUB_CODE = L_SUB_CODE + 10
+End
+
+End

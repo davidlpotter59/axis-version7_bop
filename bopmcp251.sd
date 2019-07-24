@@ -1,0 +1,210 @@
+%%
+/*
+Date Written: May 14, 2002
+
+Name: bopmcp251.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+05/14/2002             RMG          Converting from VCQ to VCS
+08/09/2002             RMG          Adding Code for Edition Date
+12/26/2002             RMG          Fixed Errors
+===========================
+*/
+
+Program
+  Name = "bopmcp251";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopmcp251.cq";
+ Unsigned ascii number l_max_lines;
+ Unsigned Ascii Number L_YEAR[4];
+ Unsigned Ascii number L_LINE_OF_BUSINESS[4];
+ Unsigned ascii number l_found[1];
+ Unsigned Ascii Number L_ITEM_COUNTER;
+ Unsigned Ascii Number L_STATE[2]=0;
+ Unsigned Ascii Number L_LOOP;
+ wdate L_EFF_DATE;
+ Unsigned Ascii Number L_LINE_COUNTER;
+ Unsigned Ascii Number L_PAGE_NUMBER;
+
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "swsut300.var"
+   Include "csfonts.inc"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+
+Update
+
+Access BOPGENERAL,
+   Set BOPGENERAL:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       BOPGENERAL:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       BOPGENERAL:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, generic
+
+Access SFPNAME,
+   Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+       SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+       SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPLOCATION,
+   Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO,
+       SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR,
+       SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access sfpend_alias,
+   Set sfpend_alias:POLICY_NO    = SFPPRINT1:POLICY_NO,
+       sfpend_alias:POL_YEAR     = SFPPRINT1:POL_YEAR,
+       sfpend_alias:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Include "swsut100.inc"
+I_CODE = "MCP251"
+Include "swsut200.inc"
+Include "swsut300.inc"
+
+Writefile(L_FILE_NAME,"%s",L_simplex)
+
+While  bopgeneral:POLICY_NO    = SFPPRINT1:POLICY_NO And
+       bopgeneral:POL_YEAR     = SFPPRINT1:POL_YEAR And
+       bopgeneral:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+  l_state            = bopgeneral:state
+  L_COMPANY_ID       = sfpname:COMPANY_ID
+  L_LINE_OF_BUSINESS = sfpname:LINE_OF_BUSINESS
+
+  Access SFSOPTEND,
+     Set SFSOPTEND:COMPANY_ID       = L_COMPANY_ID,
+         SFSOPTEND:STATE            = L_STATE,
+         SFSOPTEND:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS,
+         SFSOPTEND:CODE             = I_CODE, generic
+
+   While SFSOPTEND:COMPANY_ID       = L_COMPANY_ID and
+         SFSOPTEND:STATE            = L_STATE and
+         SFSOPTEND:LINE_OF_BUSINESS = l_LINE_OF_BUSINESS and
+         SFSOPTEND:CODE             = I_CODE
+
+     {  --start of sfsoptend check
+       If (sfpname:eff_date >= sfsoptend:eff_date and
+          (sfpname:eff_date < sfsoptend:exp_date or
+           sfsoptend:exp_date = 0)) then
+         {
+           l_eff_date = sfsoptend:eff_date
+         }
+       next sfsoptend
+     }
+
+  Access SFSOPTEND,
+     Set SFSOPTEND:COMPANY_ID       = L_COMPANY_ID,
+         SFSOPTEND:STATE            = L_STATE,
+         SFSOPTEND:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS,
+         SFSOPTEND:CODE             = I_CODE,
+         SFSOPTEND:EFF_DATE         = L_EFF_DATE, exact
+
+  If sfsoptend:edition <> 0 then
+    {
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a420h7080V")
+      Writefile(L_FILE_NAME,"%s","Ed. ")
+      Writefile(L_FILE_NAME,"%n",sfsoptend:edition)
+    }
+
+  Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+  Writefile(L_FILE_NAME,"%s","<033>&a420h7200V")
+  Writefile(L_FILE_NAME,"%s",l_copyright_6)
+  Writefile(L_FILE_NAME,"%s"," ")
+  Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+  Writefile(L_FILE_NAME,"%s",sfsoptend:COPYRIGHT)
+  Writefile(L_FILE_NAME,"%s","<033>&a200h+120V")
+
+  Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+  Writefile(L_FILE_NAME,"%s","<033>&a4300h120V")
+  Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+  Writefile(L_FILE_NAME,"%s"," ")
+  Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+  Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                  "WINDSTORM AND RELATED DAMAGE DEDUCTIBLE ","<033>&a+0h+20V",
+                  L_BULLET_6,"<033>&a+0h-20V",L_ARIAL_BOLD_9," PART I","<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a90h+0V",
+                  "This endorsement provides a special deductible for ",
+                  "windstorm and related losses.","<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a90h+0V",
+                  "The required information may be shown below or ",
+                  "elsewhere in this policy.","<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                  "Except as provided below, all other provisions ",
+                  "remain unchanged.","<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                  "<NL>","<NL>")           --Horizontal line
+
+  Access SFPLOCATION,
+     Set SFPLOCATION:POLICY_NO    = sfpprint1:POLICY_NO,
+         SFPLOCATION:POL_YEAR     = sfpprint1:POL_YEAR,
+         SFPLOCATION:END_SEQUENCE = sfpprint1:END_SEQUENCE,
+         sfplocation:prem_no      = bopgeneral:prem_no,
+         sfplocation:build_no     = bopgeneral:build_no, generic
+
+  Writefile(L_FILE_NAME,"%s",L_ARIAL_bold_9)
+  Writefile(L_FILE_NAME,"%s","<033>&a90h+0V")
+  Writefile(L_FILE_NAME,"%s","Loc. No.:")
+  Writefile(L_FILE_NAME,"%s"," ")
+  Writefile(L_FILE_NAME,"%n",sfplocation:prem_no)
+  Writefile(L_FILE_NAME,"%s",L_ARIAL_bold_9)
+  Writefile(L_FILE_NAME,"%s","<033>&a90h+120V")
+  Writefile(L_FILE_NAME,"%s","Bldg. No.:")
+  Writefile(L_FILE_NAME,"%s"," ")
+  Writefile(L_FILE_NAME,"%n",sfplocation:build_no)
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+120V","$",
+                  L_LETTER_GOTHIC_BOLD_10,
+                  Str(BOPGENERAL:WIND_DEDUCTIBLE,"ZZ,ZZZ"),L_ARIAL_BOLD_9,
+                  "<033>&a500h+0V","< Windstorm Deductible Amount","<NL>",
+                  "<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s","<033>&a90h+0V","COVERAGE MODIFICATION","<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+0V","The deductible provision ",
+                  "of the Part I G ","<033>&a+0h+20V",L_BULLET_6,
+                  "<033>&a+0h-20V",L_ARIAL_BOLD_9," How Losses Are Settled ",
+                  "Condition is amended as","<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1100h+0V","follows:","<NL>","<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s","<033>&a1100h+0V","The deductible amount ",
+                  "shown for Windstorm replaces the otherwise applicable ",
+                  "Part I deductible","<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s","<033>&a1100h+0V","for all loss in any one ",
+                  "occurrence caused by windstorm. This includes any ",
+                  "related loss to (1) the","<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s","<033>&a1100h+0V","interior of a building ",
+                  "or structure or (2) personal property within a ",
+                  "building or structure: damaged","<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s%s%s","<033>&a1100h+0V","by hail, ice, rain, ",
+                  "sleet, snow or water as a result of an exterior roof ",
+                  "or wall sustaining loss by","<NL>")
+
+  Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1100h+0V","windstorm allowing such ",
+                  "elements to enter the building or structure.","<NL>")
+
+  Writefile(L_FILE_NAME,"%s","<FF>")
+  Next bopgeneral
+}
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

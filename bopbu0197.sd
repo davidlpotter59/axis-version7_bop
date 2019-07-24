@@ -1,0 +1,164 @@
+%%
+/*
+Date Written: February 22, 2002
+
+Name: bopbu0197.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+03/17/2002             RMG              Upgrade to VCS from VCQ
+08/02/2002             RMG              Adding Code for Edidtion Date
+===========================
+*/
+
+Program
+  Name         = "bopbu0197";
+  Type         = "File";
+  Domain       = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0197.cq";
+ Unsigned Ascii Number L_LINE_COUNTER;
+ String L_SFPLOCATION_ZIP;
+
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "swsut300.var"
+   Include "csfonts.inc"
+
+Initialization
+
+  Deletefile (L_FILE_NAME);
+
+Update
+
+  Access SFPLOCATION,
+         Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+             SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+             SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,Generic
+
+  Access SFPNAME,
+         Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+             SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+             SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE , Generic
+
+If (Val(SFPLOCATION:STR_ZIPCODE[6,9]) = 0) Then
+  {
+    L_SFPLOCATION_ZIP =  SFPLOCATION:STR_ZIPCODE[1,5]
+  }
+Else
+  {
+    L_SFPLOCATION_ZIP = SFPLOCATION:STR_ZIPCODE[1,5] + "-" +
+                        SFPLOCATION:STR_ZIPCODE[6,9]
+  }
+
+Include "swsut100.inc"
+I_CODE = "BU0197 "
+Include "swsut200.inc"
+--Include "swsut300.inc"
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                      L_COPYRIGHT_6,L_ARIAL_9," 1993 MSO, Inc.",
+                      "<NL>")
+/*
+Writefile(L_FILE_NAME,"%s","<033>&a500h120V")
+Writefile(L_FILE_NAME,"->%s<-",SFSOPTEND:COMPANY_ID)
+Writefile(L_FILE_NAME,"%s",SFPNAME:COMPANY_ID)
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<033>&a500h+0V")
+Writefile(L_FILE_NAME,"->%n<-",SFSOPTEND:STATE)
+Writefile(L_FILE_NAME,"%n",I_STATE)
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<033>&a500h+0V")
+Writefile(L_FILE_NAME,"->%n<-",SFSOPTEND:LINE_OF_BUSINESS)
+Writefile(L_FILE_NAME,"%n",SFPNAME:LINE_OF_BUSINESS)
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<033>&a500h+0V")
+Writefile(L_FILE_NAME,"->%s<-",SFSOPTEND:CODE)
+Writefile(L_FILE_NAME,"%s",I_CODE)
+Writefile(L_FILE_NAME,"%s","<NL>")
+*/
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h120V",
+          Trun(SFSOPTEND:FORM_PRINT)," ",L_ARIAL_BOLD_9,SFSOPTEND:EDITION_PRINT,
+          "<NL>")
+          L_LINE_COUNTER =L_LINE_COUNTER + 2
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+120V",
+                      "LIQUOR LAW LIABILITY FOR PACKAGE STORES ",
+                      "<033>&a+0h+20V",L_BULLET_6,"<033>&a+0h-20V",
+                      L_ARIAL_BOLD_9," PART II","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "When made a part of this insurance contract, ",
+                      "the following applies to Part II.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "Except as provided below, all other provisions here ",
+                      "remain unchanged.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "A.",L_ARIAL_9,"<033>&a1300h+0V","Coverage E is ",
+                      "extended to include the operation of the package ",
+                      "liquor store, described in","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "the Declarations, in connection with the furnishing, ",
+                      "giving, selling, or serving of alcoholic","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "beverages, at the described premises.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "This includes liability of any ",L_ARIAL_ITALIC_9,
+                      "insured ",L_ARIAL_9,"or ",L_ARIAL_ITALIC_9,"your ",
+                      L_ARIAL_9,"indemnity:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+0V",
+                      "1.",L_ARIAL_9,"<033>&a1500h+0V","Because of violation ",
+                      "of law, ordinance or regulation relating to the ",
+                      "distribution, gift,","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1500h+0V",
+                      "sale, or use of alcoholic beverages.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+40V",
+                      "2.",L_ARIAL_9,"<033>&a1500h+0V","By reason of giving, ",
+                      "selling, or serving alcoholic beverages to persons ",
+                      "under the legal","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1500h+0V",
+                      "drinking age or under the influence of alcohol or ",
+                      "which contributes to the intoxication","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1500h+0V","of any person.",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a1100h+0V","B.",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Liability Not Insured","<033>&a+25h-30V<033>*c75h3v0P",
+                      "<033>&a+100h+30V",L_ARIAL_ITALIC_9,"We ",L_ARIAL_9,
+                      "do not provide insurance for the following:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+0V",
+                      "1.",L_ARIAL_9,"<033>&a1500h+0V","Acts in connection ",
+                      "with unlicensed operations required to be licensed;",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a1300h+40V","2.",L_ARIAL_9,"<033>&a1500h+0V",
+                      "A warranty or representation made by ",L_ARIAL_ITALIC_9,
+                      "you ",L_ARIAL_9,"with respect to ",L_ARIAL_ITALIC_9,
+                      "your products ",L_ARIAL_9,"or goods.","<NL>")
+
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

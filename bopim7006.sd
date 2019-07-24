@@ -1,0 +1,338 @@
+%%
+/*
+Date Written: March 04, 2003
+
+Name: bopim7006.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+03/04/2003             RMG
+
+===========================
+*/
+
+Program
+  Name = "bopim7006";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopim7006.cq";
+ Unsigned Ascii Number L_ITEM_NUMBER;
+ Unsigned Ascii Number L_LINE_COUNTER;
+ Unsigned Ascii Number L_MAX_LINES;
+ Unsigned Ascii Number L_PAGE_NUMBER;
+
+--
+ String L_CHARACTER_STRING[1500]           = "";
+ Unsigned Ascii Number L_START_PRINT[4]    = 0;   --point to start printing.
+ Unsigned Ascii Number L_END_PRINT[4]      = 0;
+ Unsigned Ascii Number L_LEN_STRING[4]     = 0;
+ Unsigned Ascii Number L_CHARACTER_BREAK   = 0;
+ Unsigned Ascii Number L_CHARACTER_COUNTER = 0;
+ Unsigned Ascii Number L_MAX_CHAR          = 0;
+ String L_NEWPAGE_WORDING[40]              = "";  --wording displayed at bottom of page if new
+ String L_H_POSITION;
+ String L_V_POSITION;
+--
+
+   Include "csfonts.inc"
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "swsut300.var"
+   Include "center2.var"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPEND,
+       Set SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+   Include "swsut100.inc"
+   I_CODE = "IM7006 "
+   Include "swsut200.inc"
+   Include "swsut300.inc"
+
+L_MAX_LINES = 55
+L_PAGE_NUMBER = 1
+
+While SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO And
+      SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR And
+      SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+  If SFPEND:CODE = "IM7006 " Then
+    {
+      L_LINE_COUNTER = 1
+
+      Access bopENDORSE,
+         Set bopENDORSE:POLICY_NO    = SFPEND:POLICY_NO,
+             bopENDORSE:POL_YEAR     = SFPEND:POL_YEAR,
+             bopENDORSE:END_SEQUENCE = SFPEND:END_SEQUENCE,
+             bopENDORSE:PREM_NO      = SFPEND:PREM_NO,
+             bopENDORSE:BUILD_NO     = SFPEND:BUILD_NO,
+             bopENDORSE:CODE         = "IM7006 ", Generic
+
+      Access bopDESC,
+         Set bopDESC:POLICY_NO    = SFPEND:POLICY_NO,
+             bopDESC:POL_YEAR     = SFPEND:POL_YEAR,
+             bopDESC:END_SEQUENCE = SFPEND:END_SEQUENCE,
+             bopDESC:PREM_NO      = SFPEND:PREM_NO,
+             bopDESC:BUILD_NO     = SFPEND:BUILD_NO,
+             bopDESC:CODE         = "IM7006 ", Generic
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a200h120V")
+      Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+      Writefile(L_FILE_NAME,"%s"," ")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      Writefile(L_FILE_NAME,"%s","<033>&a200h+120V")
+      Writefile(L_FILE_NAME,"%s","Page ")
+      Writefile(L_FILE_NAME,"%n",L_PAGE_NUMBER)
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      Writefile(L_FILE_NAME,"%s","<033>&a200h+60V")
+      Writefile(L_FILE_NAME,"%s","<033>*c5400h5v0P") --Horizontal line
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      L_STRING = "CONTRACTORS' EQUIPMENT SCHEDULE"
+      L_FONT = L_ARIAL_BOLD_12
+      L_PITCH_HALF = 6
+      L_PITCH_FULL = 12
+      L_VERTICAL_POS = "+240"
+      Include "center2.pro"
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      L_STRING = "(The information required below may be indicated"
+      L_FONT = L_ARIAL_9
+      L_PITCH_HALF = 4.5
+      L_PITCH_FULL = 9
+      L_VERTICAL_POS = "+120"
+      Include "center2.pro"
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      L_STRING = "on a separate schedule or supplemental 'schedule'.)"
+      L_FONT = L_ARIAL_9
+      L_PITCH_HALF = 4.5
+      L_PITCH_FULL = 9
+      L_VERTICAL_POS = "+0"
+      Include "center2.pro"
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      Writefile(L_FILE_NAME,"%s","<033>&a600h+60V")
+      Writefile(L_FILE_NAME,"%s","<033>*c4600h5v0P") --Horizontal line
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD)
+      Writefile(L_FILE_NAME,"%s","<033>&a600h+160V")
+      Writefile(L_FILE_NAME,"%s","SCHEDULED EQUIPMENT")
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      Writefile(L_FILE_NAME,"%s","<033>&a600h+80V")
+      Writefile(L_FILE_NAME,"%s","<033>*c4600h5v0P") --Horizontal line
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      Writefile(L_FILE_NAME,"%s","<033>&a600h+240V")
+      Writefile(L_FILE_NAME,"%s","Item")
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      Writefile(L_FILE_NAME,"%s","<033>&a600h+120V")
+      Writefile(L_FILE_NAME,"%s","No.")
+      Writefile(L_FILE_NAME,"%s","<033>&a2000h+0V")
+      Writefile(L_FILE_NAME,"%s","Description of Equipment")
+      Writefile(L_FILE_NAME,"%s","<033>&a4800h+0V")
+      Writefile(L_FILE_NAME,"%s","Limit")
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      While bopDESC:POLICY_NO    = SFPEND:POLICY_NO And
+            bopDESC:POL_YEAR     = SFPEND:POL_YEAR And
+            bopDESC:END_SEQUENCE = SFPEND:END_SEQUENCE And
+            bopDESC:PREM_NO      = SFPEND:PREM_NO And
+            bopDESC:BUILD_NO     = SFPEND:BUILD_NO And
+            bopDESC:CODE         = "IM7006 "
+      {
+
+      If L_LINE_COUNTER >= L_MAX_LINES - 5 Then
+        {
+          Do NEW_PAGE
+
+          Writefile(L_FILE_NAME,"%s","<033>&a600h+240V")
+          Writefile(L_FILE_NAME,"%s","<033>*c4600h5v0P") --Horizontal line
+          L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD)
+          Writefile(L_FILE_NAME,"%s","<033>&a600h+160V")
+          Writefile(L_FILE_NAME,"%s","SCHEDULED EQUIPMENT (Continued)")
+          L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+          Writefile(L_FILE_NAME,"%s","<033>&a600h+80V")
+          Writefile(L_FILE_NAME,"%s","<033>*c4600h5v0P") --Horizontal line
+          L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+          Writefile(L_FILE_NAME,"%s","<033>&a600h+160V")
+          Writefile(L_FILE_NAME,"%s","Item")
+          L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+          Writefile(L_FILE_NAME,"%s","<033>&a600h+120V")
+          Writefile(L_FILE_NAME,"%s","No.")
+          Writefile(L_FILE_NAME,"%s","<033>&a2000h+0V")
+          Writefile(L_FILE_NAME,"%s","Description of Equipment")
+          Writefile(L_FILE_NAME,"%s","<033>&a4800h+0V")
+          Writefile(L_FILE_NAME,"%s","Limit")
+          L_LINE_COUNTER = L_LINE_COUNTER + 1
+        }
+
+      L_ITEM_NUMBER = L_ITEM_NUMBER + 1
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a600h+180V")
+      Writefile(L_FILE_NAME,"%n",L_ITEM_NUMBER)
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a4600h+0V")
+      Writefile(L_FILE_NAME,"%s","$")
+      Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+      Writefile(L_FILE_NAME,"%s",Str(bopDESC:LIMIT,"ZZ,ZZZ,ZZZ"))
+
+      L_FONT             = L_ARIAL_9
+      L_V_POSITION       = "+0"
+      L_H_POSITION       = "1200"
+      L_CHARACTER_STRING = bopDESC:DESCRIPTION
+      L_MAX_CHAR         = 60
+      Include "line_spacing.inc"
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      Next bopDESC
+
+      }
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a1300h+240V")
+      Writefile(L_FILE_NAME,"%s","Catastrophe Limit")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+
+      If bopENDORSE:LIMIT[1] <> 0 Then
+        {
+          Writefile(L_FILE_NAME,"%s","$")
+          Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+          Writefile(L_FILE_NAME,"%s",Str(bopENDORSE:LIMIT[1],"ZZ,ZZZ,ZZZ"))
+        }
+      Else
+        {
+          Writefile(L_FILE_NAME,"%s","N/A")
+        }
+
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      If L_LINE_COUNTER >= L_MAX_LINES - 8 Then
+        {
+          Do NEW_PAGE
+        }
+      Writefile(L_FILE_NAME,"%s","<033>&a600h+240V")
+      Writefile(L_FILE_NAME,"%s","<033>*c4600h5v0P") --Horizontal line
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD)
+      Writefile(L_FILE_NAME,"%s","<033>&a600h+160V")
+      Writefile(L_FILE_NAME,"%s","DEDUCTIBLE")
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      Writefile(L_FILE_NAME,"%s","<033>&a600h+80V")
+      Writefile(L_FILE_NAME,"%s","<033>*c4600h5v0P") --Horizontal line
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a600h+180V")
+      Writefile(L_FILE_NAME,"%s","Deductible Amount")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a4600h+0V")
+
+      If bopENDORSE:DEDUCTIBLE[1] <> 0 Then
+        {
+          Writefile(L_FILE_NAME,"%s","$")
+          Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+          Writefile(L_FILE_NAME,"%s",Str(bopENDORSE:DEDUCTIBLE[1],"ZZ,ZZZ,ZZZ"))
+        }
+      Else
+        {
+          Writefile(L_FILE_NAME,"%s","N/A")
+        }
+
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      Writefile(L_FILE_NAME,"%s","<033>&a200h+240V")
+      Writefile(L_FILE_NAME,"%s","<033>*c5400h5v0P") --Horizontal line
+      L_LINE_COUNTER = L_LINE_COUNTER + 2
+
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a200h+120V")
+      Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+      Writefile(L_FILE_NAME,"%s"," ")
+      Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+      L_STRING = "Copyright MCMXCIV, American Association of Insurance Services"
+      L_FONT = L_ARIAL_8
+      L_PITCH_HALF = 4
+      L_PITCH_FULL = 8
+      L_VERTICAL_POS = "+0"
+      Include "center2.pro"
+
+      Writefile(L_FILE_NAME,"%s","<FF>")
+    }
+  Next SFPEND
+}
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+
+Procedure Definition
+
+Procedure NEW_PAGE
+Begin
+  L_LINE_COUNTER = 0
+  L_PAGE_NUMBER = L_PAGE_NUMBER + 1
+
+  Writefile(L_FILE_NAME,"%s","<FF>")
+
+  Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+  Writefile(L_FILE_NAME,"%s","<033>&a200h120V")
+  Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+  Writefile(L_FILE_NAME,"%s"," ")
+  Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+  Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+  L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+  Writefile(L_FILE_NAME,"%s","<033>&a200h+120V")
+  Writefile(L_FILE_NAME,"%s","Page ")
+  Writefile(L_FILE_NAME,"%n",L_PAGE_NUMBER)
+  L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+  Writefile(L_FILE_NAME,"%s","<033>&a200h+60V")
+  Writefile(L_FILE_NAME,"%s","<033>*c5400h5v0P") --Horizontal line
+  L_LINE_COUNTER = L_LINE_COUNTER + 1
+End
+
+End

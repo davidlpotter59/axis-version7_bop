@@ -1,0 +1,167 @@
+%%
+/*
+Date Written: March 25, 2002
+
+Name: bopbu0375.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+03/25/2002             RMG              Upgrade to VCS from VCQ
+08/05/2002             RMG              Adding Code for Edition Date
+12/26/2002             RMG              Fixed Errors
+===========================
+*/
+
+Program
+  Name = "bopbu0375";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0375.cq";
+
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "csfonts.inc"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPLOCATION,
+   Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,Generic
+
+Access SFPNAME,
+   Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+       SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+       SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE , Generic
+
+Access SFPEND,
+   Set SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO,
+       SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR,
+       SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Include "swsut100.inc"
+I_CODE = "BU0375"
+Include "swsut200.inc"
+
+While SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO And
+      SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR And
+      SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+  If SFPEND:CODE = "BU0375 " Then
+    {
+
+Access BOPGLASS,
+       Set BOPGLASS:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           BOPGLASS:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           BOPGLASS:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+           BOPGLASS:PREM_NO      = SFPEND:PREM_NO,
+           BOPGLASS:BUILD_NO     = SFPEND:BUILD_NO, Generic
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+           SFPLOCATION:PREM_NO      = SFPEND:PREM_NO,
+           SFPLOCATION:BUILD_NO     = SFPEND:BUILD_NO, Generic
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                      L_COPYRIGHT_6,L_ARIAL_9," 1993 MSO, Inc.",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h120V",
+          Trun(SFSOPTEND:FORM_PRINT)," ",L_ARIAL_BOLD_9,SFSOPTEND:EDITION_PRINT,
+          "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_14,"<033>&a1600h+0V",
+                      "BUSINESSOWNERS ENDORSEMENT",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "INDOOR GLASS BREAKAGE COVERAGE",
+                      "<033>&a+30h+20V",L_BULLET_6,"<033>&a+30h-20V",
+                      L_ARIAL_BOLD_9,"PART I","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "When made part of this insurance contract, ",
+                      "the following applies to Part I.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "Except as provided below, all other provisions here ",
+                      "remain unchanged.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "The required information may be shown below or ",
+                      "elsewhere here.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a90h+0V")
+Writefile(L_FILE_NAME,"%s%n","Location: ",SFPLOCATION:PREM_NO)
+Writefile(L_FILE_NAME,"%s","<033>&a+60h+0V")
+Writefile(L_FILE_NAME,"%s%n","Building: ",SFPLOCATION:BUILD_NO)
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "$",L_LETTER_GOTHIC_BOLD_10,Str(BOPGLASS:LIMIT,"ZZ,ZZZ,ZZZ"),
+                      "<033>&a1100h+0V",L_ARIAL_9,"<","<033>&a1300h+0V",
+                      "Limit of Liability","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "$",L_LETTER_GOTHIC_BOLD_10,Str(BOPGLASS:DEDUCTIBLE,"ZZ,ZZZ,ZZZ"),
+                      "<033>&a1100h+0V",L_ARIAL_9,"<","<033>&a1300h+0V",
+                      "Deductible","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "A.",L_ARIAL_9,"<033>&a1300h+0V","Coverage B is ",
+                      "extended to cover, for the limits shown above or ",
+                      "elsewhere here, indoor glass","<NL>")
+
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "used by ",L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,"in ",
+                      L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,"business for direct ",
+                      "physical loss caused by breakage.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Parts I D and I E (other than 2, 6 and 11. A and E) ",
+                      "do not apply.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "B.",L_ARIAL_9,"<033>&a1300h+0V","A $200 deductible per ",
+                      "occurrence applies for this extension, unless a ",
+                      "different deductible","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "amount is shown for this coverage.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "C.",L_ARIAL_9,"<033>&a1300h+0V","Indoor glass includes ",
+                      "counters, display cases, panels and partitions, ",
+                      "refrigerator and cooler","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "cases, shelves, showcases, and table and desk tops.","<FF>")
+/*
+If sfpend:PREM_NO  >= 1 or
+   sfpend:BUILD_NO >= 1 then
+  {
+    Writefile(L_FILE_NAME,"%s","<FF>")
+  }
+*/
+    }
+  Next SFPEND
+}
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

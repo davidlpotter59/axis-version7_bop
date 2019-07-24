@@ -1,0 +1,153 @@
+%%
+Screen
+        Name            = "bopmt196" ;
+        Type            = "Detail" ;
+        Padcharacter    = Space ;
+        Highlite        = Underscore ;
+        Screensize      = "dynamic" ;
+        Windowtitle = "%a     %s Physicians' and Surgeons' Equipment Coverage   Ver 7.0  %m" ;
+        Domain          = "bopENDORSE" ;
+        iconline        = 0;
+
+        Global Unsigned Ascii Number G_policy_NO[9] ;
+        global unsigned ascii number g_year[4];
+        global unsigned ascii number g_end_sequence[4];
+        Global Unsigned Ascii Number G_PREM_NO[4] ;
+        Global Unsigned Ascii Number G_BUILD_NO[4] ;
+
+--        Global Signed Ascii Number G_PREMIUM1[9]/decimals=2 ;
+
+        Global String G_CODE[7] ;
+
+        Local Signed Ascii Number L_PREMIUM[9]=0 ,
+                                  l_deviation[4]=0/dec=2,
+                                  l_package[4]=0/dec=2;
+
+        Local Unsigned Ascii Number L_SUB_CODE[4]=0 ;
+
+        Access bopENDORSE,
+           Set bopENDORSE:policy_NO = G_policy_NO ,
+               bopendorse:pol_year = g_year,
+               bopendorse:end_sequence = g_end_sequence,
+               bopENDORSE:PREM_NO = G_PREM_NO ,
+               bopENDORSE:BUILD_NO = G_BUILD_NO ,
+               bopENDORSE:CODE = G_CODE ;
+
+        Include "STDKEYS7.INC"
+
+style definition
+
+        include "styles.inc"
+
+Functions
+
+        Include "STDFUNC7.INC"
+
+menu definition
+
+        include "stdmenu7.inc"
+
+}
+
+toolbar definition
+
+        include "stdtoolbar7.inc"
+
+}
+
+screen entry
+access sfsline, set sfsline:company_id = sfpname:company_id,
+                    sfsline:line_of_business = sfpname:line_of_business,
+                    sfsline:lob_subline = "00", generic
+
+Access Validation
+If bopENDORSE:policy_NO <> G_policy_NO Or
+   bopendorse:pol_year <> g_year or
+   bopendorse:end_sequence <> g_end_sequence or
+   bopENDORSE:PREM_NO <> G_PREM_NO Or
+   bopENDORSE:BUILD_NO <> G_BUILD_NO Or
+   bopENDORSE:CODE <> G_CODE Then
+    Error 1000 ;
+
+
+screen at 1,1 to 20,80
+Properties
+        {
+        Layouttype = column
+        }
+{
+Panel
+Properties
+        {
+        Borderstyle     = raised
+        Scrollbarpolicy = asneeded
+        }
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Limit of Liability:  __________                                              |
+| Deductible:          _____                                                   |
+| Extra Expense:       __________                                              |
+| Off Premises:        __________                                              |
+| Rate:                _______                                                 |
+*------------------------------------------------------------------------------*
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            bopENDORSE:policy_NO = G_policy_NO
+            bopendorse:pol_year = g_year
+            bopendorse:end_sequence = g_end_sequence
+            bopENDORSE:PREM_NO = G_PREM_NO
+            bopENDORSE:BUILD_NO = G_BUILD_NO
+            bopENDORSE:CODE = G_CODE
+            Do SUBCODE
+            bopENDORSE:SUB_CODE = L_SUB_CODE
+            End
+        End
+        bopENDORSE:LIMIT[1];
+401     bopENDORSE:DEDUCTIBLE[1];
+501     bopENDORSE:LIMIT[2];
+601     bopENDORSE:LIMIT[3];
+701     bopENDORSE:RATE[1];
+
+}
+
+}
+
+
+Procedure Definition
+
+Procedure SUBCODE
+Begin
+Access bopENDORSE_ALIAS, Set bopENDORSE_ALIAS:policy_NO = G_policy_NO,
+                             bopendorse_alias:pol_year = bopendorse:pol_year,
+                             bopendorse_alias:end_sequence = bopendorse:end_sequence,
+                             bopENDORSE_ALIAS:PREM_NO = G_PREM_NO,
+                             bopENDORSE_ALIAS:BUILD_NO = G_BUILD_NO,
+                             bopENDORSE_ALIAS:CODE = G_CODE, Generic
+
+L_SUB_CODE = 0
+While bopENDORSE_ALIAS:policy_NO = G_policy_NO And
+      bopendorse_alias:pol_year = g_year and
+      bopendorse_alias:end_sequence = g_end_sequence and
+      bopENDORSE_ALIAS:PREM_NO = G_PREM_NO And
+      bopENDORSE_ALIAS:BUILD_NO = G_BUILD_NO And
+      bopENDORSE_ALIAS:CODE = G_CODE
+        Begin
+        L_SUB_CODE = bopENDORSE_ALIAS:SUB_CODE
+
+        Next bopENDORSE_ALIAS
+        End
+
+L_SUB_CODE = L_SUB_CODE + 10
+End
+
+End

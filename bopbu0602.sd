@@ -1,0 +1,152 @@
+%%
+/*
+Date Written: March 28, 2002
+
+Name: bopbu0602.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+03/28/2002             RMG              Upgrade to VCS from VCQ
+08/06/2002             RMG              Adding Code for Edition Date
+===========================
+*/
+
+Program
+  Name         = "bopbu0602";
+  Type         = "File";
+  Domain       = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0602.cq";
+ String L_COPY_NAME[20] ;
+ String L_READ;
+ Number L_START_PRINT;       --first character printed
+ Number L_END_PRINT;         --last character printed when l_break reaches 40C
+ Number L_BREAK = 40;       --number of characters printed before break
+ Number L_BREAK_POINT;      --where the break occurs and newline is inserted
+ Number L_LOOP;
+ Number L_PAGE_NUMBER = 1;
+ Number L_ITEM_NO = 1;
+ Unsigned Ascii Number L_ITEM_COUNTER;
+ Unsigned Ascii Number L_LINE_COUNTER;
+ String L_SFPLOCATION_ZIP;
+
+  Include "swsut100.var"
+  Include "swsut200.var"
+  Include "swsut300.var"
+  Include "csfonts.inc"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+  L_SFPLOCATION_ZIP = If (Val(SFPLOCATION:STR_ZIPCODE[6,9]) = 0) Then
+                        SFPLOCATION:STR_ZIPCODE[1,5]
+                      Else
+                        SFPLOCATION:STR_ZIPCODE[1,5] + "-" +
+                        SFPLOCATION:STR_ZIPCODE[6,9]
+
+Include "swsut100.inc"
+I_CODE = "BU0602 "
+Include "swsut200.inc"
+--Include "swsut300.inc"
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                      L_COPYRIGHT_6,L_ARIAL_9," 1993 MSO, Inc.",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h120V",
+          Trun(SFSOPTEND:FORM_PRINT)," ",L_ARIAL_BOLD_9,SFSOPTEND:EDITION_PRINT,
+          "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_14,"<033>&a1600h+120V",
+                      "BUSINESSOWNERS ENDORSEMENT",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a90h+0V","ADDITIONAL ",L_ARIAL_ITALIC_BOLD_9,
+                      "INSUREDS","<033>&a+25h-30V<033>*c75h3v0P",L_ARIAL_BOLD_9,
+                      "<033>&a+100h+30V","ARCHITECTS / ENGINEERS / SURVEYORS",
+                      "<033>&a+30h+20V",L_BULLET_6,"<033>&a+30h-20V",
+                      L_ARIAL_BOLD_9,"PART II","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "When made part of this insurance contract, the ",
+                      "following applies to Part II.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "Except as provided below, all other provisions here ",
+                      "remain unchanged.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "PERSONS INSURED EXTENSION","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "Architects / Engineers / Surveyors","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "The definition of ",L_ARIAL_ITALIC_BOLD_9,"insured ",
+                      L_ARIAL_BOLD_9,"in the Glossary is amended to include ",
+                      "the following as an","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_ITALIC_BOLD_9,"<033>&a1100h+0V",
+                      "insured ",L_ARIAL_BOLD_9,"here.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,
+                      "<033>&a1100h+60V","Insured ",L_ARIAL_9,
+                      "includes any architect, engineer ","or surveyor that ",
+                      L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,
+                      "engage, but only with respect to","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "liability arising out of ",L_ARIAL_ITALIC_9,
+                      "your premises ",L_ARIAL_9,"or ",L_ARIAL_ITALIC_9,
+                      "your work.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+60V",
+                      "However, ",L_ARIAL_ITALIC_9,"we ",L_ARIAL_9,
+                      "do not insure ",L_ARIAL_ITALIC_9,"bodily injury, ",
+                      "property damage, ",L_ARIAL_9,
+                      "advertising injury or personal injury","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s","<033>&a1100h+0V",
+                      "arising out of the rendering of or the failure to ",
+                      "render any sort of professional service by or on","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1100h+0V","your ",
+                      L_ARIAL_9,"behalf including:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s","<033>&a1100h+20V",L_BULLET_6,
+                      "<033>&a1300h-20V",L_ARIAL_9,"The approving, preparing ",
+                      "or failing to approve or prepare change orders, ",
+                      "designs, drawings,","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "maps, opinions, reports, specifications or surveys; or:",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s","<033>&a1100h+20V",L_BULLET_6,
+                      "<033>&a1300h-20V",L_ARIAL_9,"Engineering, inspection ",
+                      "or supervisory services.","<NL>")
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

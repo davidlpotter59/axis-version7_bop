@@ -1,0 +1,350 @@
+%%
+/*
+Date Written: December 30, 2002
+
+Name: bopmim001.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+12/30/2002             RMG       Coverting form from VCQ to VCS
+
+===========================
+*/
+
+Program
+  Name = "bopmim011";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopmim011.cq";
+
+   Include "csfonts.inc"
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "swsut300.var"
+   Include "center2.var"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPEND,
+       Set SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+   Include "swsut100.inc"
+   I_CODE = "MIM011 "
+   Include "swsut200.inc"
+   Include "swsut300.inc"
+
+While SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO And
+      SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR And
+      SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+  If SFPEND:CODE = "MIM011" Then
+    {
+Access BOPENDORSE,
+       Set BOPENDORSE:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           BOPENDORSE:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           BOPENDORSE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+           BOPENDORSE:PREM_NO      = SFPEND:PREM_NO,
+           BOPENDORSE:BUILD_NO     = SFPEND:BUILD_NO,
+           BOPENDORSE:CODE         = "MIM011 ", Generic
+
+Writefile(L_FILE_NAME,"%s","<033>&a420h7000V")
+Writefile(L_FILE_NAME,"%s",L_COPYRIGHT_12)
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s"," 1996 MSO, Inc.")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a4600h+0V")
+Writefile(L_FILE_NAME,"%s","Page 1")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h200V<033>*c5200h5v0P") --Horizontal Line
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+L_STRING = "INLAND MARINE SUPPLEMENTAL DECLARATIONS - " + Trun(SFSOPTEND:FORM_PRINT) + " " + Trun(SFSOPTEND:EDITION_PRINT)
+L_FONT = L_ARIAL_BOLD_14
+L_PITCH_HALF = 7
+L_PITCH_FULL = 14
+L_VERTICAL_POS = "+60"
+Include "center2.pro"
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h-40V<033>*c5200h5v0P") --Horizontal Line
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a400h+60V")
+Writefile(L_FILE_NAME,"%s","Policy # ")
+Writefile(L_FILE_NAME,"%n",SFPPRINT1:POLICY_NO)
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h+60V")
+Writefile(L_FILE_NAME,"%s","MIM 011 is used with the Inland Marine Common Provisions Form (MIM 010) and one more of the Inland")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","Marine Coverage Forms when providing Inland Marine Coverage. The required information may be shown")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","below or elsewhere in this policy.")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h-30V<033>*c5200h5v0P") --Horizontal Line
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+60V")
+Writefile(L_FILE_NAME,"%s","NEWLY ACQUIRED PROPERTY - LIMIT $ ")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:LIMIT[1],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+60V")
+Writefile(L_FILE_NAME,"%s","PROPERTY OF OTHERS - LIMIT $ ")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:LIMIT[2],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h+60V<033>*c5200h5v0P") --Horizontal Line
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","MIM 110 - FINE ARTS SCHEDULE")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+60V")
+Writefile(L_FILE_NAME,"%s","Description of Covered Property:")
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s","Limit")
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s","Deductible")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:LIMIT[3],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:DEDUCTIBLE[1],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h+800V<033>*c5200h5v0P") --Horizontal Line
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","MIM 111 - INSTALLATION FLOATER SCHEDULE")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+60V")
+Writefile(L_FILE_NAME,"%s","Description of Covered Property:")
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s","Limit")
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s","Deductible")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:LIMIT[4],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:DEDUCTIBLE[2],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h+800V<033>*c5200h5v0P") --Horizontal Line
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","MIM 112 - MISCELLANEOUS PROPERTY FLOATER SCHEDULE")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+60V")
+Writefile(L_FILE_NAME,"%s","Description of Covered Property:")
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s","Limit")
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s","Deductible")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:LIMIT[5],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:DEDUCTIBLE[3],"ZZ,ZZZ,ZZZ"))
+
+Writefile(L_FILE_NAME,"%s","<FF>")
+
+-- PAGE 2
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","MIM 113 - MUSICAL INSTRUMENTS FLOATER SCHEDULE")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+60V")
+Writefile(L_FILE_NAME,"%s","Description of Covered Property:")
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s","Limit")
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s","Deductible")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:LIMIT[6],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:DEDUCTIBLE[4],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h+800V<033>*c5200h5v0P") --Horizontal Line
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","MIM 114 - PHOTOGRAPHIC EQUIPMENT FLOATER SCHEDULE")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+60V")
+Writefile(L_FILE_NAME,"%s","Description of Covered Property:")
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s","Limit")
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s","Deductible")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:LIMIT[7],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:DEDUCTIBLE[5],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h+800V<033>*c5200h5v0P") --Horizontal Line
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","MIM 115 - PHYSICIAN'S AND SURGEONS' EQUIPMENT FLOATER SCHEDULE")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+60V")
+Writefile(L_FILE_NAME,"%s","Description of Covered Property:")
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s","Limit")
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s","Deductible")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:LIMIT[8],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:DEDUCTIBLE[6],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+600V")
+Writefile(L_FILE_NAME,"%s","Extra Expense")
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s","Basic Limit")
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s","Revised Limit")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(1000,"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(BOPENDORSE:LIMIT[9],"ZZ,ZZZ,ZZZ"))
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h+100V<033>*c5200h5v0P") --Horizontal Line
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","Endorsement applicable to this coverage:")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a300h+0V")
+Writefile(L_FILE_NAME,"%s","Additional conditions applicable to this coverage:")
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&a420h7000V")
+Writefile(L_FILE_NAME,"%s","Page 2")
+
+    }
+  Next SFPEND
+}
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

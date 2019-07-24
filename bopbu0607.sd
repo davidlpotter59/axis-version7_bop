@@ -1,0 +1,292 @@
+%%
+/*
+Date Written: April 01, 2002
+
+Name: bopbu0607.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+04/01/2002             RMG              Upgrade to VCS from VCQ
+08/06/2002             RMG              Adding Code for Edition Date
+===========================
+*/
+
+Program
+  Name         = "bopbu0607";
+  Type         = "File";
+  Domain       = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0607.cq";
+ Unsigned Ascii Number L_loop;
+ String L_SFPLOCATION_ZIP;
+ String L_COMPANY_ID[10] ;
+ String L_BOPADDIN_ZIP;
+ Unsigned Ascii Number L_LINE_COUNTER;
+ Unsigned Ascii Number L_PAGE_NUMBER = 1;
+ Unsigned Ascii Number L_MAX_LINES=35;
+ Unsigned Ascii number L_LINE_OF_BUSINESS[4];
+ Unsigned Ascii Number L_STATE[2]=0;
+  wdate L_EFF_DATE;
+
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "csfonts.inc"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+
+Update
+
+Access BOPGENERAL ,
+   Set BOPGENERAL:POLICY_NO    = SFPPRINT1:POLICY_NO,
+       BOPGENERAL:POL_YEAR     = SFPPRINT1:POL_YEAR,
+       BOPGENERAL:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access BOPADDIN ,
+   Set BOPADDIN:POLICY_NO    = SFPPRINT1:POLICY_NO,
+       BOPADDIN:POL_YEAR     = SFPPRINT1:POL_YEAR,
+       BOPADDIN:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPLOCATION ,
+   Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO,
+       SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR,
+       SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPEND_ALIAS,
+   Set SFPEND_ALIAS:POLICY_NO    = SFPPRINT1:POLICY_NO,
+       SFPEND_ALIAS:POL_YEAR     = SFPPRINT1:POL_YEAR,
+       SFPEND_ALIAS:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPNAME,
+   Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+       SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+       SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Include "swsut100.inc"
+I_CODE = "BU0607"
+Include "swsut200.inc"
+
+While SFPEND_ALIAS:POLICY_NO    = SFPPRINT1:POLICY_NO And
+      SFPEND_ALIAS:POL_YEAR     = SFPPRINT1:POL_YEAR And
+      SFPEND_ALIAS:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+  If SFPEND_ALIAS:CODE = I_CODE Then
+    {
+      Access bopaddin,
+         Set bopaddin:POLICY_NO    = sfpend_alias:POLICY_NO ,
+             bopaddin:POL_YEAR     = sfpend_alias:POL_YEAR ,
+             bopaddin:END_SEQUENCE = sfpend_alias:END_SEQUENCE,
+             bopaddin:prem_no      = sfpend_alias:prem_no,
+             bopaddin:build_no     = sfpend_alias:build_no,
+             bopaddin:sub_code     = sfpend_alias:sub_code, generic
+
+       While bopaddin:POLICY_NO    = sfpend_alias:POLICY_NO and
+             bopaddin:POL_YEAR     = sfpend_alias:POL_YEAR and
+             bopaddin:END_SEQUENCE = sfpend_alias:END_SEQUENCE and
+             bopaddin:prem_no      = sfpend_alias:prem_no and
+             bopaddin:build_no     = sfpend_alias:build_no and
+             bopaddin:sub_code     = sfpend_alias:sub_code
+      {
+        If BOPADDIN:CODE = I_CODE Then
+          {
+            l_state            = bopgeneral:state
+            L_COMPANY_ID       = sfpname:COMPANY_ID
+            L_LINE_OF_BUSINESS = sfpname:LINE_OF_BUSINESS
+
+            Access SFSOPTEND,
+               Set SFSOPTEND:COMPANY_ID       = L_COMPANY_ID,
+                   SFSOPTEND:STATE            = L_STATE,
+                   SFSOPTEND:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS,
+                   SFSOPTEND:CODE             = I_CODE, generic
+
+             While SFSOPTEND:COMPANY_ID       = L_COMPANY_ID and
+                   SFSOPTEND:STATE            = L_STATE and
+                   SFSOPTEND:LINE_OF_BUSINESS = l_LINE_OF_BUSINESS and
+                   SFSOPTEND:CODE             = I_CODE
+
+               {  --start of sfsoptend check
+                 If (sfpname:eff_date >= sfsoptend:eff_date and
+                    (sfpname:eff_date < sfsoptend:exp_date or
+                     sfsoptend:exp_date = 0)) then
+                   {
+                     l_eff_date = sfsoptend:eff_date
+                   }
+                 next sfsoptend
+               }
+
+            Access SFSOPTEND,
+               Set SFSOPTEND:COMPANY_ID       = L_COMPANY_ID,
+                   SFSOPTEND:STATE            = L_STATE,
+                   SFSOPTEND:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS,
+                   SFSOPTEND:CODE             = I_CODE,
+                   SFSOPTEND:EFF_DATE         = L_EFF_DATE, exact
+
+            If sfsoptend:edition <> 0 then
+              {
+                Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+                Writefile(L_FILE_NAME,"%s","<033>&a420h7080V")
+                Writefile(L_FILE_NAME,"%s","Ed. ")
+                Writefile(L_FILE_NAME,"%n",sfsoptend:edition)
+              }
+
+            L_BOPADDIN_ZIP = If (Val(BOPADDIN:STR_ZIPCODE[6,9]) = 0) Then
+                        BOPADDIN:STR_ZIPCODE[1,5]
+                      Else
+                        BOPADDIN:STR_ZIPCODE[1,5] + "-" +
+                        BOPADDIN:STR_ZIPCODE[6,9]
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                            L_COPYRIGHT_6,L_ARIAL_9," 1993 MSO, Inc.",
+                            "<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h120V",
+                      Trun(SFSOPTEND:FORM_PRINT)," ",L_ARIAL_BOLD_9,SFSOPTEND:EDITION_PRINT,
+                      "<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_14,"<033>&a1600h+0V",
+                            "BUSINESSOWNERS ENDORSEMENT",
+                            "<NL>","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                            "<033>&a90h+0V","ADDITIONAL ",L_ARIAL_ITALIC_BOLD_9,
+                            "INSUREDS","<033>&a+25h-30V<033>*c75h3v0P",
+                            L_ARIAL_BOLD_9,"<033>&a+100h+30V",
+                            "MANAGERS OR LESSORS OF PREMISES",
+                            "<033>&a+30h+20V",L_BULLET_6,"<033>&a+30h-20V",
+                            L_ARIAL_BOLD_9,"PART II","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                            "When made part of this insurance contract, the ",
+                            "following applies to Part II.","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                            "Except as provided below, all other provisions in here ",
+                            "remain unchanged.","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                            "The required information may be shown below or ",
+                            "elsewhere here.","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                            "<NL>","<NL>")           --Horizontal line
+
+            Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                            "PERSONS INSURED EXTENSION","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                            "Managers or Lessors of Premises","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                            "The definition of ",L_ARIAL_ITALIC_BOLD_9,"insured ",
+                            L_ARIAL_BOLD_9,"in the Glossary is amended to include ",
+                            "the following as an","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_ITALIC_BOLD_9,"<033>&a1100h+0V",
+                            "insured ",L_ARIAL_BOLD_9,"here.","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1100h+60V",
+                            "Insured ",L_ARIAL_9,"includes the designated person ",
+                            "or organization but only with respect to liability ",
+                            "arising","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                            "out of the maintenance, ownership or use of that part ",
+                            "of the designated premises leased to ",
+                            L_ARIAL_ITALIC_9,"you.","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1100h+60V",
+                            "However, this insurance does not apply to:","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s","<033>&a1100h+20V",L_BULLET_6,
+                            "<033>&a1300h-20V",L_ARIAL_9,"Any occurrence that takes ",
+                            "place after ",L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,
+                            "cease to be a tenant in such premises; or","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s","<033>&a1100h+50V",L_BULLET_6,
+                            "<033>&a1300h-20V",L_ARIAL_9,"Demolition operations, ",
+                            "new construction or structural alterations performed ",
+                            "by or on behalf","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                            "of such person or organization.","<NL>","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                            "DESIGNATED PERSON OR ORGANIZATION","<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                            "Name of Person or Organization:","<033>&a2800h+0V",
+                            "Description / Location of Premises (Part Leased to ",
+                            L_ARIAL_ITALIC_BOLD_9,"You",L_ARIAL_BOLD_9,"):")
+            Writefile(L_FILE_NAME,"%s","<NL>")
+
+            Access SFPLOCATION ,
+               Set SFPLOCATION:POLICY_NO    = bopaddin:POLICY_NO,
+                   SFPLOCATION:POL_YEAR     = bopaddin:POL_YEAR,
+                   SFPLOCATION:END_SEQUENCE = bopaddin:END_SEQUENCE,
+                   SFPLOCATION:PREM_NO      = BOPADDIN:PREM_NO,
+                   SFPLOCATION:BUILD_NO     = BOPADDIN:BUILD_NO, Generic
+
+            L_SFPLOCATION_ZIP = If (Val(SFPLOCATION:STR_ZIPCODE[6,9]) = 0) Then
+                              SFPLOCATION:STR_ZIPCODE[1,5]
+                            Else
+                              SFPLOCATION:STR_ZIPCODE[1,5] + "-" +
+                              SFPLOCATION:STR_ZIPCODE[6,9]
+
+            Writefile(L_FILE_NAME,"%s","<033>&f0S")
+            Writefile(L_FILE_NAME,"%s%s%s%n%s%s%n%s",L_ARIAL_9,"<033>&a2800h+0V",
+                            "Location: ",SFPLOCATION:PREM_NO,"<033>&a3300h+0V",
+                            "Building: ",SFPLOCATION:BUILD_NO,"<NL>")
+
+            Writefile(L_FILE_NAME,"%s%s%s","<033>&a2800h+0V",
+                            SFPLOCATION:ADDRESS,"<NL>")
+
+             For l_loop = 1 to 3
+               {
+                 If SFPLOCATION:ADDRESS1[l_loop] <> "" Then
+                   {
+                     Writefile(L_FILE_NAME,"%s%s%s","<033>&a2800h+0V",
+                             SFPLOCATION:ADDRESS1[1],"<NL>")
+                  }
+               }
+
+            Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s","<033>&a2800h+0V",
+                            Trun(SFPLOCATION:CITY),", ",SFPLOCATION:STR_STATE,
+                            " ",L_SFPLOCATION_ZIP,"<NL>")
+
+            Writefile(L_FILE_NAME,"%s","<033>&f1S")
+            For l_loop = 1 to 3
+              {
+                If bopaddin:name[l_loop] <> "" then
+                  {
+                    Writefile(L_FILE_NAME,"%s%s%s","<033>&a90h+0V",
+                                BOPADDIN:NAME[l_loop],"<NL>")
+                  }
+              }
+
+            For l_loop = 1 to 3
+               {
+                 If BOPADDIN:ADDRESS[l_loop] <> "" Then
+                   {
+                     Writefile(L_FILE_NAME,"%s%s%s","<033>&a90h+0V",
+                              Trun(BOPADDIN:ADDRESS[l_loop]),"<NL>")
+                    }
+               }
+                Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s","<033>&a90h+0V",
+                              Trun(BOPADDIN:CITY),", ",BOPADDIN:STR_STATE,
+                              " ",L_BOPADDIN_ZIP,"<FF>")
+          }
+        Next BOPADDIN
+      }
+    }
+  NEXT SFPEND_ALIAS
+}
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

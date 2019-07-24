@@ -1,0 +1,91 @@
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Limit: ________ Each / ________  General Aggregate                           |
+*------------------------------------------------------------------------------*
+
+
+
+
+%%
+Screen
+        Name = "bopin179" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Liquor Liability Part II  Ver 7.00 %m" ;
+        Domain = "bopENDORSE" ;
+
+        Global Unsigned Ascii Number G_POLICY_NO[9] ;
+        global unsigned ascii number g_year[4];
+        global unsigned ascii number g_end_sequence[4];
+        Global Unsigned Ascii Number G_PREM_NO[4] ;
+        Global Unsigned Ascii Number G_BUILD_NO[4] ;
+        Global Unsigned Ascii Number G_sub_code[4] ;
+        global unsigned ascii number g_state[2] ;
+
+        Global Signed Ascii Number G_PREMIUM[9]/decimals=2 ;
+
+        Global String G_CODE[7] ;
+
+        Local Unsigned Ascii Number L_SUB_CODE[4]=0 ,
+                                    l_limit[8]=0,
+                                    l_limit2[8]=0,
+                                    l_state[2] ;
+
+        Access bopENDORSE,
+           Set bopENDORSE:POLICY_NO = G_POLICY_NO ,
+               bopendorse:pol_year = g_year,
+               bopendorse:end_sequence = g_end_sequence,
+               bopENDORSE:PREM_NO = G_PREM_NO ,
+               bopENDORSE:BUILD_NO = G_BUILD_NO ,
+               bopENDORSE:CODE = G_CODE ;
+
+        Include "STDKEYS.INC"
+
+Functions
+
+        Include "STDFUNC.INC"
+
+Access Validation
+If bopENDORSE:POLICY_NO <> G_POLICY_NO Or
+   bopendorse:pol_year <> g_year or
+   bopendorse:end_sequence <> g_end_sequence or
+   bopENDORSE:PREM_NO <> G_PREM_NO Or
+   bopENDORSE:BUILD_NO <> G_BUILD_NO Or
+   bopENDORSE:CODE <> G_CODE Then
+    Error 1000 ;
+
+Fields
+101     FUNCTION ;
+301     bopENDORSE:limit[1]/displayonly ;
+302     bopendorse:limit[2]/displayonly ;
+
+procedure definition
+
+Procedure SUBCODE
+Begin
+Access bopENDORSE_ALIAS, Set bopENDORSE_ALIAS:POLICY_NO = G_POLICY_NO,
+                             bopendorse_alias:pol_year = g_year,
+                             bopendorse_alias:end_sequence = g_end_sequence,
+                             bopENDORSE_ALIAS:PREM_NO = G_PREM_NO,
+                             bopENDORSE_ALIAS:BUILD_NO = G_BUILD_NO,
+                             bopENDORSE_ALIAS:CODE = G_CODE, Generic
+
+L_SUB_CODE = 0
+While bopENDORSE_ALIAS:POLICY_NO = G_POLICY_NO And
+      bopendorse_alias:pol_year = g_year and
+      bopendorse_alias:end_sequence = g_end_sequence and
+      bopENDORSE_ALIAS:PREM_NO = G_PREM_NO And
+      bopENDORSE_ALIAS:BUILD_NO = G_BUILD_NO And
+      bopENDORSE_ALIAS:CODE = G_CODE
+        Begin
+        L_SUB_CODE = bopENDORSE_ALIAS:SUB_CODE
+
+        Next bopENDORSE_ALIAS
+        End
+
+L_SUB_CODE = L_SUB_CODE + 10
+End
+
+End

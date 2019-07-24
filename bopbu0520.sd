@@ -1,0 +1,142 @@
+%%
+/*
+Date Written: March 26, 2002
+
+Name: bopbu0520.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+03/26/2002             RMG              Upgrade to VCS from VCQ
+04/22/2002             RMG              Data Added
+08/05/2002             RMG              Adding Code for Edition Date
+===========================
+*/
+
+Program
+  Name         = "bopbu0520";
+  Type         = "File";
+  Domain       = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0520.cq";
+ String L_COPY_NAME[20] ;
+ String L_BOPENDORSE_ZIP;
+
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "swsut300.var"
+   Include "csfonts.inc"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Access BOPENDORSE ,
+       Set BOPENDORSE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           BOPENDORSE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           BOPENDORSE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic;
+
+Update
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Include "swsut100.inc"
+I_CODE = "BU0520 "
+Include "swsut200.inc"
+Include "swsut300.inc"
+
+While      BOPENDORSE:POLICY_NO    = SFPPRINT1:POLICY_NO And
+           BOPENDORSE:POL_YEAR     = SFPPRINT1:POL_YEAR And
+           BOPENDORSE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+  If BOPENDORSE:CODE = "BU0520 " Then
+    {
+      L_BOPENDORSE_ZIP = If (Val(BOPENDORSE:STR_ZIPCODE[6,9]) = 0) Then
+                        BOPENDORSE:STR_ZIPCODE[1,5]
+                      Else
+                        BOPENDORSE:STR_ZIPCODE[1,5] + "-" +
+                        BOPENDORSE:STR_ZIPCODE[6,9]
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                      L_COPYRIGHT_6,L_ARIAL_9," 1993 MSO, Inc.",
+                      "<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h120V",
+                Trun(SFSOPTEND:FORM_PRINT)," ",L_ARIAL_BOLD_9,SFSOPTEND:EDITION_PRINT,
+                "<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_14,"<033>&a1600h+0V",
+                      "BUSINESSOWNERS ENDORSEMENT",
+                      "<NL>","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "PROPERTY NOT COVERED",
+                      "<033>&a+30h+20V",L_BULLET_6,"<033>&a+30h-20V",
+                      L_ARIAL_BOLD_9,"PART I","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "When made part of this insurance contract, ",
+                      "the following applies to Part I.","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "Except as provided below, all other provisions here ",
+                      "remain unchanged. ","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+      Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "PROPERTY NOT COVERED (Page 8) ","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_BOLD_9,"<033>&a1100h+0V",
+                      "We ",L_ARIAL_BOLD_9,"do not cover the property ",
+                      "designated below. ","<NL>","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "DESIGNATED PROPERTY: ","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%n%s%s%n%s%s",L_ARIAL_9,"<033>&a90h+0V",
+                      "Location: ",BOPENDORSE:PREM_NO,"<033>&a600h+0V",
+                      "Building: ",BOPENDORSE:BUILD_NO,"<NL>","<033>&a90h+0V")
+
+      If BOPENDORSE:ST_NUMBER <> 0 Then
+        {
+          Writefile(L_FILE_NAME,"%n%s",BOPENDORSE:ST_NUMBER," ")
+        }
+      If BOPENDORSE:ST_DIRECTION <> "" Then
+        {
+          Writefile(L_FILE_NAME,"%s%s",BOPENDORSE:ST_DIRECTION," ")
+        }
+      If BOPENDORSE:STREET <> "" Then
+        {
+          Writefile(L_FILE_NAME,"%s%s",Trun(BOPENDORSE:STREET)," ")
+        }
+      If BOPENDORSE:ST_TYPE <> "" Then
+        {
+          Writefile(L_FILE_NAME,"%s%s",BOPENDORSE:ST_TYPE,"<NL>")
+        }
+      If BOPENDORSE:ADDRESS <> "" Then
+        {
+          Writefile(L_FILE_NAME,"%s%s%s","<033>&a90h+0V",
+                      BOPENDORSE:ADDRESS,"<NL>")
+        }
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s","<033>&a90h+0V",
+                      Trun(BOPENDORSE:CITY),", ",BOPENDORSE:STR_STATE,
+                      " ",L_BOPENDORSE_ZIP,"<NL>")
+    }
+  Next BOPENDORSE
+}
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

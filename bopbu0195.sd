@@ -1,0 +1,178 @@
+%%
+/*
+Date Written: February 22, 2002
+
+Name: bopbu0195.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+03/17/2002             RMG              Upgrade to VCS from VCQ
+08/09/2002             RMG              Adding Code for Edition Date
+===========================
+*/
+
+Program
+  Name         = "bopbu0195";
+  Type         = "File";
+  Domain       = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0195.cq";
+ String L_COPY_NAME[20] ;
+
+  Include "swsut100.var"
+  Include "swsut200.var"
+  Include "swsut300.var"
+  Include "csfonts.inc"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,Generic
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE , Generic
+
+Include "swsut100.inc"
+I_CODE = "BU0195 "
+Include "swsut200.inc"
+Include "swsut300.inc"
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                      L_COPYRIGHT_6,L_ARIAL_9," 1993 MSO, Inc.",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h120V",
+          Trun(SFSOPTEND:FORM_PRINT)," ",L_ARIAL_BOLD_9,SFSOPTEND:EDITION_PRINT,
+          "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_14,"<033>&a1600h+0V",
+                      "BUSINESSOWNERS ENDORSEMENT",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "FUNERAL DIRECTORS' PROFESSIONAL LIABILITY",
+                      "<033>&a+30h+20V",L_BULLET_6,"<033>&a+30h-20V",
+                      L_ARIAL_BOLD_9,"PART II","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "When made part of this insurance contract, ",
+                      "the following applies to Part II.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "Except as provided below, all other provisions here ",
+                      "remain unchanged.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "A.",L_ARIAL_9,"<033>&a1300h+0V","Coverage E is extended to ",
+                      "Include professional liability in connection with ",
+                      L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,"business /","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "operations described in the Declarations in the burial, ",
+                      "disposition, disinterment, embalming,","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "handling, or removal of a deceased human body, or the ",
+                      "conduct of memorial services.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a1100h+0V","B.",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Coverage E is also ","extended to include damages for ",
+                      L_ARIAL_ITALIC_9,"property damage ",L_ARIAL_9,
+                      "as follows:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+0V",
+                      "1.",L_ARIAL_9,"<033>&a1500h+0V","To caskets, casket ",
+                      "cases, crypts, mausoleums and other facilities ",
+                      "belonging to others","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1500h+0V",
+                      "and in ",L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,
+                      "care, custody, or control for the purpose of burying ",
+                      "or caring for a deceased","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1500h+0V",
+                      "human body","<033>&a+25h-30V<033>*c75h3v0P",
+                      "<033>&a+100h+30V","including any severed part or ",
+                      "ashes after legal cremation.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+40V",
+                      "2.",L_ARIAL_9,"<033>&a1500h+0V","To property of others ",
+                      "other than that in the care, custody, or control of an ",
+                      L_ARIAL_ITALIC_9,"insured.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a1100h+0V","C.",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Coverage also applies to acts of ",L_ARIAL_ITALIC_9,
+                      "insureds ",L_ARIAL_9,"done in good faith at the ",
+                      "request of a public official","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "having (apparent) authority to request such acts",
+                      "<033>&a+25h-30V<033>*c75h3v0P","<033>&a+100h+30V",
+                      "even if in violation of penal law or","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V","ordinance.",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a1100h+0V","D.",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Liability Not Insured","<033>&a+25h-30V<033>*c75h3v0P",
+                      "<033>&a+100h+30V",L_ARIAL_ITALIC_9,"We ",L_ARIAL_9,
+                      "do not provide insurance for the following:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+0V",
+                      "1.",L_ARIAL_9,"<033>&a1500h+0V","Acts of unlicensed ",
+                      "practitioners required to be licensed.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+40V",
+                      "2.",L_ARIAL_9,"<033>&a1500h+0V","Liability assumed ",
+                      "under contract or agreement, except as described below.",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V","E.",
+                       L_ARIAL_9,"<033>&a1300h+0V",
+                      "Professional liability includes error or omission, ",
+                      "malpractice, or mistake in connection with","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "rendering or failure to render the described services. ",
+                      "This includes services rendered away","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "from the described premises which are necessary and ",
+                      "incidental to services performed at","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "the described premises. This also includes a warranty ",
+                      "of the fitness of ",L_ARIAL_ITALIC_9,"your products ",
+                      L_ARIAL_9,"or goods.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1300h+0V",
+                      "Bodily injury ",L_ARIAL_9,"includes mental anguish. ",
+                      "Under Part II C, Exclusion 2 does not apply, with",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "respect to ",L_ARIAL_ITALIC_9,"automobiles, ",
+                      L_ARIAL_9,"to mental anguish when not accompanied by ",
+                      "other bodily harm.")
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

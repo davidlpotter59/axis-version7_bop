@@ -1,0 +1,208 @@
+%%
+Screen
+        Name = "bopmt180" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s On Premises Money and Securities Cov. - Ver. 7.00   %m" ;
+        Domain = "bopENDORSE" ;
+--      resizeable = yes;
+        iconline = 0 ;
+
+        Global Unsigned Ascii Number G_policy_NO[9] ;
+        Global Unsigned Ascii Number G_YEAR[4] ;
+        Global Unsigned Ascii Number G_END_SEQUENCE[4] ;
+        Global Unsigned Ascii Number G_PREM_NO[4] ;
+        Global Unsigned Ascii Number G_BUILD_NO[4] ;
+        Global Unsigned Ascii Number G_OPT[2] ;
+
+        Global String G_CODE[7] ;
+
+        Local string l_username[15],
+                     l_system_id[15] ;
+
+        local unsigned ascii number l_sub_code[4] ;
+
+        Access bopENDORSE,
+           Set bopENDORSE:policy_NO    = G_policy_NO ,
+               bopendorse:pol_year     = g_year,
+               bopendorse:end_sequence = g_End_sequence,
+               bopENDORSE:PREM_NO      = G_PREM_NO ,
+               bopENDORSE:BUILD_NO     = G_BUILD_NO ,
+               bopENDORSE:CODE         = G_CODE ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen entry
+l_username      = username/spacefill
+l_system_id     = "bop"/spacefill
+
+access sfpname, set sfpname:policy_no = g_policy_no,
+                    sfpname:pol_year = g_year,
+                    sfpname:end_sequence = g_end_sequence, generic
+
+access sfssecurity_rating, set sfssecurity_rating:company_id = sfpname:company_id,
+                               sfssecurity_rating:user_id    = l_username,
+                               sfssecurity_rating:system_id  = l_system_id, generic
+
+if g_opt = 99 and
+   sfssecurity_rating:allow_to_change_in_inquiry = 0 then
+    begin
+    disable(add_fn)
+    disable(change_fn)
+    disable(delete_fn)
+    end
+
+Access Validation
+If bopENDORSE:policy_NO <> G_policy_NO Or
+   bopendorse:pol_Year <> g_year or
+   bopendorse:end_sequence <> g_end_sequence or
+   bopENDORSE:PREM_NO <> G_PREM_NO Or
+   bopENDORSE:BUILD_NO <> G_BUILD_NO Or
+   bopENDORSE:CODE <> G_CODE Then
+    Error 1000 ;
+
+screen
+{
+%%
+                                                        _______________
+*----------------------------------------------------------------------------------------*
+| Number:  ________  Direction: __  Street: ______________________________ Type: ______  |
+| Address: __________________________________________________                            |
+| City:    ______________________________   State:  ____   Zip Code: __________          |
+*----------------------------------------------------------------------------------------*
+| Limit of Liability: ________                                                           |
+*----------------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            bopENDORSE:policy_NO    = G_policy_NO
+            bopendorse:pol_year     = g_Year
+            bopendorse:end_sequence = g_end_sequence
+            bopENDORSE:PREM_NO      = G_PREM_NO
+            bopENDORSE:BUILD_NO     = G_BUILD_NO
+            bopENDORSE:CODE         = G_CODE
+            do subcode
+            bopENDORSE:SUB_CODE = l_sub_code
+            End
+        End
+        bopENDORSE:ST_NUMBER;
+302     bopENDORSE:ST_DIRECTION
+        If bopENDORSE:ST_DIRECTION <> SFSDIRECTION:DIRECTION Then
+            Error 1404
+
+        Activehelp SFSDIRECTION_ALIAS:DIRECTION,
+                   SFSDIRECTION_ALIAS:DESCRIPTION ;
+303     bopENDORSE:STREET;
+304     bopENDORSE:ST_TYPE
+        If bopENDORSE:ST_TYPE <> SFSSTRTYPE:ST_TYPE Then
+            Error 1307
+
+        Activehelp SFSSTRTYPE_ALIAS:ST_TYPE,
+                   SFSSTRTYPE_ALIAS:DESCRIPTION ;
+401     begin
+        if function one of "ADD", "CHANGE" then
+            begin
+            if bopendorse:st_number = 0 then
+                begin
+                if bopendorse:st_direction = "" then
+                    begin
+                    bopendorse:address = trun(bopendorse:street) + " " +
+                                         trun(bopendorse:st_type)
+                    end
+                else
+                if bopendorse:st_direction not one of "" then
+                    begin
+                    bopendorse:address = trun(bopendorse:st_direction) + " " +
+                                         trun(bopendorse:street) + " " +
+                                         trun(bopendorse:st_type)
+                    end
+                end
+            else
+            if bopendorse:st_number not one of 0 then
+                begin
+                if bopendorse:st_direction = "" then
+                    begin
+                    bopendorse:address = trun(str(bopendorse:st_number)) + " " +
+                                         trun(bopendorse:street) + " " +
+                                         trun(bopendorse:st_type)
+                    end
+                else
+                if bopendorse:st_direction not one of "" then
+                    begin
+                    bopendorse:address = trun(str(bopendorse:st_number)) + " " +
+                                         trun(bopendorse:st_direction) + " " +
+                                         trun(bopendorse:street) + " " +
+                                         trun(bopendorse:st_type)
+                    end
+                end
+            end
+        end
+        bopENDORSE:ADDRESS/default;
+501     bopENDORSE:CITY ;
+502     bopENDORSE:STR_STATE;
+503     bopENDORSE:STR_ZIPCODE;
+503     Begin
+        If bopENDORSE:STR_ZIPCODE[6,9] = "" Then
+            bopENDORSE:STR_ZIPCODE[6,9] = "0000"
+        End
+        bopENDORSE:STR_ZIPCODE/displayonly ;
+701     bopendorse:limit[1] ;
+
+}
+
+Procedure Definition
+
+procedure subcode
+begin
+access bopendorse_alias, set bopendorse_alias:policy_no    = bopendorse:policy_no,
+                             bopendorse_alias:pol_year     = bopendorse:pol_year,
+                             bopendorse_alias:end_sequence = bopendorse:end_sequence,
+                             bopendorse_alias:prem_no      = bopendorse:prem_no,
+                             bopendorse_alias:build_no     = bopendorse:build_no,
+                             bopendorse_alias:code         = bopendorse:code, generic
+
+l_sub_code = 0
+while bopendorse_alias:policy_no    = bopendorse:policy_no and
+      bopendorse_alias:pol_year     = bopendorse:pol_year and
+      bopendorse_alias:end_Sequence = bopendorse:end_sequence and
+      bopendorse_alias:prem_no      = bopendorse:prem_no and
+      bopendorse_alias:build_no     = bopendorse:build_no and
+      bopendorse_alias:code         = bopendorse:code
+        begin
+        l_sub_code = bopendorse_alias:sub_code
+
+        next bopendorse_alias
+        end
+
+l_sub_code = l_sub_code + 10
+end
+
+End

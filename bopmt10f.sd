@@ -1,0 +1,146 @@
+%%
+Screen
+        Name = "bopMT10f";
+        Type = "Detail" ;
+        Highlight=Underscore ;
+        Padcharacter=Space ;
+        Screensize="dynamic";
+        Windowtitle="%a     %s Policy Information - Ver. 7.00    %m";
+        Domain="sfpepl" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Global Unsigned Ascii Number G_policy_no[9] ,
+                                     g_year[4],
+                                     g_end_sequence[4] ;
+
+        Global String G_COMPANY_ID[10] ,
+                      g_inquiry[1] ;
+
+        local string l_company_id[10] ,
+                     l_username[15] ,
+                     l_system_id[15] ,
+                     l_code[7],
+                     l_code_1[7],
+                     l_code_2[7],
+                     l_add_endorsement[1] ,
+                     l_form_edition[25],
+                     l_description[75] ;
+
+        local unsigned ascii number l_state[2],
+                                    l_line_of_business[4] ,
+                                    l_sub_code[4] ,
+                                    l_epl_premium[6] ;
+
+        Access sfpepl, Set sfpepl:policy_no    = G_policy_no ,
+                           sfpepl:pol_year     = g_year,
+                           sfpepl:end_sequence = g_end_sequence ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen entry
+access sfpname, set sfpname:policy_no    = g_policy_no,
+                    sfpname:pol_year     = g_year,
+                    sfpname:end_sequence = g_end_sequence, generic
+
+access sfsemail, set sfsemail:company_id = sfpname:company_id,
+                     sfsemail:user_id    = username, generic
+
+if g_inquiry = "Y" then
+    begin
+    disable(add_fn)
+    disable(delete_fn)
+    disable(change_fn)
+    end
+
+access bopgeneral, set bopgeneral:policy_no    = g_policy_no,
+                       bopgeneral:pol_year     = g_year,
+                       bopgeneral:end_sequence = g_end_sequence, generic
+
+l_username  = username
+l_system_id = "bop"
+access sfssecurity_rating, set sfssecurity_rating:company_id = sfpname:company_id,
+                               sfssecurity_rating:user_id    = l_username,
+                               sfssecurity_rating:system_id  = l_system_id, generic
+
+Access Validation
+If sfpepl:policy_no <> G_policy_no or
+   sfpepl:pol_year <> g_year or
+   sfpepl:end_sequence <> g_end_sequence Then
+    Error 1000 ;
+
+screen
+{
+%%
+                                                        _______________
+*-------------------------------------------------------------------------------*
+| EPL Premium:    __________                                                    |
+*-------------------------------------------------------------------------------*
+
+%%
+
+components
+
+fields
+        function/noecho/showasguidetext ;
+301     begin
+        l_company_id       = sfpname:company_id
+        l_state            = bopgeneral:state
+        l_line_of_business = sfpname:line_of_business
+
+        access bpsepl, set bpsepl:company_id       = l_company_id,
+                           bpsepl:state            = l_state,
+                           bpsepl:line_of_business = l_line_of_business,
+                           bpsepl:limit            = sfpepl:epl_limit, generic
+
+
+        end
+        sfpepl:epl_premium/default/mask="ZZ,ZZZ,ZZZ.99" mandatory
+        if sfpepl:epl_premium = 0 then
+            error "You must enter a premium"
+
+        access sfpmaster, set sfpmaster:policy_no    = g_policy_no,
+                              sfpmaster:pol_Year     = g_year,
+                              sfpmaster:end_sequence = g_end_sequence, generic
+
+        if sfpmaster:policy_no    = g_policy_no and
+           sfpmaster:pol_year     = g_year and
+           sfpmaster:end_sequence = g_end_sequence then
+            begin
+            change sfpmaster
+                begin
+                sfpmaster:total[9]     = sfpepl:epl_premium
+                sfpmaster:override_epl = 1
+                end
+            end ;
+301     sfpepl:epl_premium/displayonly ;
+
+}
+
+screen exit
+if sfpmaster:total[9] = 0 then
+    begin
+    error "You did not enter a premium"
+    abort()
+    end
+
+End

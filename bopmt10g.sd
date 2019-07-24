@@ -1,0 +1,997 @@
+%%
+Screen
+        Name = "bopMT10g";
+        Type = "Detail" ;
+        Highlight=Underscore ;
+        Padcharacter=Space ;
+        Screensize="dynamic";
+        Windowtitle="%a     %s Optional Coverages - Ver. 7.00     %m";
+        Domain="bopGENERAL" ;
+        resizeable = yes ;
+        iconline = 0 ;
+
+        Global Unsigned Ascii Number G_policy_no[9] ;
+        Global Unsigned Ascii Number G_year[4] ;
+        Global Unsigned Ascii Number G_end_sequence[4] ;
+        Global Unsigned Ascii Number G_PREM_NO[4] ;
+        Global Unsigned Ascii Number G_BUILD_NO[4] ;
+        Global Unsigned Ascii Number G_FORM[1] ;
+        global unsigned ascii number g_line_of_business[4] ;
+
+        global string g_inquiry[1] ;
+
+        local string l_code[7],
+                     l_code_1[7],
+                     l_code_2[7],
+                     l_code_3[7],
+                     l_code_4[7],
+                     l_code_5[7],
+                     l_code_6[7],
+                     l_code_7[7],
+                     l_code_8[7],
+                     l_code_9[7],
+                     l_code_10[7],
+                     l_code_11[7],
+                     l_code_12[7],
+                     l_code_13[7],
+                     l_code_14[7],
+                     l_code_15[7],
+                     l_code_16[7],
+                     l_add_endorsement[1],
+                     l_form_edition[18],
+                     l_description[55] ;
+
+        local unsigned ascii number l_sub_code[4]=0 ,
+                                    l_state[2]=0 ,
+                                    l_form[1]=0,
+                                    l_credit_card[8]=0,
+                                    l_electronic_data[8]=0,
+                                    l_dependent_property[8]=0,
+                                    l_interruption[8]=0;
+
+
+        Access bopGENERAL, Set bopGENERAL:policy_no = G_policy_no ,
+                               bopgeneral:pol_year = g_year,
+                               bopgeneral:end_sequence = g_end_sequence,
+                               bopGENERAL:PREM_NO  = G_PREM_NO,
+                               bopGENERAL:BUILD_NO = G_BUILD_NO, exact
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        "update_totals" display/noreturn "bopmt010" ;
+
+        include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Screen Entry
+access sfpname, set sfpname:policy_no = g_policy_no,
+                    sfpname:pol_year = g_year,
+                    sfpname:end_sequence = g_end_sequence, generic
+
+Access SFSLINE, Set SFSLINE:COMPANY_ID       = sfpname:COMPANY_ID,
+                    SFSLINE:LINE_OF_BUSINESS = sfpname:LINE_OF_BUSINESS,
+                    SFSLINE:LOB_SUBLINE      = "00", Generic
+
+access sfscompany, set sfscompany:company_id = sfpname:company_id, generic
+
+if g_inquiry = "Y" then
+    begin
+    disable(add_fn)
+    disable(change_fn)
+    disable(delete_fn)
+    end
+
+Access Validation
+If bopGENERAL:policy_no <> G_policy_no or
+   bopgeneral:pol_year <> g_year or
+   bopgeneral:end_sequence <> g_end_sequence or
+   bopgeneral:prem_no  <> g_prem_no or
+   bopgeneral:build_no <> g_build_no Then
+    Error 1000 ;
+
+screen at 2,1 to 10, 90
+Properties
+        {
+        Layouttype = column
+        }
+{
+Panel Tagged Header_pl
+Properties
+        {
+        Borderstyle        = raised
+        Scrollbarpolicy    = asneeded
+        }
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Policy No:   _________  ____  ____                                           |
+| Location No: ____                                                            |
+| Building No: ____                                                            |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     bopGENERAL:policy_no/displayonly ;
+302     bopgeneral:pol_year/displayonly ;
+303     bopgeneral:end_sequence/displayonly ;
+401     bopGENERAL:PREM_NO/displayonly ;
+501     bopGENERAL:BUILD_NO/displayonly ;
+
+}
+
+carddialog GUI at 1,1
+Properties
+        {
+        layoutconstraints = stretch
+        }
+{
+panel tagged farmers_opt_cov
+Properties
+        {
+        scrollbarpolicy = asneeded
+        text            = "Optional Coverages"
+        }
+{
+%%
+*------------------------------------------------------------------------------------*
+| Outdoor Signs:       __________         Supplies/Materials:          __________    |
+| Signs Deductible:    _____              Pollution Cleanup:           __________    |
+| Building Code/Law %: ___                Inflation Guard %:           ____          |
+| Exterior Glass:      __________         Customers' Prop:             __________    |
+| Include Glass Deductible:    _          Limit Water Backup:          _             |
+| Burg/Robbery:   __________/__________   Water Backup Limit:          ___________   |
+| Attach BU5001:               _          Delete Water Backup Exclusion:   _         |
+| Money/Security: __________/__________   Fire Legal:                  ___________   |
+| A/R:                 __________         Valuable Papers:             ___________   |
+| Utility Services:    __________         Boilers & Machinery:         _             |
+| Mechanical Break:    __________         Wind Deductible:             _____         |
+| Delete Loss Coverage:        _          Credit Card:                 ________      |
+| Delete Loss of Income:       _          Electronic Data Processing:  ________      |
+| Loss Income to Extra Expense & Rental Income:  _                                   |
+| Loss of Income Limit: ___________       Loss Income Factor:          _____         |
+| Wholesaler:                  _    [R   _~100%  _~200% Cov B R]                     |
+| Debris Removal:       ___________                                                  |
+| Dependent Property:   ________          Interruption Computer Serv:  ________      |
+*------------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+201     begin
+        do read_bopgeneral1
+        if sfsline:lob_code one of "CPORTFOLIO" then
+            begin
+            access sfpmastsupp, set sfpmastsupp:policy_no = g_policy_no,
+                                    sfpmastsupp:pol_year = g_year,
+                                    sfpmastsupp:end_sequence = g_end_sequence,
+                                    sfpmastsupp:line_of_business = g_line_of_business, generic
+
+            l_form = sfpmastsupp:form
+            end
+        else
+            begin
+            access sfpmaster, set sfpmaster:policy_no = g_policy_no,
+                                  sfpmaster:pol_year = g_year,
+                                  sfpmaster:end_sequence = g_end_sequence, generic
+
+            l_form = sfpmaster:form
+            end
+        end
+        bopGENERAL:SIGNS_LIMIT/default ;
+301     bopGENERAL:SIGNS_DEDUCTIBLE[1]/default;
+401     bopGENERAL:BUILDING_CODE_PERCENT/default
+        if bpsbuildingcode:display_warning = 1 then
+            warning "Contact an Underwriter before Binding"
+
+        activehelp bpsbuildingcode_alias:building_code_percent;
+501     bopGENERAL:GLASS_LIMIT ;
+601     Begin
+        If FUNCTION one of "ADD", "NEW" Then
+            bopGENERAL:INCLUDE_GLASS_DEDUCTIBLE = "N"
+        End
+        bopGENERAL:INCLUDE_GLASS_DEDUCTIBLE/checkbox/values="N,Y" ;
+701     bopGENERAL:BURGLARY_LIMIT_ON/default
+        Hide If bopGENERAL:PROPERTY_LIMIT = 0 Or
+                L_FORM = 3
+
+        bopgeneral:burglary_limit_off = bpsburglmt:burglary_limit_off
+
+        If bopGENERAL:BURGLARY_LIMIT_ON <> BPSBURGLMT:BURGLARY_LIMIT_ON Then
+            Error 1238
+
+        Activehelp BPSBURGLMT_ALIAS:BURGLARY_LIMIT_ON,
+                   BPSBURGLMT_ALIAS:BURGLARY_LIMIT_OFF ;
+701     bopGENERAL:BURGLARY_LIMIT_ON/displayonly
+        If bopGENERAL:BURGLARY_LIMIT_ON = 0 Or
+           bopGENERAL:PROPERTY_LIMIT = 0 Or
+           L_FORM = 3 Then
+            Begin
+            bopGENERAL:BURGLARY_LIMIT_ON = 0
+            bopGENERAL:BURGLARY_LIMIT_OFF = 0
+            bopGENERAL:BURGLARY_PREMIUM = 0
+            End ;
+702     Begin
+        If FUNCTION one of "CHANGE", "CHG" Then
+            bopGENERAL:BURGLARY_LIMIT_OFF = BPSBURGLMT:BURGLARY_LIMIT_OFF
+        End
+        bopGENERAL:BURGLARY_LIMIT_OFF/displayonly
+        Hide If bopGENERAL:PROPERTY_LIMIT = 0 Or
+                L_FORM = 3 ;
+
+801     bopGENERAL:ATTACH_BU5001/checkbox/values="N,Y"
+        Hide If bopGENERAL:PROPERTY_LIMIT <> 0 Or
+                L_FORM <> 3 ;
+801     Begin
+        If bopGENERAL:ATTACH_BU5001 = "N" And
+           L_FORM = 1 Then
+            Begin
+            bopGENERAL:MONEY_LIMIT_ON = 0
+            bopGENERAL:MONEY_LIMIT_OFF = 0
+            End
+        End
+        bopGENERAL:ATTACH_BU5001/displayonly/checkbox/values="N,Y"  ;
+
+901     Begin
+        If FUNCTION one of "ADD", "NEW" Then
+            Begin
+            bopGENERAL:MONEY_LIMIT_ON  = BPSDEFAULT:MONEY_LIMIT_ON
+            bopGENERAL:MONEY_LIMIT_OFF = BPSDEFAULT:MONEY_LIMIT_OFF
+            End
+        If FUNCTION one of "CHANGE", "CHG" And
+           bopGENERAL:MONEY_LIMIT_ON = 0 And
+           bopGENERAL:PROPERTY_LIMIT > 0 And
+           L_FORM = 3 and
+           g_form not one of 3 Then
+            Begin
+            bopGENERAL:MONEY_LIMIT_ON  = BPSDEFAULT:MONEY_LIMIT_ON
+            bopGENERAL:MONEY_LIMIT_OFF = BPSDEFAULT:MONEY_LIMIT_OFF
+            End
+        End
+        bopGENERAL:MONEY_LIMIT_ON/default
+        Hide If ((bopGENERAL:PROPERTY_LIMIT = 0 Or
+                L_FORM <> 3) And
+                bopGENERAL:ATTACH_BU5001 = "N")
+
+        If bopGENERAL:MONEY_LIMIT_ON <> BPSMNYLMT:MONEY_LIMIT_ON Then
+            Error 1238
+
+        Activehelp BPSMNYLMT_ALIAS:MONEY_LIMIT_ON ,
+                   BPSMNYLMT_ALIAS:MONEY_LIMIT_OFF ;
+901     bopGENERAL:MONEY_LIMIT_ON/displayonly
+        If ((bopGENERAL:MONEY_LIMIT_ON = 0 Or
+           bopGENERAL:PROPERTY_LIMIT = 0 Or
+           L_FORM <> 3) And
+           bopGENERAL:ATTACH_BU5001 = "N") Then
+            Begin
+            bopGENERAL:MONEY_LIMIT_ON = 0
+            bopGENERAL:MONEY_LIMIT_OFF = 0
+            bopGENERAL:MONEY_PREMIUM = 0
+            End ;
+902     Begin
+        If FUNCTION one of "CHANGE", "CHG", "ADD", "NEW" Then
+            bopGENERAL:MONEY_LIMIT_OFF = BPSMNYLMT:MONEY_LIMIT_OFF
+        End
+        bopGENERAL:MONEY_LIMIT_OFF/displayonly
+        Hide If ((bopGENERAL:PROPERTY_LIMIT = 0 Or
+                L_FORM <> 3) And
+                bopGENERAL:ATTACH_BU5001 = "N") ;
+1001    bopGENERAL:AR_LIMIT/default  ;
+1101    bopGENERAL:UTILITY_LIMIT/default
+        hide if bopgeneral:delete_loss_coverage = 1
+        Access SFSLINE, Set SFSLINE:COMPANY_ID = bopgeneral:COMPANY_ID,
+                            SFSLINE:LINE_OF_BUSINESS = bopgeneral:LINE_OF_BUSINESS,
+                            SFSLINE:LOB_SUBLINE = "00", Generic
+
+        If bopGENERAL:UTILITY_LIMIT > BPSDEFAULT:UTILITY_MAX And
+           SFSLINE:OPTION = "P" And
+           BPSDEFAULT:UTILITY_MAX <> 0 Then
+            Error 1238 ;
+1201    bopGENERAL:MECHANICAL_LIMIT/default
+        hide if bopgeneral:delete_loss_coverage = 1
+        hide if sfsemail:agent_no <> 0
+        Access SFSLINE, Set SFSLINE:COMPANY_ID = bopgeneral:COMPANY_ID,
+                            SFSLINE:LINE_OF_BUSINESS = bopgeneral:LINE_OF_BUSINESS,
+                            SFSLINE:LOB_SUBLINE = "00", Generic
+
+        If bopGENERAL:MECHANICAL_LIMIT > BPSDEFAULT:MECHANICAL_MAX And
+           SFSLINE:OPTION = "P" And
+           BPSDEFAULT:MECHANICAL_MAX <> 0 Then
+            Error 1238 ;
+1201    bopgeneral:mechanical_limit/displayonly ;
+1301    bopgeneral:delete_loss_coverage/checkbox/values="0,1"
+        if bopgeneral:delete_loss_coverage = 1 then
+            begin
+            bopgeneral:mechanical_limit = 0
+            bopgeneral:utility_limit    = 0
+            end
+        if bopgeneral:delete_loss_coverage = 0 and
+           bopgeneral:mechanical_limit = 0 and
+           bopgeneral:utility_limit = 0 then
+            do add_coverage_back_on ;
+1101    bopgeneral:utility_limit/displayonly ;
+1201    bopgeneral:mechanical_limit/displayonly ;
+
+1401    bopGENERAL:DELETE_LOSS_INCOME/checkbox/values="N,Y"
+        if bopgeneral:delete_loss_income = "Y" then
+            begin
+            bopgeneral:limit_loss_income = "N"
+            bopgeneral:loss_income_limit = 0
+            end ;
+1501    bopGENERAL:LIMIT_LOSS_INCOME/checkbox/values="N,Y"
+        Hide If bopGENERAL:DELETE_LOSS_INCOME = "Y" ;
+1601    bopGENERAL:LOSS_INCOME_LIMIT
+        Hide If bopGENERAL:DELETE_LOSS_INCOME = "Y"
+        If bopGENERAL:LOSS_INCOME_LIMIT <> BPSLOSSINCOME:LIMIT Then
+            Warning 1238
+
+        if bopgeneral:loss_income_limit = bpslossincome:limit then
+            bopgeneral:loss_income_factor = 0
+
+        Activehelp If BPSLOSSINCOME_ALIAS:DISPLAY = "Y" Then
+                       BPSLOSSINCOME_ALIAS:LIMIT
+                   Else
+                        NULL ;
+1602    bopgeneral:loss_income_factor
+        hide if bopGENERAL:LOSS_INCOME_LIMIT = BPSLOSSINCOME:LIMIT ;
+1701    bopGENERAL:WHOLESALER/checkbox/values="N,Y" ;
+1701    Begin
+        If bopGENERAL:WHOLESALER = "N" Then
+            bopGENERAL:WHOLESALER_PERCENT = 0
+        End
+        bopGENERAL:WHOLESALER/displayonly/checkbox/values="N,Y" ;
+1702    bopGENERAL:WHOLESALER_PERCENT/values="100,200"
+        Hide If bopGENERAL:WHOLESALER = "N" or
+                bpsdefault:hide_wholesaler_percent = 1 ;
+
+1801    bopgeneral:debris_removal_limit/default ;
+1901    l_dependent_property/default ;
+
+
+202     bopGENERAL:SUPPLIES_LIMIT/default;
+302     bopGENERAL:POLLUTION_LIMIT/default ;
+402     bopGENERAL:AUTO_PERCENT/default
+        hide if sfsemail:agent_no <> 0
+        If bopGENERAL:AUTO_PERCENT <> SFSINFLATION:PERCENT Then
+            Error 1209
+        Activehelp SFSINFLATION_ALIAS:PERCENT ;
+402     bopgeneral:auto_percent/displayonly ;
+502     bopGENERAL:CUSTOMER_PROP_LIMIT/default ;
+602     bopGENERAL:WATER_BACKUP_LIMITED/checkbox/values="N,Y" ;
+703     bopGENERAL:WATER_BACKUP_LIMIT/default
+        Hide If bopGENERAL:WATER_BACKUP_LIMITED = "N" ;
+802     bopGENERAL:WATER_BACKUP_EXCLUSION/checkbox/values="N,Y" ;
+903     bopGENERAL:FIRE_LIMIT/default
+        If bopGENERAL:FIRE_LIMIT <> BPSFIRE:FIRE_LIMIT Then
+            Error 1238
+        Activehelp BPSFIRE_ALIAS:FIRE_LIMIT ;
+1002    bopGENERAL:VALUABLE_PAPERS_LIMIT/default;
+1102    begin
+        If FUNCTION one of "ADD", "NEW" Or
+           FUNCTION one of "CHANGE", "CHG" Then
+            begin
+            if bopgeneral:boilers not one of "Y" then
+                bopgeneral:boilers = "N"
+            end
+        end
+        bopGENERAL:BOILERS/default/checkbox/values="N,Y" ;
+1202    bopgeneral:wind_deductible
+        if bopgeneral:wind_deductible <> sfswinddeduct:wind_deductible then
+            error 1207
+
+        activehelp sfswinddeduct_alias:wind_deductible ;
+1302    l_credit_card/default ;
+1402    l_electronic_data/default ;
+1902    l_interruption/default
+        do update_bopgeneral1;
+
+}
+
+}
+
+}
+
+update
+if updateok = "YES" and
+   abort = "NO" then
+    begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_no = G_policy_no,
+                                 bopgeneral_alias:pol_year = g_year,
+                                 bopgeneral_alias:end_sequence = g_end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO  = G_PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = G_BUILD_NO, Generic
+
+    access sfpname, set sfpname:policy_no = g_policy_no,
+                        sfpname:pol_year = g_year,
+                        sfpname:end_sequence = g_end_sequence, generic
+
+    L_STATE = bopGENERAL_ALIAS:STATE
+    Access BPSRATE, Set BPSRATE:COMPANY_ID       = bopgeneral_alias:company_id,
+                        BPSRATE:STATE            = L_STATE,
+                        BPSRATE:LINE_OF_BUSINESS = bopgeneral_alias:line_of_business, Generic
+
+    l_code_1 = ""
+    l_code_15 = ""
+    l_code_16 = ""
+    Repeat Begin
+        Exit If BPSRATE:COMPANY_ID <> bopgeneral_alias:company_id Or
+                BPSRATE:STATE <> L_STATE Or
+                BPSRATE:LINE_OF_BUSINESS <> bopgeneral_alias:line_of_business
+
+        If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+            Begin
+            L_CODE_1  = BPSRATE:BOILERS_CODE
+            L_CODE_2  = BPSRATE:WATERBKUP_CODE[1] -- chatham square added auto
+            L_CODE_3  = BPSRATE:BUILDING_CODE
+            L_CODE_4  = BPSRATE:SPRINKLER_CODE
+            L_CODE_5  = BPSRATE:LIMIT_LOSS_INCOME_CODE
+            L_CODE_6  = BPSRATE:BUILDING_LAW_CODE
+            L_CODE_7  = BPSRATE:SIGNS_NOT_ATTACHED_CODE
+            L_CODE_8  = BPSRATE:SIGNS_ALL_RISK_CODE
+            L_CODE_9  = BPSRATE:MONEY_CODE
+            L_CODE_10 = BPSRATE:WATERBKUP_CODE[1]
+            L_CODE_11 = BPSRATE:WATERBKUP_CODE[2]
+            L_CODE_12 = BPSRATE:GLASS_DEDUCTIBLE_CODE
+            L_CODE_13 = BPSRATE:WIND_DEDUCT_CODE
+            l_code_15 = bpsrate:weather_code[1] -- with deductible
+            l_code_16 = bpsrate:weather_code[2] -- no deductible
+            End
+
+        Next BPSRATE
+        End
+
+    If L_CODE_1 <> "" Then
+        Begin
+        -- boiler endorsement if answer BU2519 applies
+        L_CODE = L_CODE_1
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_ALIAS:BOILERS = "Y" Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_ALIAS:BOILERS = "N" Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_2 <> "" Then
+        Begin
+        -- water bkup BU5003
+        L_CODE = L_CODE_2
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           SFSLINE:OPTION = "P" And
+           bopGENERAL_ALIAS:WATER_BACKUP_LIMITED = "Y" Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           SFSLINE:OPTION <> "P" And
+           bopGENERAL_ALIAS:WATER_BACKUP_LIMITED ="N" Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_3 <> "" Then
+        Begin
+        -- building Law code
+        L_CODE = L_CODE_3
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_ALIAS:BUILDING_LIMIT <> 0 Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_ALIAS:BUILDING_LIMIT = 0 Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_4 <> "" Then
+        Begin
+        -- sprinkler code
+        L_CODE = L_CODE_4
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_ALIAS:SPRINKLERS = "Y" Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_ALIAS:SPRINKLERS = "N" Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_5 <> "" Then
+        Begin
+        -- BU5010
+        L_CODE = L_CODE_5
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_ALIAS:LIMIT_LOSS_INCOME = "Y" Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_ALIAS:LIMIT_LOSS_INCOME = "N" Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_6 <> "" Then
+        Begin
+        -- building code/law endorsement, only add if no limit
+        L_CODE = L_CODE_6
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_alias:BUILDING_CODE_PERCENT = 0 Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_alias:BUILDING_CODE_PERCENT <> 0 Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_7 <> "" Then
+        Begin
+        -- signs not attached endorsement, only add if there is a limit
+        L_CODE = L_CODE_7
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_alias:SIGNS_NOT_ATTACHED_LIMIT <> 0 Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_alias:SIGNS_NOT_ATTACHED_LIMIT = 0 Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_8 <> "" Then
+        Begin
+        -- signs all risk endorsement, only add if there is a limit and
+        -- l_form <> 1
+        L_CODE = L_CODE_8
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_alias:SIGNS_NOT_ATTACHED_LIMIT <> 0 And
+           L_FORM <> 1 Then
+            Do ADD_sfpEND
+        else
+        If ((L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_alias:SIGNS_NOT_ATTACHED_LIMIT = 0) Or
+           L_FORM = 1) Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_9 <> "" Then
+        Begin
+        -- money endorsement if answer BU5001 applies
+        L_CODE = L_CODE_9
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_alias:ATTACH_BU5001 = "Y" Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_alias:ATTACH_BU5001 = "N" Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_10 <> "" Then
+        Begin
+        -- water backup limited (BU5003)
+        L_CODE = L_CODE_10
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_alias:WATER_BACKUP_LIMITED = "Y" Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_alias:WATER_BACKUP_LIMITED = "N" Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_11 <> "" Then
+        Begin
+        -- water backup exclusion deleted (BU5002)
+        L_CODE = L_CODE_11
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_alias:WATER_BACKUP_EXCLUSION = "Y" Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_alias:WATER_BACKUP_EXCLUSION = "N" Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_12 <> "" Then
+        Begin
+        -- glass deductible (BU0522)
+        L_CODE = L_CODE_12
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_alias:INCLUDE_GLASS_DEDUCTIBLE = "Y" Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_alias:INCLUDE_GLASS_DEDUCTIBLE = "N" Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_13 <> "" Then
+        Begin
+        -- wind deductible
+        L_CODE = L_CODE_13
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_alias:WIND_DEDUCTIBLE <> 0 Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_alias:WIND_DEDUCTIBLE = 0 Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_15 <> "" Then
+        Begin
+        L_CODE = L_CODE_15
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_ALIAS:weather_related = 1 Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_alias:weather_related <> 1 Then
+            Do DELETE_sfpEND
+        End
+
+    If L_CODE_16 <> "" Then
+        Begin
+        L_CODE = L_CODE_16
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_ALIAS:weather_related = 2 Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_alias:weather_related <> 2 Then
+            Do DELETE_sfpEND
+        End
+
+    Access bpstrigger, Set bpstrigger:COMPANY_ID       = bopgeneral_alias:company_id,
+                           bpstrigger:STATE            = L_STATE,
+                           bpstrigger:LINE_OF_BUSINESS = bopgeneral_alias:line_of_business, Generic
+
+    l_code_14 = ""
+    Repeat Begin
+        Exit If bpstrigger:COMPANY_ID <> bopgeneral_alias:company_id Or
+                bpstrigger:STATE <> L_STATE Or
+                bpstrigger:LINE_OF_BUSINESS <> bopgeneral_alias:line_of_business
+
+        If sfpNAME:EFF_DATE >= bpstrigger:rate_DATE Then
+            Begin
+            L_CODE_14  = bpstrigger:code[9] --BU5012
+            end
+
+        next bpstrigger
+        end
+
+    If L_CODE_14 <> "" Then
+        Begin
+        L_CODE = L_CODE_14
+        Do ACCESS_sfpEND
+        If L_ADD_ENDORSEMENT = "Y" And
+           bopGENERAL_ALIAS:delete_loss_coverage = 1 Then
+            Do ADD_sfpEND
+        else
+        If L_ADD_ENDORSEMENT = "N" And
+           bopGENERAL_alias:delete_loss_coverage = 0 Then
+            Do DELETE_sfpEND
+        End
+
+    end
+
+screen exit
+if function one of "EXIT", "BACK" and
+   g_inquiry not one of "Y" then
+    function = "update_totals"
+
+procedure definition
+
+procedure read_bopgeneral1
+begin
+access bopgeneral1, set bopgeneral1:policy_no = g_policy_no,
+                        bopgeneral1:pol_year = g_year,
+                        bopgeneral1:end_sequence = g_end_sequence,
+                        bopgeneral1:prem_no  = g_prem_no,
+                        bopgeneral1:build_no = g_build_no, generic
+
+l_credit_card        = bopgeneral1:credit_card
+l_electronic_data    = bopgeneral1:electronic_data
+l_dependent_property = bopgeneral1:dependent_property
+l_interruption       = bopgeneral1:interruption
+
+end
+
+procedure update_bopgeneral1
+begin
+access bopgeneral1, set bopgeneral1:policy_no = g_policy_no,
+                        bopgeneral1:pol_year = g_year,
+                        bopgeneral1:end_sequence = g_end_sequence,
+                        bopgeneral1:prem_no  = g_prem_no,
+                        bopgeneral1:build_no = g_build_no, generic
+
+if bopgeneral1:policy_no = g_policy_no and
+   bopgeneral1:pol_year = g_year and
+   bopgeneral1:end_sequence = g_end_sequence and
+   bopgeneral1:prem_no  = g_prem_no and
+   bopgeneral1:build_no = g_build_no then
+    begin
+    change bopgeneral1
+        begin
+        bopgeneral1:credit_card        = l_credit_card
+        bopgeneral1:electronic_data    = l_electronic_data
+        bopgeneral1:dependent_property = l_dependent_property
+        bopgeneral1:interruption       = l_interruption
+        end
+    end
+
+end
+
+procedure add_coverage_back_on
+begin
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_no = G_policy_no,
+                             bopgeneral_alias:pol_year = g_year,
+                             bopgeneral_alias:end_sequence = g_end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO  = G_PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = G_BUILD_NO, Generic
+
+l_form = sfpmaster:form
+Access BPSDEFAULT, Set BPSDEFAULT:COMPANY_ID       = bopgeneral_alias:company_id,
+                       BPSDEFAULT:LINE_OF_BUSINESS = bopgeneral_alias:line_of_business,
+                       BPSDEFAULT:FORM             = L_FORM, Generic
+
+bopGENERAL:UTILITY_LIMIT              = BPSDEFAULT:UTILITY_LIMIT
+bopGENERAL:MECHANICAL_LIMIT           = BPSDEFAULT:MECHANICAL_LIMIT
+
+end
+
+Procedure ACCESS_sfpEND
+Begin
+Access sfpEND, Set sfpEND:policy_no = G_policy_no ,
+                   sfpend:pol_year = g_Year,
+                   sfpend:end_sequence = g_end_sequence,
+                   sfpEND:PREM_NO = G_PREM_NO,
+                   sfpEND:BUILD_NO = G_BUILD_NO, Generic
+
+L_ADD_ENDORSEMENT = "Y"
+Repeat Begin
+    Exit If sfpEND:policy_no <> G_policy_no Or
+            sfpend:pol_year <> g_Year or
+            sfpend:end_sequence <> g_end_sequence or
+            sfpEND:PREM_NO <> G_PREM_NO Or
+            sfpEND:BUILD_NO <> G_BUILD_NO
+
+    If sfpEND:CODE = L_CODE Then
+        L_ADD_ENDORSEMENT = "N"
+
+    Next sfpEND
+    End
+
+End
+
+Procedure ACCESS_sfpEND_1
+Begin
+Access sfpEND, Set sfpEND:policy_no = G_policy_no ,
+                   sfpend:pol_year = g_Year,
+                   sfpend:end_sequence = g_end_sequence,
+                   sfpEND:PREM_NO = 0,
+                   sfpEND:BUILD_NO = 0, Generic
+
+L_ADD_ENDORSEMENT = "Y"
+while sfpEND:policy_no = G_policy_no and
+      sfpend:pol_year = g_Year and
+      sfpend:end_sequence = g_end_sequence and
+      sfpEND:PREM_NO  = 0 and
+      sfpEND:BUILD_NO = 0
+    begin
+    If sfpEND:CODE = L_CODE Then
+        L_ADD_ENDORSEMENT = "N"
+
+    Next sfpEND
+    End
+
+End
+
+Procedure ADD_sfpEND
+Begin
+Access sfpEND, Set sfpEND:policy_no = G_policy_no ,
+                   sfpend:pol_year = g_Year,
+                   sfpend:end_sequence = g_end_sequence,
+                   sfpEND:PREM_NO  = G_PREM_NO,
+                   sfpEND:BUILD_NO = G_BUILD_NO, Generic
+
+L_SUB_CODE = 0
+Repeat Begin
+    Exit If sfpEND:policy_no <> G_policy_no Or
+            sfpend:pol_year <> g_Year or
+            sfpend:end_sequence <> g_end_sequence or
+            sfpEND:PREM_NO <> G_PREM_NO Or
+            sfpEND:BUILD_NO <> G_BUILD_NO
+
+    L_SUB_CODE = sfpEND:SUB_CODE
+
+    Next sfpEND
+    End
+
+L_SUB_CODE = L_SUB_CODE + 10
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_no = G_policy_no,
+                             bopgeneral_alias:pol_year = g_year,
+                             bopgeneral_alias:end_sequence = g_end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = G_PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = G_BUILD_NO, Generic
+
+L_STATE = bopGENERAL_ALIAS:STATE
+Access SFSOPTEND, Set SFSOPTEND:COMPANY_ID = bopgeneral_alias:company_id,
+                      SFSOPTEND:STATE = L_STATE,
+                      SFSOPTEND:LINE_OF_BUSINESS = bopgeneral_alias:line_of_business,
+                      SFSOPTEND:CODE = L_CODE, Generic
+
+Repeat Begin
+    Exit If SFSOPTEND:COMPANY_ID <> bopgeneral_alias:company_id Or
+            SFSOPTEND:STATE <> L_STATE Or
+            SFSOPTEND:LINE_OF_BUSINESS <> bopgeneral_alias:line_of_business Or
+            SFSOPTEND:CODE <> L_CODE
+
+    If (sfpNAME:EFF_DATE >= SFSOPTEND:EFF_DATE and
+       (sfpname:eff_date <= sfsoptend:exp_date or
+       sfsoptend:exp_date = 0)) Then
+        Begin
+        L_FORM_EDITION = SFSOPTEND:FORM_EDITION
+        L_DESCRIPTION = SFSOPTEND:DESCRIPTION
+        End
+
+    Next SFSOPTEND
+    End
+
+Add sfpEND
+    Begin
+    sfpEND:policy_no            =       G_policy_no
+    sfpend:pol_year             =       g_year
+    sfpend:end_sequence         =       g_end_sequence
+    sfpEND:PREM_NO              =       G_PREM_NO
+    sfpEND:BUILD_NO             =       G_BUILD_NO
+    sfpEND:SUB_CODE             =       L_SUB_CODE
+    sfpEND:CODE                 =       L_CODE
+    sfpEND:FORM_EDITION         =       L_FORM_EDITION
+    sfpEND:DESCRIPTION          =       L_DESCRIPTION
+    sfpEND:PREMIUM              =       0
+    sfpend:lob_end_code         =       "X"
+    End
+
+End
+
+Procedure ADD_sfpEND_1
+Begin
+Access sfpEND, Set sfpEND:policy_no = G_policy_no ,
+                   sfpend:pol_year = g_Year,
+                   sfpend:end_sequence = g_end_sequence,
+                   sfpEND:PREM_NO  = 0,
+                   sfpEND:BUILD_NO = 0, Generic
+
+L_SUB_CODE = 0
+while sfpEND:policy_no = G_policy_no and
+      sfpend:pol_year = g_Year and
+      sfpend:end_sequence = g_end_sequence and
+      sfpEND:PREM_NO  = 0 and
+      sfpEND:BUILD_NO = 0
+    begin
+    L_SUB_CODE = sfpEND:SUB_CODE
+
+    Next sfpEND
+    End
+
+L_SUB_CODE = L_SUB_CODE + 10
+
+Access SFSOPTEND, Set SFSOPTEND:COMPANY_ID       = bopgeneral_alias:company_id,
+                      SFSOPTEND:STATE            = bopgeneral_alias:STATE,
+                      SFSOPTEND:LINE_OF_BUSINESS = bopgeneral_alias:line_of_business,
+                      SFSOPTEND:CODE             = L_CODE, Generic
+
+while SFSOPTEND:COMPANY_ID       = bopgeneral_alias:company_id and
+      SFSOPTEND:STATE            = bopgeneral_alias:STATE and
+      SFSOPTEND:LINE_OF_BUSINESS = bopgeneral_alias:line_of_business and
+      SFSOPTEND:CODE             = L_CODE
+    begin
+    If (sfpNAME:EFF_DATE >= SFSOPTEND:EFF_DATE and
+       (sfpname:eff_date <= sfsoptend:exp_date or
+       sfsoptend:exp_date = 0)) Then
+        Begin
+        L_FORM_EDITION = SFSOPTEND:FORM_EDITION
+        L_DESCRIPTION  = SFSOPTEND:DESCRIPTION
+        End
+
+    Next SFSOPTEND
+    End
+
+Add sfpEND
+    Begin
+    sfpEND:policy_no            =       G_policy_no
+    sfpend:pol_year             =       g_year
+    sfpend:end_sequence         =       g_end_sequence
+    sfpEND:PREM_NO              =       0
+    sfpEND:BUILD_NO             =       0
+    sfpEND:SUB_CODE             =       L_SUB_CODE
+    sfpEND:CODE                 =       L_CODE
+    sfpEND:FORM_EDITION         =       L_FORM_EDITION
+    sfpEND:DESCRIPTION          =       L_DESCRIPTION
+    sfpEND:PREMIUM              =       0
+    sfpend:lob_end_code         =       "X"
+    End
+
+End
+
+Procedure DELETE_sfpEND
+Begin
+Access sfpEND, Set sfpEND:policy_no = G_policy_no ,
+                   sfpend:pol_year = g_Year,
+                   sfpend:end_sequence = g_end_sequence,
+                   sfpEND:PREM_NO = G_PREM_NO,
+                   sfpEND:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If sfpEND:policy_no <> G_policy_no Or
+            sfpend:pol_year <> g_Year or
+            sfpend:end_sequence <> g_end_sequence or
+            sfpEND:PREM_NO <> G_PREM_NO Or
+            sfpEND:BUILD_NO <> G_BUILD_NO
+
+    If sfpEND:CODE = L_CODE Then
+        Delete sfpEND
+
+    Next sfpEND
+    End
+
+End
+
+Procedure DELETE_sfpEND_1
+Begin
+Access sfpEND, Set sfpEND:policy_no = G_policy_no ,
+                   sfpend:pol_year = g_Year,
+                   sfpend:end_sequence = g_end_sequence,
+                   sfpEND:PREM_NO  = 0,
+                   sfpEND:BUILD_NO = 0, Generic
+
+while sfpEND:policy_no = G_policy_no and
+      sfpend:pol_year = g_Year and
+      sfpend:end_sequence = g_end_sequence and
+      sfpEND:PREM_NO  = 0 and
+      sfpEND:BUILD_NO = 0
+    begin
+    If sfpEND:CODE = L_CODE Then
+        Delete sfpEND
+
+    Next sfpEND
+    End
+
+End
+
+End

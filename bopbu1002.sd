@@ -1,0 +1,205 @@
+%%
+/*
+Date Written: April 03, 2002
+
+Name: bopbu1002.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+04/03/2002             RMG              Upgrade to VCS from VCQ
+04/12/2002             RMG              Data Added
+08/06/2002             RMG              Adding Code for Edition Date
+===========================
+*/
+
+Program
+  Name         = "bopbu1002";
+  Type         = "File";
+  Domain       = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu1002.cq";
+ String L_COPY_NAME[20] ;
+ String L_SFPLOCATION_ZIP;
+
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "swsut300.var"
+   Include "csfonts.inc"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+
+Access SFPEND,
+       Set SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE , Generic;
+
+Update
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Include "swsut100.inc"
+I_CODE = "BU1002 "
+Include "swsut200.inc"
+Include "swsut300.inc"
+
+While      SFPEND:POLICY_NO         = SFPPRINT1:POLICY_NO And
+           SFPEND:POL_YEAR          = SFPPRINT1:POL_YEAR And
+           SFPEND:END_SEQUENCE      = SFPPRINT1:END_SEQUENCE
+{
+  Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,
+           SFPLOCATION:PREM_NO      = SFPEND:PREM_NO ,
+           SFPLOCATION:BUILD_NO     = SFPEND:BUILD_NO , Generic
+
+  If SFPEND:CODE = "BU1002 " Then
+
+    {
+      L_SFPLOCATION_ZIP = If (Val(SFPLOCATION:STR_ZIPCODE[6,9]) = 0) Then
+                        SFPLOCATION:STR_ZIPCODE[1,5]
+                      Else
+                        SFPLOCATION:STR_ZIPCODE[1,5] + "-" +
+                        SFPLOCATION:STR_ZIPCODE[6,9]
+
+      Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a420h6890V","Ed 1.1")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                L_COPYRIGHT_6,L_ARIAL_9," 1994 MSO, Inc.")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h120V",
+                Trun(SFSOPTEND:FORM_PRINT)," ",L_ARIAL_BOLD_9,SFSOPTEND:EDITION_PRINT,
+                "<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_14,"<033>&a1600h+0V",
+                      "BUSINESSOWNERS ENDORSEMENT",
+                      "<NL>","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a90h+0V","PROTECTIVE SAFEGUARDS",
+                      "<033>&a+25h-30V<033>*c75h3v0P",L_ARIAL_BOLD_9,
+                      "<033>&a+100h+30V","AUTOMATIC FIRE ALARM",
+                      "<033>&a+30h+20V",L_BULLET_6,"<033>&a+30h-20V",
+                      L_ARIAL_BOLD_9,"PART I","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "When made part of this insurance contract, the ",
+                      "following applies to Part I. ","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "Except as provided below, all other provisions in this policy ",
+                      "are unchanged. ","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "The required information may be shown below or ",
+                      "elsewhere in this policy. ","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+      Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "COVERAGE MODIFICATION","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a1100h+0V","A.",L_ARIAL_9,"<033>&a1300h+0V",
+                      "As a condition of this insurance, ",L_ARIAL_ITALIC_9,
+                      "you ",L_ARIAL_9,"are required to maintain the ",
+                      L_ARIAL_ITALIC_9,"protective safeguard ",l_arial_9, "described ","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V","below.",
+                      "<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+60V",
+                      "Insurance under Part I for loss caused by, or ",
+                      "resulting from, fire is suspended and ",
+                      L_ARIAL_ITALIC_9,"we ",L_ARIAL_9,"do not insure ","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "such loss if ",L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,
+                      "fail to immediately notify ",L_ARIAL_ITALIC_9,"us ",
+                      L_ARIAL_9,"when ",L_ARIAL_ITALIC_9,"you:","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s","<033>&a1300h+20V",L_BULLET_6,
+                      L_ARIAL_9,"<033>&a1500h-20V","Know of any suspension of ",
+                      "service or impairment in the working order of the ",
+                      L_ARIAL_ITALIC_9,"protective ","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1500h+0V",
+                      "safeguard; ",L_ARIAL_9,"or","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s","<033>&a1300h+50V",L_BULLET_6,
+                      L_ARIAL_9,"<033>&a1500h-20V","Fail to maintain in ",
+                      "complete working order such ",L_ARIAL_ITALIC_9,
+                      "protective safeguard ",L_ARIAL_9,"under ",
+                      L_ARIAL_ITALIC_9,"your ", L_ARIAL_9,"control.","<NL>","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V","B.",
+                      L_ARIAL_9,"<033>&a1300h+0V",
+                      "If the policy covers more than one location and a ",
+                      "premises is designated below, this Condition ","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "applies only to such designated premises.","<NL>","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1300h+0V",
+                      "Designated Premises: ","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%n%s%s%s%s%n%s",L_ARIAL_BOLD_9,"<033>&a1300h+0V",
+                      "Location: ",L_ARIAL_9,SFPLOCATION:PREM_NO,L_ARIAL_BOLD_9,
+                      "<033>&a1900h+0V","Building: ",L_ARIAL_9,
+                      SFPLOCATION:BUILD_NO,"<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s","<033>&a1300h+0V",SFPLOCATION:ADDRESS,"<NL>")
+
+      If SFPLOCATION:ADDRESS1[1] <> "" Then
+        {
+          Writefile(L_FILE_NAME,"%s%s%s","<033>&a1300h+0V",SFPLOCATION:ADDRESS1[1],"<NL>")
+        }
+      If SFPLOCATION:ADDRESS1[2] <> "" Then
+        {
+          Writefile(L_FILE_NAME,"%s%s%s","<033>&a1300h+0V",SFPLOCATION:ADDRESS1[2],"<NL>")
+        }
+      If SFPLOCATION:ADDRESS1[3] <> "" Then
+        {
+          Writefile(L_FILE_NAME,"%s%s%s","<033>&a1300h+0V",SFPLOCATION:ADDRESS1[3],"<NL>")
+        }
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s","<033>&a1300h+0V",Trun(SFPLOCATION:CITY),
+                      ", ",SFPLOCATION:STR_STATE," ",L_SFPLOCATION_ZIP,"<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s","<033>&a90h+0V",
+                      "<NL>","<NL>","<NL>","<NL>","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "ADDITIONAL DEFINITION","<NL>","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1100h+0V",
+                      "Protective safeguard, ",L_ARIAL_9,
+                      "as used in this endorsement, means an automatic fire ",
+                      "alarm protecting the entire ","<NL>")
+
+      Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "building and connected to a central station ",
+                      "or reporting to a public or private fire alarm station."
+                      ,"<FF>")
+    }
+  Next SFPEND
+}
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

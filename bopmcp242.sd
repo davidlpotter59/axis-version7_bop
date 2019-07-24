@@ -1,0 +1,259 @@
+%%
+
+/*
+Date Written: December 26, 2002
+
+Name: bopmcp242.sd
+
+Copyright (c) 2002, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+12/26/2002             JER              Changing .eq to .sd
+                                        Minor content changes
+
+04/24/2001             DWR              Modified form for MSO
+
+
+===========================
+*/
+
+Program
+  Name = "bopmcp242";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+   String L_FILE_NAME[12] = "BOPMcp242.cQ";
+   Unsigned Ascii Number L_LOOP;
+
+   Include "CSFONTS.INC"
+   Include "SWSUT100.VAR"
+   Include "swsut200.var"
+   Include "swsut300.vAr"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic;
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic;
+
+Access SFPEND,
+       Set SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+           SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+           SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic;
+
+Update
+
+   Include "swsut100.inc"
+   I_CODE = "MCP242 "
+   Include "swsut200.inc"
+
+While SFPEND:POLICY_NO = SFPPRINT1:POLICY_NO And
+      SFPEND:POL_YEAR = SFPPRINT1:POL_YEAR And
+      SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+      If SFPEND:CODE = "MCP242 " Then
+        {
+
+          Access SFPLOCATION,
+            Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO ,
+                SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR ,
+                SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+                SFPLOCATION:PREM_NO = SFPEND:PREM_NO,
+                SFPLOCATION:BUILD_NO = SFPEND:BUILD_NO, Generic
+
+          Writefile(L_FILE_NAME,"%s","<033>&a420h7000V")
+          Writefile(L_FILE_NAME,"%s",L_COPYRIGHT_6)
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s"," 1998 MSO, Inc.")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+          Writefile(L_FILE_NAME,"%s","<033>&a4800h120V")
+          Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+          Writefile(L_FILE_NAME,"%s"," ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+          Writefile(L_FILE_NAME,"%s","<NL>")
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s","PROTECTIVE SAFEGUARDS - HOOD AND DUCT PROTECTION")
+          Writefile(L_FILE_NAME,"%s","<033>&a+30h+14V")
+          Writefile(L_FILE_NAME,"%s",L_BULLET_6)
+          Writefile(L_FILE_NAME,"%s","<033>&a+30h-14V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a+50h+0V")
+          Writefile(L_FILE_NAME,"%s","PART I")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+          Writefile(L_FILE_NAME,"%s","This endorsement establishes conditions for suspension of coverage. The required information may be shown below or elsewhere")
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s","in this policy.")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+160V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s", "The provisions of this endorsement apply only when the endorsement number is listed in the Declarations.")
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s","Except as provided below, all other provisions in this policy are unchanged.")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s","<033>&a300h-60V")
+          Writefile(L_FILE_NAME,"%s","<033>*c5800h5v0P") --Horizontal line
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s","Policy #  ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%n", SFPNAME:POLICY_NO)
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+240V")
+          Writefile(L_FILE_NAME,"%s","SCHEDULE")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s","Number*")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","Location: ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%n", SFPLOCATION:PREM_NO)
+          Writefile(L_FILE_NAME,"%s","<033>&a+300h+0V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","Building: ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%n", SFPLOCATION:BUILD_NO)
+
+          Writefile(L_FILE_NAME,"%s","<033>&a400h+180V")
+          Writefile(L_FILE_NAME,"%s", SFPLOCATION:ADDRESS)
+
+          For L_LOOP = 1 To 3
+            {
+              If SFPLOCATION:ADDRESS1[L_LOOP] <> "" Then
+                {
+                   Writefile(L_FILE_NAME,"%s","<033>&a400h+120V")
+                   Writefile(L_FILE_NAME,"%s", SFPLOCATION:ADDRESS1[L_LOOP])
+                }
+            }
+          Writefile(L_FILE_NAME,"%s","<033>&a400h+120V")
+          Writefile(L_FILE_NAME,"%s", Trun(SFPLOCATION:CITY))
+          Writefile(L_FILE_NAME,"%s","<033>&a1100h+0V")
+          Writefile(L_FILE_NAME,"%s", SFPLOCATION:STR_STATE)
+          Writefile(L_FILE_NAME,"%s","<033>&a1250h+0V")
+          Writefile(L_FILE_NAME,"%s", SFPLOCATION:STR_ZIPCODE[1,5])
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+360V")
+          Writefile(L_FILE_NAME,"%s","*Item No. or Location / Building Nos. As Shown in the Declarations")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+240V")
+          Writefile(L_FILE_NAME,"%s","COVERAGE MODIFICATION")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1250h+120V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","The Part I Conditions are amended by adding the following:")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1250h+120V")
+          Writefile(L_FILE_NAME,"%s","A.")
+          Writefile(L_FILE_NAME,"%s","<033>&a+50h+0V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","All cooking appliances including their hoods and ducts must have in service, at all times, both a")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1400h+120V")
+          Writefile(L_FILE_NAME,"%s","fixed automatic fire extinguishing system and a grease removal system. Such systems must be")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1400h+120V")
+          Writefile(L_FILE_NAME,"%s","installed, maintained and routinely inspected in accordance with local codes, NFPA Standards")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1400h+120V")
+          Writefile(L_FILE_NAME,"%s","and the authority having jurisdiction.")
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a1250h+240V")
+          Writefile(L_FILE_NAME,"%s","B.")
+          Writefile(L_FILE_NAME,"%s","<033>&a+50h+0V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","Insurance under Part I for loss caused by, or resulting from, fire is suspended and")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+          Writefile(L_FILE_NAME,"%s"," we ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","do not insure")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1400h+120V")
+          Writefile(L_FILE_NAME,"%s","such loss if")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+          Writefile(L_FILE_NAME,"%s"," you ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","fail to immediately notify")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+          Writefile(L_FILE_NAME,"%s"," us ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","when")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+          Writefile(L_FILE_NAME,"%s"," you:")
+
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1350h+120V")
+          Writefile(L_FILE_NAME,"%s","<033>&a+0h+14V")
+          Writefile(L_FILE_NAME,"%s",L_BULLET_6)
+          Writefile(L_FILE_NAME,"%s","<033>&a+100h-14V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","Know of any suspension of service or impairment in the working order of the fixed automatic")
+          Writefile(L_FILE_NAME,"%s","<033>&a1510h+120V")
+          Writefile(L_FILE_NAME,"%s","fire extinguishing systems or the grease removal systems; or")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1350h+120V")
+          Writefile(L_FILE_NAME,"%s","<033>&a+0h+14V")
+          Writefile(L_FILE_NAME,"%s",L_BULLET_6)
+          Writefile(L_FILE_NAME,"%s","<033>&a+100h-14V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","Fail to maintain in complete working order such fixed automatic fire extinguishing")
+          Writefile(L_FILE_NAME,"%s","<033>&a1510h+120V")
+          Writefile(L_FILE_NAME,"%s","systems or grease removal systems under")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+          Writefile(L_FILE_NAME,"%s"," your ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","control.")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1250h+240V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD)
+          Writefile(L_FILE_NAME,"%s","C.")
+          Writefile(L_FILE_NAME,"%s","<033>&a+50h+0V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","If any changes in the systems are made,")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+          Writefile(L_FILE_NAME,"%s"," you ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","must report the changes to")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+          Writefile(L_FILE_NAME,"%s"," us ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","immediately in writing.")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1250h+240V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD)
+          Writefile(L_FILE_NAME,"%s","D.")
+          Writefile(L_FILE_NAME,"%s","<033>&a+50h+0V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","If the policy covers more than one location and a premises is designated in the Schedule, this")
+          Writefile(L_FILE_NAME,"%s","<033>&a1400h+120V")
+          Writefile(L_FILE_NAME,"%s","Condition applies only to such designated premises.")
+
+        }
+     Next SFPEND
+}
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

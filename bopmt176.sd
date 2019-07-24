@@ -1,0 +1,127 @@
+%%
+Screen
+        Name = "bopmt176" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Functional Replace Condition Cov B Part 1 - Ver 7.00     %m" ;
+        domain="bopendorse" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Global Unsigned Ascii Number G_POLICY_NO[9] ;
+        global unsigned ascii number G_YEAR[4];
+        global unsigned ascii number G_END_SEQUENCE[4];
+        Global Unsigned Ascii Number G_PREM_NO[4] ;
+        Global Unsigned Ascii Number G_BUILD_NO[4] ;
+        Global Unsigned Ascii Number G_SUB_CODE[4] ;
+        global string g_code[7] ;
+
+        local string l_code[7],
+                     l_code_1[7],
+                     l_form_edition[25],
+                     l_description[75],
+                     l_add_endorsement[1] ,
+                     l_company_id[10] ;
+
+        local unsigned ascii number l_sub_code[4],
+                                    l_type[1] ,
+                                    l_limit[8],
+                                    l_deductible[5] ;
+
+        Access bopendorse,
+           Set bopendorse:POLICY_NO = G_POLICY_NO ,
+               bopendorse:pol_year = g_year,
+               bopendorse:end_sequence = g_end_sequence,
+               bopendorse:PREM_NO = G_PREM_NO ,
+               bopendorse:BUILD_NO = G_BUILD_NO,
+               bopendorse:code     = g_code, generic
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+access validation
+if bopendorse:policy_no <> g_policy_no or
+   bopendorse:pol_year <> g_year or
+   bopendorse:end_sequence <> g_end_sequence or
+   bopendorse:prem_no <> g_prem_no or
+   bopendorse:build_no <> g_build_no or
+   bopendorse:code     <> g_code then
+    error 1000 ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Limit:  __________                                                           |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     begin
+        if function one of "ADD" then
+            begin
+            bopendorse:policy_no = g_policy_no
+            bopendorse:pol_year = g_year
+            bopendorse:end_sequence = g_end_sequence
+            bopendorse:prem_no  = g_prem_no
+            bopendorse:build_no = g_build_no
+            bopendorse:code     = g_code
+            do subcode
+            bopendorse:sub_code = l_sub_code
+            end
+
+        end
+        bopendorse:LIMIT[1];
+
+}
+
+procedure definition
+
+procedure subcode
+begin
+access bopendorse_alias, set bopendorse_alias:policy_no = g_policy_no,
+                             bopendorse:pol_year = g_year,
+                             bopendorse:end_sequence = g_end_sequence,
+                             bopendorse_alias:prem_no  = g_prem_no,
+                             bopendorse_alias:build_no = g_build_no, generic
+
+l_sub_code = 0
+while bopendorse_alias:policy_no = g_policy_no and
+      bopendorse:pol_year = g_year and
+      bopendorse:end_sequence = g_end_sequence and
+      bopendorse_alias:prem_no  = g_prem_no and
+      bopendorse_alias:build_no = g_build_no
+        begin
+        l_sub_code = bopendorse_alias:sub_code
+
+        next bopendorse_alias
+        end
+
+end
+
+End

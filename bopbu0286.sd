@@ -1,0 +1,332 @@
+%%
+/*
+Date Written: February 22, 2002
+
+Name: bopbu0286.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+03/22/2002             RMG              Upgrade to VCS from VCQ
+08/05/2002             RMG              Adding Code for Edition Date
+===========================
+*/
+
+Program
+  Name         = "bopbu0286";
+  Type         = "File";
+  Domain       = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopbu0286.cq";
+ String L_COPY_NAME[20] ;
+
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "swsut300.var"
+   Include "csfonts.inc"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO         = SFPPRINT1:POLICY_NO ,
+           SFPLOCATION:POL_YEAR           = SFPPRINT1:POL_YEAR ,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,Generic
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO         = SFPPRINT1:POLICY_NO ,
+           SFPNAME:POL_YEAR           = SFPPRINT1:POL_YEAR ,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE , Generic
+
+Include "swsut100.inc"
+I_CODE = "BU0286 "
+Include "swsut200.inc"
+Include "swsut300.inc"
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                      L_COPYRIGHT_6,L_ARIAL_9," 1993 MSO, Inc.",L_ARIAL_BOLD_9,
+                      "<033>&a4850h7000V","Page 1","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_14,"<033>&a1600h240V",
+                      "BUSINESSOWNERS ENDORSEMENT",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h120V",
+          Trun(SFSOPTEND:FORM_PRINT)," ",L_ARIAL_BOLD_9,SFSOPTEND:EDITION_PRINT,
+          "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+120V",
+                      "COMMERCIAL CONDOMINIUM COVERAGE FOR CONDOMINIUM ",
+                      "ASSOCIATIONS","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "When made part of this insurance contract, the ",
+                      "following special condominium","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a900h+0V",
+                      "provisions apply. Except as provided below, all other ",
+                      "provisions here remain unchanged.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "COVERAGE A ","<033>&a+0h+20V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_BOLD_9,
+                      " BUILDINGS (Page 1)","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "Coverage A is extended to include the following items.",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V","F.",
+                      L_ARIAL_9,"<033>&a1300h+0V","Permanent additions, ",
+                      "alterations, appliances, decorations, fixtures, and ",
+                      "other similar","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "improvements which are owned by ",L_ARIAL_ITALIC_9,
+                      "you.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a1100h+0V","G.",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Property which is ",L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,
+                      "exclusive insurance responsibility under a property ",
+                      "owners agreement.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "H.",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Real property pertaining to common areas.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "I.",L_ARIAL_ITALIC_9,"<033>&a1300h+0V",
+                      "Your ",L_ARIAL_9,"personal property used in the ",
+                      "business / operations of the condominium association.",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "J.",L_ARIAL_9,"<033>&a1300h+0V","Maintenance fees.",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "PROPERTY NOT COVERED (Page 8)","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "Property Not Covered is extended to include the ",
+                      "following items.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "I.",L_ARIAL_9,"<033>&a1300h+0V","Property, as follows:",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a1300h+0V","1.",L_ARIAL_9,"<033>&a1500h+0V",
+                      "Owned or used by or in the care, custody, or control ",
+                      "of any ",L_ARIAL_ITALIC_9,"unit-owner, ",L_ARIAL_9,
+                      "other than","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1500h+0V",
+                      "property described in F and G above.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,
+                      "<033>&a1300h+40V","2.",L_ARIAL_9,"<033>&a1500h+0V",
+                      "Property which the ",L_ARIAL_ITALIC_9,"unit-owner ",
+                      L_ARIAL_9,"is required to provide insurance for under ",
+                      "a property","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1500h+0V",
+                      "owners agreement.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "ADDITIONAL CONDITIONS","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "A.","<033>&a1300h+0V","Insurance Trustee and ",
+                      "Loss Payment","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "If ",L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,"designate an ",
+                      "insurance trustee, loss is adjusted with ",
+                      L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,
+                      "but payable to the insurance","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "trustee. If ",L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,
+                      "do not designate a specific insurance trustee, ",
+                      L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,
+                      "are the insurance trustee","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "for all ",L_ARIAL_ITALIC_9,"unit-owners ",L_ARIAL_9,
+                      "with respect to the condominium property covered here.",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,
+                      "<033>&a1300h+40V","Our ",L_ARIAL_9,
+                      "payment to the insurance trustee constitutes full ",
+                      "discharge of ",L_ARIAL_ITALIC_9,"our ",L_ARIAL_9,
+                      "liability here for the","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V","loss. ",
+                      "<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "B.","<033>&a1300h+0V","Mortgagees","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Conditions I G 3. A (Page 13) is revised to provide ",
+                      "that payment will be made to mortgagees",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "only upon termination of the described condominium ",
+                      "association.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "C.","<033>&a1300h+0V","Other Insurance","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Common Condition 10 (Page 27) is revised to provide ",
+                      "that the insurance here on covered","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "property is primary insurance, and insurance in the ",
+                      "name of the ",L_ARIAL_ITALIC_9,"unit-owner ",L_ARIAL_9,
+                      "is","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "non-contributory.","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a1100h+0V",
+                      "D.","<033>&a1300h+0V","Recovery From Others","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "Common Condition 12 (Page 28) is revised to ",
+                      "provide that ",L_ARIAL_ITALIC_9,"we ",L_ARIAL_9,"waive ",
+                      L_ARIAL_ITALIC_9,"our ",L_ARIAL_9,"right of recovery",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "against ",L_ARIAL_ITALIC_9,"unit-owners.","<NL>")
+
+                      --End of Page one
+
+Writefile(L_FILE_NAME,"%s%s","<FF>","<NL>")
+
+                      --Top of Page two
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a420h7000V",
+                      "Page 2","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h240V",
+                      "ADDITIONAL DEFINITIONS","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "The definitions in the Glossary are amended as follows:",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1300h+0V",
+                      "Insured ",L_ARIAL_9,"(Page 24) includes each ",
+                      L_ARIAL_ITALIC_9,"unit-owner ",L_ARIAL_9,
+                      "of the described condominium association with","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "respect to liability arising out of:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s","<033>&a1300h+20V",L_BULLET_6,
+                      "<033>&a1500h-20V",L_ARIAL_9,"the condominium premises ",
+                      "other than that part owned individually by the ",
+                      L_ARIAL_ITALIC_9,"unit-owners","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1500h+0V",
+                      "(the condominium unit).","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s","<033>&a1300h+50V",L_BULLET_6,
+                      "<033>&a1500h-20V",L_ARIAL_9,"membership in the ",
+                      "described condominium association.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a1300h+60V",
+                      "Unit-owner ",L_ARIAL_9,"means the owner of the ",
+                      "individual condominium unit.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,
+                      "<033>&a1300h+60V","You ",L_ARIAL_9,"and ",
+                      L_ARIAL_ITALIC_9,"your ",L_ARIAL_9,"mean the described ",
+                      "condominium association named in the declarations, and ",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1300h+0V",
+                      "reflects the collective indivisible interest of the ",
+                      "condominium ",L_ARIAL_ITALIC_9,"unit-owners.",
+                      "<NL>","<NL>","<NL>","<NL>","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h+0V",
+                      "BU 02 87",L_ARIAL_BOLD_9," 08 93",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD,"<033>&a90h+0V",
+                      "When BU 02 87 is made part of this insurance contract, ",
+                      "the provisions of","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a840h+0V",
+                      "BU 02 86 are amended, as follows. All other provisions ",
+                      "remain unchanged.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "COVERAGE A ","<033>&a+0h+20V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_BOLD_9,
+                      " BUILDINGS","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "Paragraph F is amended as follows:","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "Coverage applies solely to such property owned by ",
+                      L_ARIAL_ITALIC_9,"you ",L_ARIAL_9,"or ",
+                      L_ARIAL_ITALIC_9,"unit-owners.","<NL>","<NL>","<NL>",
+                      "<NL>","<NL>","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_12,"<033>&a4300h+0V",
+                      "BU 02 88",L_ARIAL_BOLD_9," 08 93",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD,"<033>&a90h+0V",
+                      "When BU 02 88 is made part of this insurance contract, ",
+                      "the provisions of","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a840h+0V",
+                      "BU 02 86 are amended, as follows. All other provisions ",
+                      "remain unchanged.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "COVERAGE A ","<033>&a+0h+20V",L_BULLET_6,
+                      "<033>&a+0h-20V",L_ARIAL_BOLD_9,
+                      " BUILDINGS","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "Paragraph F is amended to include the following item.",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "Coverage applies solely to property initially ",
+                      "installed or replaced in accordance with the original",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a1100h+0V",
+                      "condominium plans or specifications.","<NL>")
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

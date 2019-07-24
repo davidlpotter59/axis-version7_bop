@@ -1,0 +1,82 @@
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Location: ____                                                               |
+| Building: ____                                                               |
+*------------------------------------------------------------------------------*
+| Charge for Water Backup? __                                                  |
+*------------------------------------------------------------------------------*
+
+%%
+Screen
+        Name = "BOPMT11f" ;
+        Type = "Detail" ;
+        Padcharacter=Space ;
+        Highlight=Underscore ;
+        Screensize="dynamic";
+        Windowtitle="%a     %s Water Backup     %m";
+        Domain="BOPGENERAL" ;
+
+/*
+
+        Date Written: 08/18/2000
+
+        Copyright 2000, SCIPS.com, Inc.
+
+        Modify
+        Date            By            Comment
+        ---------------------------------------------------------------------
+        08/18/2000      jmm           added scips print and include files.
+        10/31/2000      dap           changed the look of the screen, so it can
+                                      use sfpmt001, also changed rate file names
+                                      to new names allowing for MSO as well as
+                                      ISO rates.
+        =====================================================================
+*/
+
+
+        Global Unsigned Ascii Number G_POLICY_NO[9] ,
+                                     G_YEAR[4] ,
+                                     G_END_SEQUENCE[4] ,
+                                     G_PREM_NO[4],
+                                     G_BUILD_NO[4] ;
+
+        Global String G_WATER_CHARGE[1] ;
+
+        Access BOPGENERAL, Set BOPGENERAL:POLICY_NO = G_POLICY_NO ,
+                               BOPGENERAL:POL_YEAR = G_YEAR,
+                               BOPGENERAL:END_SEQUENCE = G_END_SEQUENCE ,Generic
+
+        Include "stdkeys.INC"
+
+Functions
+
+--        Include "boqmsomenu.inc"
+
+        Include "bopmsofunc2.inc"
+
+Access Validation
+If BOPGENERAL:POLICY_NO <> G_POLICY_NO Or
+   BOPGENERAL:POL_YEAR <> G_YEAR Or
+   BOPGENERAL:END_SEQUENCE  <> G_END_SEQUENCE Then
+    Error 1000 ;
+
+Fields
+101     FUNCTION;
+301     BOPGENERAL:PREM_NO/displayonly ;
+401     BOPGENERAL:BUILD_NO/displayonly ;
+601     Begin
+        If BOPGENERAL:CHARGE_WATER_BACKUP_FIX = ""  Then
+             BOPGENERAL:CHARGE_WATER_BACKUP_FIX = "N"
+        End
+        BOPGENERAL:CHARGE_WATER_BACKUP_FIX/uppercase/default
+        If BOPGENERAL:CHARGE_WATER_BACKUP_FIX <> "Y" And
+           BOPGENERAL:CHARGE_WATER_BACKUP_FIX <> "N" Then
+            Error 1211 ;
+
+
+
+
+
+
+
+End

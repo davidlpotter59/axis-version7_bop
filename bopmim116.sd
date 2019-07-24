@@ -1,0 +1,299 @@
+%%
+/*
+Date Written: January 2, 2003
+
+Name: bopmim116.sd
+
+Copyright (c) 2003, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+10/17/2002             RMG
+
+01/02/2003             JER                 Converting .eq -> .sd
+
+08/11/2004             REL                 Corrected over printing on description
+
+===========================
+*/
+
+Program
+  Name = "bopmim116";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[12] = "bopmim116.cq";
+
+   Include "csfonts.inc"
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "swsut300.var"
+
+   Local Unsigned Ascii Number L_LOOP;
+   Unsigned Ascii Number L_LOOP2;
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPLOCATION,
+       Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPEND,
+       Set SFPEND:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPEND:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+
+   Include "swsut100.inc"
+   I_CODE = "MIM116 "
+   Include "swsut200.inc"
+
+While SFPEND:POLICY_NO = SFPPRINT1:POLICY_NO And
+      SFPEND:POL_YEAR  = SFPPRINT1:POL_YEAR And
+      SFPEND:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+  {
+      If SFPEND:CODE = "MIM116 " Then
+        {
+          Access SFPLOCATION,
+             Set SFPLOCATION:POLICY_NO    = SFPPRINT1:POLICY_NO,
+                 SFPLOCATION:POL_YEAR     = SFPPRINT1:POL_YEAR,
+                 SFPLOCATION:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+                 SFPLOCATION:PREM_NO      = SFPEND:PREM_NO,
+                 SFPLOCATION:BUILD_NO     = SFPEND:BUILD_NO, Generic
+
+
+          Access BOPENDORSE,
+             Set BOPENDORSE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+                 BOPENDORSE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+                 BOPENDORSE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,
+                 BOPENDORSE:PREM_NO      = SFPEND:PREM_NO,
+                 BOPENDORSE:BUILD_NO     = SFPEND:BUILD_NO,
+                 BOPENDORSE:CODE         = "MIM116 ", Generic
+
+          Writefile(L_FILE_NAME,"%s","<033>&a420h7000V")
+          Writefile(L_FILE_NAME,"%s",L_COPYRIGHT_6)
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s"," 1997 MSO, Inc.")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+          Writefile(L_FILE_NAME,"%s","<033>&a4300h120V")
+          Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+          Writefile(L_FILE_NAME,"%s"," ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+          Writefile(L_FILE_NAME,"%s","<NL>")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","TRANSIT FLOATER")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+          Writefile(L_FILE_NAME,"%s","This endorsement, together with the Inland Marine Common Provisions Form (MIM 010)")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s","provides coverage for property in transit. The required information may be shown below or")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s","elsewhere in this policy.")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+160V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","The provisions of this endorsement apply only when the endorsement number is listed in")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s","the Declarations. Except as provided below, all other provisions of this policy are unchanged.")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+60V")
+          Writefile(L_FILE_NAME,"%s","<033>*c4700h5v0P") --Horizontal line
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+180V")
+          Writefile(L_FILE_NAME,"%s","Policy #")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a+100h+0V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%n",SFPPRINT1:POLICY_NO)
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+180V")
+          Writefile(L_FILE_NAME,"%s","SCHEDULE")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a+300h+0V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","Location: ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%n", SFPLOCATION:PREM_NO)
+          Writefile(L_FILE_NAME,"%s","<033>&a+300h+0V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","Building: ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%n", SFPLOCATION:BUILD_NO)
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s","Description of Covered Property")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a+1400h+0V")
+          Writefile(L_FILE_NAME,"%s","Limit of Liability")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a+450h+0V")
+          Writefile(L_FILE_NAME,"%s","Deductible")
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s", SFPLOCATION:ADDRESS)
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a3080h+0V")
+          Writefile(L_FILE_NAME,"%s","$")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%n",BOPENDORSE:LIMIT[1])
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a4230h+0V")
+          Writefile(L_FILE_NAME,"%s","$")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%n",BOPENDORSE:DEDUCTIBLE[1])
+
+
+          For L_LOOP = 1 To 3
+           {
+              If SFPLOCATION:ADDRESS1[L_LOOP] <> "" Then
+                {
+                  Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+                  Writefile(L_FILE_NAME,"%s", SFPLOCATION:ADDRESS1[L_LOOP])
+                }
+          }
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+          Writefile(L_FILE_NAME,"%s", Trun(SFPLOCATION:CITY))
+          Writefile(L_FILE_NAME,"%s","<033>&a1000h+0V")
+          Writefile(L_FILE_NAME,"%s", SFPLOCATION:STR_STATE)
+          Writefile(L_FILE_NAME,"%s","<033>&a1150h+0V")
+          Writefile(L_FILE_NAME,"%s", SFPLOCATION:STR_ZIPCODE[1,5])
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+240V")
+          Writefile(L_FILE_NAME,"%s","Description of Covered Conveyances:")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+240V")
+          Writefile(L_FILE_NAME,"%s","Year")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a+500h+0V")
+          Writefile(L_FILE_NAME,"%s","Make/Model")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a+1000h+0V")
+          Writefile(L_FILE_NAME,"%s","Limit of Liability per Vehicle")
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+
+          Access BOPENDORSE,
+             Set BOPENDORSE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+                 BOPENDORSE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+                 BOPENDORSE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE ,
+                 BOPENDORSE:PREM_NO      = SFPEND:PREM_NO,
+                 BOPENDORSE:BUILD_NO     = SFPEND:BUILD_NO,
+                 BOPENDORSE:CODE         = "MIM116 ", Generic
+
+          L_LOOP2 = 1
+          while BOPENDORSE:POLICY_NO    = SFPPRINT1:POLICY_NO and
+                BOPENDORSE:POL_YEAR     = SFPPRINT1:POL_YEAr and
+                BOPENDORSE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE and
+                BOPENDORSE:PREM_NO      = SFPEND:PREM_NO and
+                BOPENDORSE:BUILD_NO     = SFPEND:BUILD_NO
+--                BOPENDORSE:CODE         = "MIM116 "
+          if bopendorse:code = "MIM116" then
+            {
+              Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+              Writefile(L_FILE_NAME,"%n",L_LOOP2)
+              Writefile(L_FILE_NAME,"%s",". ")
+              Writefile(L_FILE_NAME,"%n",BOPENDORSE:YEAR[1])
+              Writefile(L_FILE_NAME,"%s","<033>&a1000h+0V")
+              Writefile(L_FILE_NAME,"%s",BOPENDORSE:MANUFACTURER[1])
+              Writefile(L_FILE_NAME,"%s","<033>&a2500h+0V")
+              Writefile(L_FILE_NAME,"%s","$")
+              Writefile(L_FILE_NAME,"%n",BOPENDORSE:LIMIT[2])
+              L_LOOP2 = L_LOOP2 + 1
+              next bopendorse
+            }
+          while L_LOOP2 <= 4    -- making sure that there is 4 numbers with . after them
+
+            {
+              Writefile(L_FILE_NAME,"%s","<033>&a300h+120V")
+              Writefile(L_FILE_NAME,"%n",L_LOOP2)
+              Writefile(L_FILE_NAME,"%s",". ")
+              l_loop2 = l_loop2 + 1
+            }
+          Writefile(L_FILE_NAME,"%s","<033>&a300h+240V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","ADDITIONAL CONDITIONS")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1350h+120V")
+          Writefile(L_FILE_NAME,"%s","A.  Deductible - The Following is added to Loss Condition 3.C:")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1500h+180V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","The deductible shown applies per vehicle.")
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a1350h+240V")
+          Writefile(L_FILE_NAME,"%s","B.  Owned Vehicle Restriction")
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a1500h+180V")
+          Writefile(L_FILE_NAME,"%s","If MIM 504 is listed in the Declarations, coverage applies only to property in vehicles owned")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1500h+120V")
+          Writefile(L_FILE_NAME,"%s","or leased by")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+          Writefile(L_FILE_NAME,"%s"," you.")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1350h+180V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","C.  Substitute Vehicles")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1500h+180V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","If a vehicle described in this endorsement is withdrawn from normal use because of sale or")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1500h+120V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","mechanical repairs, the limit of liability applying to such vehicle shall apply to a substitute")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1500h+120V")
+          Writefile(L_FILE_NAME,"%s","vehicle operated by the")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+          Writefile(L_FILE_NAME,"%s"," insured")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s",", providing the substitute vehicle is reported to")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+          Writefile(L_FILE_NAME,"%s"," us ")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","with proper")
+
+          Writefile(L_FILE_NAME,"%s","<033>&a1500h+120V")
+          Writefile(L_FILE_NAME,"%s","description as soon as possible, but no later than 30 days after substitution.")
+
+          Writefile(L_FILE_NAME,"%s","<FF>")
+        }
+
+    Next SFPEND
+ }
+
+
+Screen Exit
+Writefile(L_file_name,"%s%s",L_formfeed ,L_reset )
+Closefile(L_file_name)
+End

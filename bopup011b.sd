@@ -1,0 +1,4680 @@
+%%
+Program
+        Name = "bopup011b" ;
+        Type = "File" ;
+        Padcharacter = Space ;
+        Domain = "Flat" ;
+
+        Global Unsigned Ascii Number G_POLICY_NO[9] ,
+                                     G_YEAR[4],
+                                     G_END_SEQUENCE[4] ,
+                                     g_prem_no[4],
+                                     g_build_no[4] ;
+
+        rwdate l_bu1526_eff_date ;
+
+        local array[50] of signed ascii number l_original_bop_premium[9];
+
+        local array[50] of unsigned ascii number l_original_building_premium[6],
+                                                 l_original_property_premium[6],
+                                                 l_original_property_special[6],
+                                                 l_original_liability_charge[4] ;
+
+        local signed ascii number l_eq_building_premium[9]=0/dec=2,
+                                  l_eq_contents_premium[9]=0/dec=2 ;
+
+        Local Signed Ascii Number   L_PREM[8]=0 ,
+                                    L_LOC_TOTAL[8]=0 ,
+                                    L_LOC_TOTAL_1[8]=0 ,
+                                    L_LOC_TOTAL_2[8]=0,
+                                    l_bop_premium[9]=0,
+                                    L_END_PREMIUM[8]=0 ,
+                                    l_hired_nonowned_premium[6]=0,
+                                    l_package_deviation[4]=0/dec=2,
+                                    L_MISC_PREMIUM[8]=0 ,
+                                    L_OPTIONAL[8]=0 ,
+                                    L_PRINTERS_PERCENT[4]=0/decimals=2,
+                                    L_PRINTERS_CREDIT[6]=0 ,
+                                    L_PERCENT_OCCUPIED[3]=0,
+                                    L_BOILERS_MINIMUM[8]=0,
+                                    L_TOTAL_PRINTERS[8]=0,
+                                    l_printers_total[8]=0,
+                                    L_BUYBACK_OPTION_TOTAL[8]=0,
+                                    L_TOTAL[8]=0 ,
+                                    L_TOTAL_1[8]=0,
+                                    L_TOTAL_2[8]=0,
+                                    L_TERRITORY_RATING[8]=0,
+                                    L_BOILER_PREM_TOTAL[8]=0 ,
+                                    l_boiler_printer_total[8]=0,
+                                    L_TOTAL_END[8]=0 ,
+                                    L_COMM[8]=0/dec=4 ,
+                                    L_PACKAGE[8]=0/dec=3 ,
+                                    L_IRPM[8]=0/dec=4 ,
+                                    L_RATE_FACTOR[1]=0/dec=2 ,
+                                    L_CREDIT_FACTOR[8]=0/dec=3 ,
+                                    L_BOILER_PREM[6]=0,
+                                    L_MAX_CREDITS[6]=0/decimals=3,
+                                    L_BPSCREDITS_MAXIMUM[3]=0/decimals=2 ;
+
+        Local Unsigned Ascii Number L_MINIMUM[4]=0 ,
+                                    l_build_no[4]=0,
+                                    l_employee_limit[8]=0,
+                                    l_end_sequence[4]=0,
+                                    l_minimum_boiler[4]=0,
+                                    l_location_credit[2]=0,
+                                    l_count_locations[2]=0,
+                                    l_off_premises_limit[8]=0,
+                                    l_off_premises_premium[6]=0,
+                                    l_bop_building_premium[6]=0,
+                                    l_bop_property_premium[6]=0,
+                                    l_restaurant_premium[4] ,
+                                    l_bop_special_premium[6]=0,
+                                    l_sub[2]=0,
+                                    l_no_locations[2]=0,
+                                    l_mp_building_property[1]=0,
+                                    l_fire_premium[6]=0,
+                                    l_minimum_1[4]=0,
+                                    l_fuel_pump_charge[3]=0,
+                                    l_liability_rate_or_charge[1]=0,
+                                    l_liability_charge_2[4]=0,
+                                    l_liability_charge_3[4]=0,
+                                    l_sub_1[2]=0,
+                                    l_row,
+                                    l_col,
+                                    l_bu1526_factor[4]=0/dec=3,
+                                    l_eq_construction[1]=0,
+                                    l_eq_building_rate[5]=0/dec=3,
+                                    l_eq_contents_rate[5]=0/dec=3,
+                                    l_eq_deductible[5]=0,
+                                    l_deductible_rate[4]=0/dec=2,
+                                    l_deductible_per[2]=0,
+                                    l_eq_deduct_rate[4]=0/dec=2,
+                                    L_OFF_PREMISE_PREM[6] ,
+                                    l_fungi_factor[6]=0/dec=4,
+                                    l_tier[2]=0,
+                                    l_tier_factor[6]=0/dec=4,
+                                    l_fungi_minimum[4]=0,
+                                    L_FMA_FACTOR[4]=0/decimals=2,
+                                    L_TYPE[1]=0,
+                                    l_change_minimum_rating[1]=0,
+                                    l_reins_factor[5]=0/dec=4,
+                                    l_reins_limit[8]=0,
+                                    l_reins_limit1[8]=0,
+                                    l_liability_code[2]=0,
+                                    l_location_premium_10[8]=0,
+                                    l_location_premium_11[8]=0,
+                                    l_rating_territory_factor[5]=0/dec=3,
+                                    L_AGENT_COMM[4]=0/decimals=2,
+                                    L_CUSTOMER_ADJ_RATE[8]=0/decimals=4,
+                                    L_CUSTOMER_ADJ_RATE_SPECIAL[8]=0/decimals=4,
+                                    L_LOSS_INCOME_FACTOR_1[3]=0/decimals=2,
+                                    L_AR_LIMIT[8]=0,
+                                    L_AR_LIMIT_1[8]=0,
+                                    L_UTILITY_LIMIT[8]=0,
+                                    L_COMPUTER_LIMIT[8]=0,
+                                    L_MECHANICAL_LIMIT[8]=0,
+                                    L_EMPLOYEE_DIS_LIMIT[8]=0,
+                                    L_EXTERIOR_SIGNS_LIMIT[8]=0,
+                                    L_INDOOR_GLASS_LIMIT[8]=0,
+                                    L_TERRITORY_BOILER_MINIMUM[8]=0,
+                                    L_COUNT[2]=0,
+                                    L_WATER_BKUP_LIMIT[8]=0,
+                                    L_VALUE_LIMIT[8]=0,
+                                    L_VALUE_LIMIT_1[8]=0,
+                                    L_EDP_LIMIT[8]=0,
+                                    L_BOILERS_PREM[6]=0,
+                                    L_RECEIPTS[8]=0,
+                                    L_RECEIPTS_LIMIT[8]=0,
+                                    L_RECEIPTS_CHARGE[4]=0,
+                                    L_PRINTERS_ERROR[4]=0,
+                                    L_PREM_NO[4];
+
+        Local String L_MISC[1]="N" ,
+                     L_MINIMUM_APPLIES[1]="N" ,
+                     l_split_comm[1]="",
+                     l_extend_hired_nonowned[1],
+                     l_delete_hired_nonowned[1],
+                     l_policy_wide_first[1],
+                     l_liability_first[1]="Y",
+                     L_FIRST[1],
+                     l_boiler_added[1]="N",
+                     L_FMA[1]="N",
+                     L_SPRINKLERED[1]="N",
+                     L_BUYBACK[1]="N",
+                     L_NO_RATING_FOR_LOCATION[1]="N" ;
+
+        Include "boprate.var"
+
+Initialisation
+g_policy_no = val(commandline[1,9])
+g_year = val(commandline[10,13])
+g_end_sequence = val(commandline[14,17])
+g_prem_no = val(commandline[18,21])
+g_build_no = val(commandline[22,25])
+l_count_locations = val(commandline[26,27])
+l_sub = val(commandline[28,29])
+l_first = uppercase(commandline[30])
+L_BOILER_PREM = 0
+L_BOILER_PREM_TOTAL = 0
+L_BUYBACK_OPTION_TOTAL = 0
+L_TOTAL_PRINTERS = 0
+L_TOTAL = 0
+l_printers_credit = 0
+l_change_minimum_rating = 0
+do number_locations
+
+access bopgeneral, set bopgeneral:policy_no = g_policy_no,
+                       bopgeneral:pol_year = g_year,
+                       bopgeneral:end_Sequence = g_end_sequence,
+                       bopgeneral:prem_no = g_prem_no,
+                       bopgeneral:build_no = g_build_no, generic
+
+Do LOC_TOTAL
+If SFSCOMPANY:SPECIAL_TERRITORY_RATING = 1 Then
+     Do TERRITORY_RATING
+
+update
+
+procedure definition
+
+procedure number_locations
+begin
+access bopgeneral_alt, set bopgeneral_alt:policy_no    = g_policy_no,
+                           bopgeneral_alt:pol_year     = g_year,
+                           bopgeneral_alt:end_sequence = g_end_sequence, generic
+
+l_no_locations = 0
+while bopgeneral_alt:policy_no    = g_policy_no and
+      bopgeneral_alt:pol_Year     = g_year and
+      bopgeneral_alt:end_sequence = g_end_sequence
+        begin
+        l_no_locations = l_no_locations + 1
+
+        next bopgeneral_alt
+        end
+
+end
+
+Procedure LOC_TOTAL
+Begin
+access sfpname, set sfpname:policy_no = g_policy_no,
+                    sfpname:pol_year = g_year,
+                    sfpname:end_sequence = g_end_sequence, generic
+
+Access SFSLINE, Set SFSLINE:COMPANY_ID = bopgeneral:company_id,
+                    SFSLINE:LINE_OF_BUSINESS = bopgeneral:line_of_business,
+                    SFSLINE:LOB_SUBLINE = "00",Generic
+
+Access SFSLINE_ALIAS, Set SFSLINE_ALIAS:COMPANY_ID = bopgeneral:company_id,
+                          SFSLINE_ALIAS:LINE_OF_BUSINESS = bopgeneral:line_of_business,
+                          SFSLINE_ALIAS:LOB_SUBLINE = "00",Generic
+
+Access sfpMASTER, Set sfpMASTER:policy_NO = bopGENERAL:policy_NO,
+                      sfpmaster:pol_year = bopgeneral:pol_year,
+                      sfpmaster:end_sequence = bopgeneral:end_sequence, Generic
+
+access sfscompany, set sfscompany:company_id = sfpname:company_id, generic
+
+If sfpMASTER:policy_NO <> bopGENERAL:policy_NO and
+   sfpmaster:pol_year <> bopgeneral:pol_year and
+   sfpmaster:end_sequence <> bopgeneral:end_sequence Then
+    Add sfpMASTER
+        Begin
+        sfpMASTER:policy_NO        =       bopGENERAL:policy_NO
+        sfpmaster:pol_Year         =       bopgeneral:pol_year
+        sfpmaster:End_sequence     =       bopgeneral:end_sequence
+        End
+
+if sfsline:lob_code one of "CPORTFOLIO" then
+    begin
+    access sfpmastsupp, set sfpmastsupp:policy_no        = bopgeneral:policy_no,
+                            sfpmastsupp:pol_year         = bopgeneral:pol_year,
+                            sfpmastsupp:end_sequence     = bopgeneral:end_sequence,
+                            sfpmastsupp:line_of_business = bopgeneral:line_of_business, generic
+
+    l_form = sfpmastsupp:form
+    l_off_premises_limit = sfpmastsupp:off_premises_limit
+    l_delete_hired_nonowned = sfpmastsupp:delete_hired_nonowned
+    l_extend_hired_nonowned = sfpmastsupp:extend_hired_nonowned
+    l_liability_code = sfpmastsupp:liability_code
+    l_location_credit = sfpmastsupp:location_credit
+    l_deductible = sfpmastsupp:deductible
+    end
+else
+    begin
+    l_form = sfpmaster:form
+    l_off_premises_limit = sfpmaster:off_premises_limit
+    l_delete_hired_nonowned = sfpmaster:delete_hired_nonowned
+    l_extend_hired_nonowned = sfpmaster:extend_hired_nonowned
+    l_liability_code = sfpmaster:liability_code
+    l_location_credit = sfpmaster:location_credit
+    l_deductible = sfpmaster:deductible
+    end
+
+l_line_of_business = bopgeneral:line_of_business
+l_state = bopgeneral:state
+access bpsdefault, set bpsdefault:company_id       = sfpname:company_id,
+                       bpsdefault:line_of_business = l_line_of_business,
+                       bpsdefault:form             = l_form, generic
+
+access sfsliability, set sfsliability:company_id       = sfpname:company_id,
+                         sfsliability:state            = l_state,
+                         sfsliability:line_of_business = l_line_of_business,
+                         sfsliability:liability_code   = l_liability_code, generic
+
+Do RATE_ALARM
+
+Access sfpEND, Set sfpEND:policy_NO = bopGENERAL:policy_NO,
+                   sfpend:pol_year = bopgeneral:pol_year,
+                   sfpend:end_sequence = bopgeneral:end_sequence,
+                   sfpEND:PREM_NO = bopGENERAL:PREM_NO,
+                   sfpEND:BUILD_NO  = bopGENERAL:BUILD_NO, Generic
+
+L_FMA = "N"
+while sfpEND:policy_NO = bopGENERAL:policy_NO and
+      sfpend:pol_year = bopgeneral:pol_year and
+      sfpend:end_sequence = bopgeneral:end_sequence and
+      sfpEND:PREM_NO  = bopGENERAL:PREM_NO and
+      sfpEND:BUILD_NO = bopGENERAL:BUILD_NO
+    begin
+    If sfpEND:CODE one of "FMA100", "BU0507" Then
+        Begin
+        L_FMA = "Y"
+        L_CODE = "FMA100"
+        End
+
+    Next sfpEND
+    End
+
+If L_FMA = "Y" Then
+    Begin
+    Access SFSOPTEND, Set SFSOPTEND:COMPANY_ID       = bopGENERAL:COMPANY_ID,
+                          SFSOPTEND:STATE            = bopGENERAL:STATE,
+                          SFSOPTEND:LINE_OF_BUSINESS = bopgeneral:line_of_business,
+                          SFSOPTEND:CODE             = L_CODE, Generic
+
+    while SFSOPTEND:COMPANY_ID       = bopGENERAL:COMPANY_ID and
+          SFSOPTEND:STATE            = bopGENERAL:STATE and
+          SFSOPTEND:LINE_OF_BUSINESS = bopgeneral:line_of_business and
+          SFSOPTEND:CODE             = L_CODE
+        begin
+        If (sfpNAME:EFF_DATE >= SFSOPTEND:EFF_DATE and
+           (sfpname:eff_date <= sfsoptend:exp_date or
+           sfsoptend:exp_date = 0)) Then
+            Begin
+            L_FMA_FACTOR = SFSOPTEND:PREMIUM_1[1]
+            End
+
+        Next SFSOPTEND
+        End
+    End
+Else
+    L_FMA_FACTOR = 1.00
+
+if bopgeneral:liability_only = 1 then
+    begin
+    do get_liability
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:BUILDING_PREMIUM = bopgeneral:liability_premium
+        End
+    end
+
+If bopGENERAL:BUILDING_LIMIT <> 0 Then
+    Begin
+    Do CALC_BUILDING_PREM
+
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopgeneral_alias:territory_factors[1] = l_territory_building
+        bopGENERAL_ALIAS:BUILDING_PREMIUM = (L_BUILDING_LIMIT *
+                                            (L_BUILDING_RATE *
+                                            L_BUILDING_ADJUSTMENTS))
+        End
+
+    End
+Else
+if bopgeneral:liability_only = 0 then
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:BUILDING_PREMIUM = 0
+        End
+    End
+
+If bopGENERAL:PROPERTY_LIMIT <> 0 Then
+    Begin
+    Do CALC_PROPERTY_PREM
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:PROPERTY_RATE = L_PROPERTY_RATE *
+                                         L_PROPERTY_ADJUSTMENTS
+        bopgeneral_alias:territory_factors[2] = l_territory_contents
+        bopGENERAL_ALIAS:PROPERTY_PREMIUM = (L_PROPERTY_LIMIT *
+                                            (L_PROPERTY_RATE *
+                                            L_PROPERTY_ADJUSTMENTS))
+        End
+    End
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:PROPERTY_PREMIUM = 0
+        End
+    End
+
+If bopGENERAL:PROPERTY_LIMIT <> 0 And
+   L_FORM = 3 Then
+    Begin
+    Do CALC_EXPANDED
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopgeneral_alias:territory_factors[3] = l_territory_expanded
+        bopGENERAL_ALIAS:PROPERTY_SPECIAL = L_SPECIAL * L_LOSS_COST *
+                                            L_TERRITORY_EXPANDED *
+                                            L_PROPERTY_CREDIT_FACTORS *
+                                            L_FMA_FACTOR
+
+        If bopGENERAL_ALIAS:ALARM_FACTOR <> 0 And
+           bopGENERAL_ALIAS:ALARM_OPTION[2] = "Y" And
+           bopGENERAL_ALIAS:ALARM_OPTION[1] = "N" then
+            bopGENERAL_ALIAS:PROPERTY_SPECIAL = bopGENERAL_ALIAS:PROPERTY_SPECIAL *
+                                                bopGENERAL_ALIAS:ALARM_FACTOR
+
+        bopGENERAL_ALIAS:ADJUSTMENT_FACTORS = L_PROPERTY_CREDIT_FACTORS *
+                                              L_TERRITORY_EXPANDED *
+                                              L_FMA_FACTOR
+        End
+    End
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:PROPERTY_SPECIAL = 0
+        End
+    End
+
+do minimum_premium
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+--        l_sub = l_sub + 1
+        bopGENERAL_ALIAS:BOP_PREMIUM = bopGENERAL_ALIAS:BUILDING_PREMIUM +
+                                       bopGENERAL_ALIAS:PROPERTY_PREMIUM +
+                                       bopGENERAL_ALIAS:PROPERTY_SPECIAL
+
+        l_original_bop_premium[l_sub] = bopGENERAL_ALIAS:BUILDING_PREMIUM +
+                                        bopGENERAL_ALIAS:PROPERTY_PREMIUM +
+                                        bopGENERAL_ALIAS:PROPERTY_SPECIAL
+        l_original_building_premium[l_sub] = bopgeneral_alias:building_premium
+        l_original_property_premium[l_sub] = bopgeneral_alias:property_premium
+        if g_policy_no = 604615 and
+           g_prem_no = 2 then
+            begin
+            write("%c%s",1005,"                                                                  ")
+            write("%c%n",1005,l_original_property_premium[1])
+            write("%c%n",1015,l_original_property_premium[2])
+            pause(4000)
+            end
+        l_original_property_special[l_sub] = bopgeneral_alias:property_special
+
+        if bopgeneral_alias:bop_premium < l_minimum and
+           l_change_minimum_rating = 1 and
+           l_mp_building_property = 0 and
+           bopgeneral_alias:liability_only = 0 then  -- mp per location
+            begin
+            l_minimum_applies = "Y"
+            bopgeneral_alias:bop_premium = l_minimum
+            if bopgeneral_alias:building_premium <> 0 then
+                bopgeneral_alias:building_premium = ((l_minimum -
+                                                    (bopgeneral_alias:building_premium +
+                                                    bopgeneral_alias:property_premium +
+                                                    bopgeneral_alias:property_special)) +
+                                                    bopgeneral_alias:building_premium)
+            else
+                bopgeneral_alias:property_premium = ((l_minimum -
+                                                    (bopgeneral_alias:property_premium +
+                                                    bopgeneral_alias:property_special)) +
+                                                    bopgeneral_alias:property_premium)
+            end
+        end
+
+-- mp per policy checking building and property premiums only
+if l_mp_building_property = 1 and
+   l_count_locations = l_no_locations then
+    begin
+    access bopgeneral_alt, set bopgeneral_alt:policy_no = bopgeneral:policy_no,
+                               bopgeneral_alt:pol_year = bopgeneral:pol_year,
+                               bopgeneral_alt:end_sequence = bopgeneral:end_sequence, generic
+
+    l_bop_premium = 0
+    l_bop_building_premium = 0
+    l_bop_property_premium = 0
+    l_bop_special_premium = 0
+    while bopgeneral_alt:policy_no = bopgeneral:policy_no and
+          bopgeneral_alt:pol_year = bopgeneral:pol_year and
+          bopgeneral_alt:end_sequence = bopgeneral:end_sequence
+        begin
+        l_bop_premium          = bopgeneral_alt:bop_premium +
+                                 l_bop_premium
+        l_bop_building_premium = bopgeneral_alt:building_premium +
+                                 l_bop_building_premium
+        l_bop_property_premium = bopgeneral_alt:property_premium +
+                                 l_bop_property_premium
+        l_bop_special_premium  = bopgeneral_alt:property_special +
+                                 l_bop_special_premium
+
+        next bopgeneral_alt
+        end
+
+    if l_bop_premium < l_minimum then
+        begin
+        l_minimum_applies = "Y"
+        Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                     bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                     bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                     bopgeneral_alias:prem_no  = bopgeneral:prem_no,
+                                     bopgeneral_alias:build_no = bopgeneral:build_no, generic
+
+        If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO and
+           bopgeneral_alias:pol_year = bopgeneral:pol_year and
+           bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+           bopgeneral_alias:prem_no  = bopgeneral:prem_no and
+           bopgeneral_alias:build_no = bopgeneral:build_no then
+            Change bopGENERAL_ALIAS
+                Begin
+                if bopgeneral_alias:building_premium <> 0 then
+                    begin
+                    bopgeneral_alias:adjustment_to_meet_minimum = (l_minimum -
+                                                                  (l_bop_building_premium +
+                                                                  l_bop_property_premium +
+                                                                  l_bop_special_premium))
+                    end
+                else
+                    begin
+                    bopgeneral_alias:adjustment_to_meet_minimum = (l_minimum -
+                                                                  (l_bop_property_premium +
+                                                                  l_bop_special_premium))
+                    end
+                end
+        end
+    else
+        begin
+        l_minimum_applies = "N"
+        l_sub_1 = 0
+        Access bopGENERAL_ALT, Set bopGENERAL_ALT:policy_NO = bopGENERAL:policy_NO,
+                                   bopgeneral_alt:pol_year = bopgeneral:pol_year,
+                                   bopgeneral_alt:end_sequence = bopgeneral:end_sequence, generic
+
+        while bopGENERAL_ALT:policy_NO = bopGENERAL:policy_NO and
+              bopgeneral_alt:pol_year = bopgeneral:pol_year and
+              bopgeneral_alt:end_sequence = bopgeneral:end_sequence
+            begin
+            Change bopGENERAL_ALT
+                Begin
+                l_sub_1 = l_sub_1 + 1
+                bopgeneral_alt:adjustment_to_meet_minimum = 0
+                bopgeneral_alt:bop_premium      = l_original_bop_premium[l_sub_1]
+                bopgeneral_alt:building_premium = l_original_building_premium[l_sub_1]
+                bopgeneral_alt:property_premium = l_original_property_premium[l_sub_1]
+                bopgeneral_alt:property_special = l_original_property_special[l_sub_1]
+                end
+
+            next bopgeneral_alt
+            end
+        End
+
+    end
+
+if bopgeneral:fuel_pumps > 0 then
+    begin
+    access bpsrate, set bpsrate:company_id = bopgeneral:company_id,
+                        bpsrate:state = bopgeneral:state,
+                        bpsrate:line_of_business = bopgeneral:line_of_business, generic
+
+    while bpsrate:company_id = bopgeneral:company_id and
+          bpsrate:state = bopgeneral:state and
+          bpsrate:line_of_business = bopgeneral:line_of_business
+            begin
+            if sfpname:eff_date >= bpsrate:eff_date then
+                begin
+                l_fuel_pump_charge = bpsrate:fuel_pump_charge
+
+                end
+
+            next bpsrate
+            end
+
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:fuel_pump_charge = bopgeneral_alias:fuel_pumps *
+                                            l_fuel_pump_charge
+        End
+    End
+else
+    begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:fuel_pump_charge = 0
+        End
+    End
+
+If bopGENERAL:RESTAURANT = 1 Then
+    Do RATE_RESTAURANTS
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:RESTAURANT_ENHANCEMENT = 0
+        End
+    End
+
+If SFSLINE_ALIAS:OPTION = "P" Then
+    Begin
+    L_EXTERIOR_SIGNS_LIMIT = (bopGENERAL:PROPERTY_LIMIT *
+                             (BPSDEFAULT:EXTERIOR_SIGNS_PERCENT Divide 100))
+    If L_EXTERIOR_SIGNS_LIMIT < BPSDEFAULT:SIGNS_LIMIT Then
+        L_EXTERIOR_SIGNS_LIMIT = BPSDEFAULT:SIGNS_LIMIT
+    End
+Else
+    L_EXTERIOR_SIGNS_LIMIT = BPSDEFAULT:SIGNS_LIMIT
+If bopGENERAL:SIGNS_LIMIT <> L_EXTERIOR_SIGNS_LIMIT Then
+    Do RATE_SIGNS
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:SIGNS_PREMIUM = 0
+        End
+    End
+
+If bopGENERAL:SIGNS_NOT_ATTACHED_LIMIT <> 0 Then
+    Do RATE_SIGNS_NOT_ATTACHED
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:SIGNS_NOT_ATTACHED_PREMIUM = 0
+        End
+    End
+
+If bopGENERAL:GLASS_LIMIT <> 0 Then
+    Do RATE_GLASS
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:GLASS_PREMIUM = 0
+        End
+    End
+
+If bopGENERAL:PROPERTY_LIMIT <> 0 And
+   L_FORM <> 3 And
+   bopGENERAL:BURGLARY_LIMIT_ON <> 0 Then
+    Do RATE_BURGLARY
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:BURGLARY_PREMIUM = 0
+        End
+    End
+
+If (bopGENERAL:ATTACH_BU5001 = "Y" Or
+   (bopGENERAL:PROPERTY_LIMIT <> 0 And
+   L_FORM = 3)) Then
+    Do RATE_MONEY
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:MONEY_PREMIUM = 0
+        End
+    End
+
+If SFSLINE_ALIAS:OPTION = "P" Then
+    Begin
+    L_AR_LIMIT_1 = (bopGENERAL:PROPERTY_LIMIT *
+                   (BPSDEFAULT:AR_PERCENT Divide 100))
+    If L_AR_LIMIT_1 < BPSDEFAULT:AR_LIMIT Then
+        L_AR_LIMIT_1 = BPSDEFAULT:AR_LIMIT
+    End
+Else
+    L_AR_LIMIT_1 = BPSDEFAULT:AR_LIMIT
+If bopGENERAL:AR_LIMIT <> L_AR_LIMIT_1 Then
+    Begin
+    L_AR_LIMIT = bopGENERAL:AR_LIMIT - L_AR_LIMIT_1
+    Do RATE_AR
+    End
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:AR_PREMIUM = 0
+        End
+    End
+
+If SFSLINE_ALIAS:OPTION = "P" Then
+    Begin
+    L_UTILITY_LIMIT = (bopGENERAL:PROPERTY_LIMIT *
+                      (BPSDEFAULT:UTILITY_PERCENT Divide 100))
+    If L_UTILITY_LIMIT < BPSDEFAULT:UTILITY_LIMIT Then
+        L_UTILITY_LIMIT = BPSDEFAULT:UTILITY_LIMIT
+    If L_UTILITY_LIMIT > BPSDEFAULT:UTILITY_MAX Then
+        L_UTILITY_LIMIT = BPSDEFAULT:UTILITY_MAX
+    End
+Else
+    L_UTILITY_LIMIT = BPSDEFAULT:UTILITY_LIMIT
+If bopGENERAL:UTILITY_LIMIT <> L_UTILITY_LIMIT Then
+    Do RATE_UTILITY
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:UTILITY_PREMIUM = 0
+        End
+    End
+
+If SFSLINE_ALIAS:OPTION = "P" Then
+    Begin
+    L_MECHANICAL_LIMIT = (bopGENERAL:PROPERTY_LIMIT *
+                         (BPSDEFAULT:MECHANICAL_PERCENT Divide 100))
+    If L_MECHANICAL_LIMIT < BPSDEFAULT:MECHANICAL_LIMIT Then
+        L_MECHANICAL_LIMIT = BPSDEFAULT:MECHANICAL_LIMIT
+    If L_MECHANICAL_LIMIT > BPSDEFAULT:MECHANICAL_MAX Then
+        L_MECHANICAL_LIMIT = BPSDEFAULT:MECHANICAL_MAX
+    End
+Else
+    L_MECHANICAL_LIMIT = BPSDEFAULT:MECHANICAL_LIMIT
+If bopGENERAL:MECHANICAL_LIMIT <> L_MECHANICAL_LIMIT Then
+    Do RATE_MECHANICAL
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:MECHANICAL_PREMIUM = 0
+        End
+    End
+
+If L_OFF_PREMISES_LIMIT <> BPSDEFAULT:OFF_PREMISES_B Then
+    Do RATE_OFF_PREMISES
+Else
+    Begin
+    if sfsline:lob_code = "CPORTFOLIO" then
+        begin
+        Access sfpmastsupp, Set sfpmastsupp:policy_NO = bopGENERAL:policy_NO,
+                                sfpmastsupp:pol_year = bopgeneral:pol_year,
+                                sfpmastsupp:end_sequence = bopgeneral:end_sequence,
+                                sfpmastsupp:line_of_business = bopgeneral:line_of_business, generic
+
+        Change sfpmastsupp
+            Begin
+            sfpmastsupp:OFF_PREMISES_PREMIUM = 0
+            end
+        End
+    else
+        begin
+        Access sfpMASTER, Set sfpMASTER:policy_NO = bopGENERAL:policy_NO,
+                              sfpmaster:pol_year = bopgeneral:pol_year,
+                              sfpmaster:end_sequence = bopgeneral:end_sequence, Exact
+
+        Change sfpMASTER
+            Begin
+            sfpMASTER:OFF_PREMISES_PREMIUM = 0
+            end
+        End
+    End
+
+If SFSLINE_ALIAS:OPTION = "P" Then
+    Begin
+    L_VALUE_LIMIT_1 = (bopGENERAL:PROPERTY_LIMIT *
+                      (BPSDEFAULT:VALUABLE_PERCENT Divide 100))
+    If L_VALUE_LIMIT_1 < BPSDEFAULT:VALUABLE_PAPERS_LIMIT Then
+        L_VALUE_LIMIT_1 = BPSDEFAULT:VALUABLE_PAPERS_LIMIT
+    End
+Else
+    L_VALUE_LIMIT_1 = BPSDEFAULT:VALUABLE_PAPERS_LIMIT
+If bopGENERAL:VALUABLE_PAPERS_LIMIT <> L_VALUE_LIMIT_1 Then
+    Begin
+    L_VALUE_LIMIT = bopGENERAL:VALUABLE_PAPERS_LIMIT - L_VALUE_LIMIT_1
+    Do RATE_VALUABLE_PAPERS
+    End
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:VALUABLE_PAPERS_PREMIUM = 0
+        End
+    End
+
+If SFSLINE_ALIAS:OPTION = "P" Then
+    Begin
+    L_WATER_BKUP_LIMIT = (bopGENERAL:PROPERTY_LIMIT *
+                         (BPSDEFAULT:SEWER_BKUP_PERCENT Divide 100))
+    If L_WATER_BKUP_LIMIT < BPSDEFAULT:WATER_BACKUP_LIMIT Then
+        L_WATER_BKUP_LIMIT = BPSDEFAULT:WATER_BACKUP_LIMIT
+    End
+Else
+    L_WATER_BKUP_LIMIT = BPSDEFAULT:WATER_BACKUP_LIMIT
+If bopGENERAL:WATER_BACKUP_LIMITED = "Y" Then
+    Do RATE_WATERBACKUP
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:WATER_BACKUP_PREMIUM = 0
+        End
+    End
+
+If bopGENERAL:ACV_BUILDING = "Y" Then
+    Do RATE_ACV_BUILDING
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:ACV_BUILDING_PREMIUM = 0
+        End
+    End
+
+If bopGENERAL:ACV_CONTENTS = "Y" Then
+    Do RATE_ACV_CONTENTS
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:ACV_CONTENTS_PREMIUM = 0
+        End
+    End
+
+access bpsrate, set bpsrate:company_id = bopgeneral:company_id,
+                    bpsrate:state = bopgeneral:state,
+                    bpsrate:line_of_business = bopgeneral:line_of_business, generic
+
+while bpsrate:company_id = bopgeneral:company_id and
+      bpsrate:state = bopgeneral:state and
+      bpsrate:line_of_business = bopgeneral:line_of_business
+        begin
+        if sfpname:eff_date >= bpsrate:eff_date then
+            begin
+            l_liability_rate_or_charge = bpsrate:liability_rate_or_charge
+
+            end
+
+        next bpsrate
+        end
+
+if l_liability_rate_or_charge not one of 1 then
+    begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopgeneral_alias:liability_charge = l_liability_charge
+        end
+    end
+else
+    begin
+    l_liability_rate_1 = l_liability_rate
+    l_liability_charge_1 = (((bopgeneral_alias:building_premium +
+                           bopgeneral_alias:property_premium +
+                           bopgeneral_alias:acv_building_premium +
+                           bopgeneral_alias:acv_contents_premium) *
+                           l_liability_rate_1) -
+                           (bopgeneral_alias:building_premium +
+                           bopgeneral_alias:property_premium +
+                           bopgeneral_alias:acv_building_premium +
+                           bopgeneral_alias:acv_contents_premium))
+    l_original_liability_charge[l_sub] = l_liability_charge_1
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopgeneral_alias:liability_charge = l_liability_charge_1
+        end
+    l_liability_charge_3 = l_liability_charge_1
+    end
+
+If bopGENERAL:CUSTOMER_PROP_LIMIT <> BPSDEFAULT:CUSTOMER_PROP_LIMIT Then
+    Do RATE_CUSTOMER_PROPERTY
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:CUSTOMER_PROP_PREMIUM = 0
+        End
+    End
+
+If bopGENERAL:FIRE_LIMIT <> BPSDEFAULT:FIRE_LIMIT Then
+    Do RATE_FIRE_LEGAL
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:FIRE_PREMIUM = 0
+        End
+    End
+
+If bopGENERAL:BUILDING_CODE_PERCENT <> BPSDEFAULT:BUILDING_CODE_PERCENT Then
+    Do RATE_BUILDING_CODE
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:BUILDING_CODE_PREMIUM = 0
+        End
+    End
+
+If bopGENERAL:BOILERS = "Y" and
+   bopgeneral:liability_only = 0 then
+    begin
+    l_boiler_added = "Y"
+    Do RATE_BOILERS
+    end
+Else
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:BOILERS_PREMIUM = 0
+        End
+    L_BOILERS_PREM = 0
+    End
+
+If L_DELETE_HIRED_NONOWNED = "Y" Or
+   L_EXTEND_HIRED_NONOWNED = "Y" Then
+    Do RATE_HIRED_NONOWNED
+Else
+    Begin
+    if sfsline:lob_code = "CPORTFOLIO" then
+        begin
+        Access sfpmastsupp, Set sfpmastsupp:policy_NO = bopGENERAL:policy_NO,
+                                sfpmastsupp:pol_year = bopgeneral:pol_year,
+                                sfpmastsupp:end_sequence = bopgeneral:end_sequence,
+                                sfpmastsupp:line_of_business = bopgeneral:line_of_business, generic
+
+        Change sfpmastsupp
+            Begin
+            sfpmastsupp:hired_nonowned_premium = 0
+            end
+        End
+    else
+        begin
+        Access sfpMASTER, Set sfpMASTER:policy_NO = bopGENERAL:policy_NO,
+                              sfpmaster:pol_year = bopgeneral:pol_year,
+                              sfpmaster:end_sequence = bopgeneral:end_sequence, Exact
+
+        Change sfpMASTER
+            Begin
+            sfpMASTER:HIRED_NONOWNED_PREMIUM = 0
+            end
+        End
+    End
+
+If L_FIRST = "Y" Then
+    Begin
+    L_FIRST = "N"
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:OPTIONAL_TOTAL = bopGENERAL_ALIAS:SIGNS_PREMIUM +
+                                          bopGENERAL_ALIAS:SIGNS_NOT_ATTACHED_PREMIUM +
+                                          bopGENERAL_ALIAS:GLASS_PREMIUM +
+                                          bopGENERAL_ALIAS:BURGLARY_PREMIUM +
+                                          bopGENERAL_ALIAS:MONEY_PREMIUM +
+                                          bopGENERAL_ALIAS:AR_PREMIUM +
+                                          bopGENERAL_ALIAS:UTILITY_PREMIUM +
+                                          bopGENERAL_ALIAS:MECHANICAL_PREMIUM +
+                                          bopGENERAL_ALIAS:CUSTOMER_PROP_PREMIUM +
+                                          L_OFF_PREMISES_PREMIUM +
+                                          bopGENERAL_ALIAS:POLLUTION_PREMIUM +
+                                          bopGENERAL_ALIAS:VALUABLE_PAPERS_PREMIUM +
+                                          bopGENERAL_ALIAS:ACV_BUILDING_PREMIUM +
+                                          bopGENERAL_ALIAS:ACV_CONTENTS_PREMIUM +
+                                          bopGENERAL_ALIAS:FIRE_PREMIUM +
+                                          bopGENERAL_ALIAS:BUILDING_CODE_PREMIUM +
+                                          bopGENERAL_ALIAS:BOILERS_PREMIUM +
+                                          bopGENERAL_ALIAS:WATER_BACKUP_PREMIUM +
+                                          L_HIRED_NONOWNED_PREMIUM +
+                                          bopGENERAL_ALIAS:RESTAURANT_ENHANCEMENT +
+                                          bopgeneral_alias:fuel_pump_charge
+        End
+    End
+Else
+    Begin
+    Change bopGENERAL_ALIAS
+        Begin
+        If bopGENERAL_ALIAS:OFF_PREMISES_LIMIT <> L_OFF_PREMISES_LIMIT Then
+            L_OFF_PREMISE_PREM = bopGENERAL_ALIAS:OFF_PREMISES_PREMIUM
+        Else
+            L_OFF_PREMISE_PREM = 0
+        if bpsdefault:fire_legal_policy_wide = 1 then
+            begin
+            l_fire_premium = 0
+            bopgeneral_alias:fire_premium = 0
+            end
+        else
+            l_fire_premium = bopgeneral_alias:fire_premium
+        bopGENERAL_ALIAS:OPTIONAL_TOTAL = bopGENERAL_ALIAS:SIGNS_PREMIUM +
+                                          bopGENERAL_ALIAS:SIGNS_NOT_ATTACHED_PREMIUM +
+                                          bopGENERAL_ALIAS:GLASS_PREMIUM +
+                                          L_OFF_PREMISE_PREM +
+                                          bopGENERAL_ALIAS:BURGLARY_PREMIUM +
+                                          bopGENERAL_ALIAS:MONEY_PREMIUM +
+                                          bopGENERAL_ALIAS:AR_PREMIUM +
+                                          bopGENERAL_ALIAS:UTILITY_PREMIUM +
+                                          bopGENERAL_ALIAS:MECHANICAL_PREMIUM +
+                                          bopGENERAL_ALIAS:CUSTOMER_PROP_PREMIUM +
+                                          bopGENERAL_ALIAS:POLLUTION_PREMIUM +
+                                          bopGENERAL_ALIAS:VALUABLE_PAPERS_PREMIUM +
+                                          bopGENERAL_ALIAS:ACV_BUILDING_PREMIUM +
+                                          bopGENERAL_ALIAS:ACV_CONTENTS_PREMIUM +
+                                          L_FIRE_PREMIUM +
+                                          bopGENERAL_ALIAS:BUILDING_CODE_PREMIUM +
+                                          bopGENERAL_ALIAS:BOILERS_PREMIUM +
+                                          bopGENERAL_ALIAS:WATER_BACKUP_PREMIUM +
+                                          bopGENERAL_ALIAS:RESTAURANT_ENHANCEMENT +
+                                          bopgeneral_alias:fuel_pump_charge
+        End
+    End
+
+l_end_premium = 0
+if l_policy_wide_first = "Y" then
+    begin
+    l_prem_no = 0
+    l_build_no = 0
+    Access sfpEND, Set sfpEND:policy_NO = bopGENERAL:policy_NO,
+                       sfpend:pol_year = bopgeneral:pol_year,
+                       sfpend:end_sequence = bopgeneral:end_sequence,
+                       sfpEND:PREM_NO  = l_prem_no,
+                       sfpEND:BUILD_NO = l_build_no, Generic
+
+    while sfpEND:policy_NO = bopGENERAL:policy_NO and
+          sfpend:pol_year = bopgeneral:pol_year and
+          sfpend:end_sequence = bopgeneral:end_sequence and
+          sfpEND:PREM_NO  = l_prem_no and
+          sfpEND:BUILD_NO = l_build_no
+        begin
+        L_UPDATE_SFPEND_PREMIUM = 0
+        L_CODE = sfpEND:CODE
+        Do RATE_ENDORSEMENTS
+        Change sfpEND
+            Begin
+            sfpEND:PREMIUM = L_UPDATE_SFPEND_PREMIUM
+            End
+        L_END_PREMIUM = L_END_PREMIUM + L_UPDATE_SFPEND_PREMIUM
+
+        Next sfpEND
+        End
+
+    l_policy_wide_first = "N"
+    end
+
+Access sfpEND, Set sfpEND:policy_NO = bopGENERAL:policy_NO,
+                   sfpend:pol_year = bopgeneral:pol_year,
+                   sfpend:end_sequence = bopgeneral:end_sequence,
+                   sfpEND:PREM_NO  = bopGENERAL:PREM_NO,
+                   sfpEND:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+while sfpEND:policy_NO = bopGENERAL:policy_NO and
+      sfpend:pol_year = bopgeneral:pol_year and
+      sfpend:end_sequence = bopgeneral:end_sequence and
+      sfpEND:PREM_NO  = bopGENERAL:PREM_NO and
+      sfpEND:BUILD_NO = bopGENERAL:BUILD_NO
+    begin
+    L_UPDATE_SFPEND_PREMIUM = 0
+    L_CODE = sfpEND:CODE
+    Do RATE_ENDORSEMENTS
+    Change sfpEND
+        Begin
+        sfpEND:PREMIUM = L_UPDATE_SFPEND_PREMIUM
+        End
+    L_END_PREMIUM = L_END_PREMIUM + L_UPDATE_SFPEND_PREMIUM
+
+Next sfpEND
+End
+
+Access sfpMISC, Set sfpMISC:policy_NO = G_policy_NO,
+                    sfpmisc:pol_year = g_year,
+                    sfpmisc:end_sequence = g_end_sequence, Generic
+
+L_MISC_PREMIUM = 0
+If L_MISC <> "Y" Then
+    Begin
+    while sfpMISC:policy_NO = G_policy_NO and
+          sfpmisc:pol_year = g_year and
+          sfpmisc:end_sequence = g_end_sequence
+        begin
+        L_MISC_PREMIUM = L_MISC_PREMIUM + sfpMISC:PREMIUM
+        L_MISC = "Y"
+
+        Next sfpMISC
+        End
+    End
+
+L_PREM = bopGENERAL_ALIAS:BOP_PREMIUM
+
+-- boilers does not get any discounts, credits or surcharges, need to take this
+-- out of the optional total and put back in after credits have been applied
+
+access bpsrate, set bpsrate:company_id = bopgeneral:company_id,
+                    bpsrate:state = bopgeneral:state,
+                    bpsrate:line_of_business = bopgeneral:line_of_business, generic
+
+while bpsrate:company_id = bopgeneral:company_id and
+      bpsrate:state = bopgeneral:state and
+      bpsrate:line_of_business = bopgeneral:line_of_business
+        begin
+        if sfpname:eff_date >= bpsrate:eff_date then
+            begin
+            l_liability_rate_or_charge = bpsrate:liability_rate_or_charge
+
+            end
+
+        next bpsrate
+        end
+
+-- liability mp per policy
+if l_liability_rate_or_charge one of 1 and
+   l_liability_first = "Y" then
+    begin
+    l_liability_First = "N"
+    access bopgeneral_alt, set bopgeneral_alt:policy_no = bopgeneral:policy_no,
+                               bopgeneral_alt:pol_year = bopgeneral:pol_year,
+                               bopgeneral_alt:end_sequence = bopgeneral:end_sequence, generic
+
+    l_liability_charge_2 = 0
+    while bopgeneral_alt:policy_no = bopgeneral:policy_no and
+          bopgeneral_alt:pol_Year = bopgeneral:pol_year and
+          bopgeneral_alt:end_sequence = bopgeneral:end_sequence
+        begin
+        l_liability_charge_2 = l_liability_charge_2 +
+                               bopgeneral_alt:liability_charge
+
+        next bopgeneral_alt
+        end
+
+    if l_liability_charge_2 < l_liability_charge then
+        begin
+        Access bopGENERAL_ALT, Set bopGENERAL_ALT:policy_NO = bopGENERAL:policy_NO,
+                                   bopgeneral_alt:pol_year = bopgeneral:pol_year,
+                                   bopgeneral_alt:end_sequence = bopgeneral:end_sequence, generic
+
+        Change bopGENERAL_ALT
+            Begin
+            l_liability_charge_3            = (bopgeneral_alt:liability_charge +
+                                              (l_liability_charge -
+                                              l_liability_charge_2))
+            bopgeneral_alt:liability_charge = (bopgeneral_alt:liability_charge +
+                                              (l_liability_charge -
+                                              l_liability_charge_2))
+            end
+
+        end
+    else
+        begin
+        Access bopGENERAL_ALT, Set bopGENERAL_ALT:policy_NO = bopGENERAL:policy_NO,
+                                   bopgeneral_alt:pol_year = bopgeneral:pol_year,
+                                   bopgeneral_alt:end_sequence = bopgeneral:end_sequence, generic
+
+        l_liability_charge_3 = l_original_liability_charge[1]
+        l_sub_1 = 0
+        while bopGENERAL_ALT:policy_NO = bopGENERAL:policy_NO and
+              bopgeneral_alt:pol_year = bopgeneral:pol_Year and
+              bopgeneral_alt:end_sequence = bopgeneral:end_sequence
+            begin
+            l_sub_1 = l_sub_1 + 1
+            Change bopGENERAL_ALT
+                Begin
+                bopgeneral_alt:liability_charge = l_original_liability_charge[l_sub_1]
+                end
+            next bopgeneral_alt
+            end
+        end
+
+    end
+
+if l_liability_rate_or_charge not one of 1 then
+    begin
+    L_OPTIONAL    = ((bopGENERAL_ALIAS:OPTIONAL_TOTAL -
+                    bopGENERAL_ALIAS:BOILERS_PREMIUM) +
+                    L_LIABILITY_CHARGE)
+    end
+else
+    begin
+    L_OPTIONAL    = ((bopGENERAL_ALIAS:OPTIONAL_TOTAL -
+                    bopGENERAL_ALIAS:BOILERS_PREMIUM) +
+                    L_LIABILITY_CHARGE_3)
+    end
+
+L_BOILER_PREM = bopGENERAL_ALIAS:BOILERS_PREMIUM + L_BOILER_PREM
+L_TOTAL_END   = L_OPTIONAL + L_END_PREMIUM
+
+Do GET_RATE
+do printers_credit
+
+/* end of loc total */
+End
+
+Procedure RATE_ALARM
+Begin
+Access BPSCREDITS, Set BPSCREDITS:COMPANY_ID       = bopgeneral:company_id,
+                       BPSCREDITS:STATE            = bopGENERAL:STATE,
+                       BPSCREDITS:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+while BPSCREDITS:COMPANY_ID       = bopgeneral:company_id and
+      BPSCREDITS:STATE            = bopGENERAL:STATE and
+      BPSCREDITS:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= BPSCREDITS:EFF_DATE Then
+        Begin
+        L_FACTOR = BPSCREDITS:ALARM_FACTOR[1]
+        L_SUPERIOR_FACTOR = BPSCREDITS:ALARM_FACTOR[2]
+        End
+
+    Next BPSCREDITS
+    End
+
+access bpsrate, set bpsrate:company_id = bopgeneral:company_id,
+                    bpsrate:state = bopgeneral:state,
+                    bpsrate:line_of_business = bopgeneral:line_of_business, generic
+
+while bpsrate:company_id = bopgeneral:company_id and
+      bpsrate:state = bopgeneral:state and
+      bpsrate:line_of_business = bopgeneral:line_of_business
+        begin
+        if sfpname:eff_date >= bpsrate:eff_date then
+            begin
+            l_liability_rate_or_charge = bpsrate:liability_rate_or_charge
+
+            end
+
+        next bpsrate
+        end
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+Change bopGENERAL_ALIAS
+    Begin
+    If bopGENERAL_ALIAS:BURGLAR_ALARM_SYSTEM = "" Then
+        bopGENERAL_ALIAS:BURGLAR_ALARM_SYSTEM = "N"
+
+    if l_liability_rate_or_charge not one of 1 then
+        begin
+        If bopGENERAL_ALIAS:ALARM_OPTION[1] = "Y" Or
+           bopGENERAL_ALIAS:ALARM_OPTION[2] = "Y" And
+           bopGENERAL_ALIAS:ALARM_OPTION[3] = "N" Then
+            bopGENERAL_ALIAS:ALARM_FACTOR = L_FACTOR
+        If bopGENERAL_ALIAS:ALARM_OPTION[3] = "Y" Then
+           bopGENERAL_ALIAS:ALARM_FACTOR = L_SUPERIOR_FACTOR
+
+        If bopGENERAL_ALIAS:ALARM_OPTION[1] = "N" And
+           bopGENERAL_ALIAS:ALARM_OPTION[2] = "N" And
+           bopGENERAL_ALIAS:ALARM_OPTION[3] = "N" And
+           bopGENERAL_ALIAS:BURGLAR_ALARM_SYSTEM = "N" Then
+            bopGENERAL_ALIAS:ALARM_FACTOR = 1.00
+        end
+    else
+        begin
+        if bopgeneral_alias:alarm_factor = 0 then
+            bopgeneral_alias:alarm_factor = 1.00
+        end
+    End
+
+End
+
+Procedure CALC_BUILDING_PREM
+Begin
+Do ACCESS_LOSSCOST
+
+L_RECORD_TYPE = 2
+L_COMPANY_ID = bopgeneral:company_id
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_TERRITORY = 999
+L_RATING_ID = "4"
+L_CONSTRUCTION_STRING = Str(bopGENERAL:CONSTRUCTION)
+L_STATE = bopGENERAL:STATE
+L_PROTECTION = bopGENERAL:PROTECTION
+L_EFF_DATE = sfpNAME:EFF_DATE
+L_TYPE = bopGENERAL:BOP_TYPE
+L_RATE_NO = bopGENERAL:RATE_NO
+Access BPSCREDITS, Set BPSCREDITS:COMPANY_ID = L_COMPANY_ID,
+                       BPSCREDITS:STATE = L_STATE,
+                       BPSCREDITS:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS, Generic
+
+while BPSCREDITS:COMPANY_ID       = L_COMPANY_ID and
+      BPSCREDITS:STATE            = L_STATE and
+      BPSCREDITS:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS
+    begin
+    If L_EFF_DATE >= BPSCREDITS:EFF_DATE Then
+        L_PERCENT_OCCUPIED  = BPSCREDITS:PERCENT_OCCUPIED
+
+    Next BPSCREDITS
+    End
+
+If bopGENERAL:TENANT = "N" And
+   bopGENERAL:PERCENT_OCCUPIED >= L_PERCENT_OCCUPIED Then
+    L_OCCUPIED = "O"
+Else
+    L_OCCUPIED = "L"
+
+If L_TYPE <> 8 And
+   L_TYPE <> 9 Then
+    Begin
+    if bopgeneral:company_id = "WHMIC" then
+        begin
+        include "bpsbuild1.inc"
+        end
+    else
+        begin
+        Include "bpsbuild.inc"
+        end
+    End
+Else
+If L_TYPE = 8 Or
+   L_TYPE = 9 Then
+    Begin
+    Do ACCESS_LOSSCOST
+
+    L_RECORD_TYPE = 1
+    L_COMPANY_ID = bopgeneral:company_id
+    L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+    L_TERRITORY = 999
+    L_RATING_ID = "4"
+    L_CONSTRUCTION = bopGENERAL:CONSTRUCTION
+    L_STATE = bopGENERAL:STATE
+    L_PROTECTION = bopGENERAL:PROTECTION
+    L_EFF_DATE = sfpNAME:EFF_DATE
+    L_TYPE = bopGENERAL:BOP_TYPE
+    L_RATE_NO = bopGENERAL:RATE_NO
+    Access BPSCREDITS, Set BPSCREDITS:COMPANY_ID = L_COMPANY_ID,
+                           BPSCREDITS:STATE = L_STATE,
+                           BPSCREDITS:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS, Generic
+
+    while BPSCREDITS:COMPANY_ID       = L_COMPANY_ID and
+          BPSCREDITS:STATE            = L_STATE and
+          BPSCREDITS:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS
+        begin
+        If L_EFF_DATE >= BPSCREDITS:EFF_DATE Then
+            L_PERCENT_OCCUPIED  = BPSCREDITS:PERCENT_OCCUPIED
+
+        Next BPSCREDITS
+        End
+
+    If bopGENERAL:TENANT = "N" And
+       bopGENERAL:PERCENT_OCCUPIED >= L_PERCENT_OCCUPIED Then
+        L_OCCUPIED = "O"
+    Else
+        L_OCCUPIED = "L"
+
+    Include "bpsprop.inc"
+    L_BUILDING_RATE = L_PROPERTY_RATE
+    End
+
+If (L_FORM = 2 or
+   (L_form = 1 and
+   sfpname:company_id = "CCMI")) Then
+    begin
+    Do GET_BUILDING_CREDIT
+    end
+Do GET_INFLATION_GUARD
+Do GET_CREDITS
+Do GET_LIABILITY
+
+-- only apts and condo that are leased have a building liability charge
+-- all others make 1.00
+
+-- liability on building only applies if no personal property, otherwise only appliable
+-- on personal property
+
+If bopGENERAL:PROPERTY_LIMIT <> 0 Then
+    L_LIABILITY_RATE_1 = 1.00
+Else
+    L_LIABILITY_RATE_1 = L_LIABILITY_RATE * L_AGGREGATE_FACTOR
+
+Do GET_TERRITORY_FACTORS
+Do GET_WIND_DEDUCTIBLE
+
+L_BUILDING_RATE = (((L_BUILDING_RATE - L_BUILDING_CREDIT) * L_LOSS_COST) *
+                   L_INFLATION_FACTOR)
+
+access bpsrate, set bpsrate:company_id = bopgeneral:company_id,
+                    bpsrate:state = bopgeneral:state,
+                    bpsrate:line_of_business = bopgeneral:line_of_business, generic
+
+while bpsrate:company_id = bopgeneral:company_id and
+      bpsrate:state = bopgeneral:state and
+      bpsrate:line_of_business = bopgeneral:line_of_business
+        begin
+        if sfpname:eff_date >= bpsrate:eff_date then
+            begin
+            l_liability_rate_or_charge = bpsrate:liability_rate_or_charge
+
+            end
+
+        next bpsrate
+        end
+
+l_tier = bopgeneral:tier
+include "sfstier.pro"
+
+if l_tier_factor = 0 then
+    l_tier_factor = 1.00
+
+if l_liability_rate_or_charge not one of 1 then
+    begin
+    L_BUILDING_ADJUSTMENTS = L_BUILDING_CREDIT_FACTORS * L_LIABILITY_RATE_1 *
+                             L_TERRITORY_BUILDING * L_WIND_DEDUCT_FACTOR *
+                             L_BUILDING_SPRINKLER * L_FMA_FACTOR *
+                             l_tier_factor
+    end
+else
+    begin
+    L_BUILDING_ADJUSTMENTS = L_BUILDING_CREDIT_FACTORS * l_aggregate_factor *
+                             L_TERRITORY_BUILDING * L_WIND_DEDUCT_FACTOR *
+                             L_BUILDING_SPRINKLER * L_FMA_FACTOR *
+                             l_tier_factor
+    end
+
+L_BUILDING_LIMIT = ((bopGENERAL:BUILDING_LIMIT + bopGENERAL:OTHER_STRUCTURES) Divide 1000)
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+if l_liability_rate_or_charge not one of 1 then
+    begin
+    If bopGENERAL_ALIAS:ALARM_OPTION[1] = "Y" And
+       bopGENERAL_ALIAS:ALARM_OPTION[2] = "Y" And
+       bopGENERAL_ALIAS:ALARM_OPTION[3] = "N" Then
+        L_BUILDING_ADJUSTMENTS = L_BUILDING_ADJUSTMENTS * bopGENERAL_ALIAS:ALARM_FACTOR
+    If bopGENERAL_ALIAS:ALARM_OPTION[1] = "Y" And
+       bopGENERAL_ALIAS:ALARM_OPTION[2] = "N" And
+       bopGENERAL_ALIAS:ALARM_OPTION[3] = "N" Then
+        L_BUILDING_ADJUSTMENTS = L_BUILDING_ADJUSTMENTS * bopGENERAL_ALIAS:ALARM_FACTOR
+    If bopGENERAL_ALIAS:ALARM_OPTION[3] = "Y" Then
+        L_BUILDING_ADJUSTMENTS = L_BUILDING_ADJUSTMENTS * bopGENERAL_ALIAS:ALARM_FACTOR
+    end
+else
+    begin
+    if bopgeneral_alias:alarm_option[1] = "Y" and
+       bopgeneral_alias:alarm_option[2] = "Y" then
+        l_building_adjustments = l_building_adjustments *
+                                 bopgeneral_alias:alarm_factor
+    if bopgeneral_alias:alarm_option[1] = "Y" and
+       bopgeneral_alias:alarm_option[2] = "N" then
+        l_building_adjustments = l_building_adjustments *
+                                 bopgeneral_alias:alarm_factor
+    end
+
+End
+
+Procedure GET_BUILDING_CREDIT
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_RECORD_TYPE = 3
+L_TERRITORY = 999
+L_STATE = bopGENERAL:STATE
+L_EFF_DATE = sfpNAME:EFF_DATE
+L_FORM = L_FORM
+
+Include "bpsspecbld.inc"
+
+L_BUILDING_CREDIT = L_BLD_RATE
+
+/* end of calc_building_special */
+End
+
+Procedure GET_INFLATION_GUARD
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_INFLATION_GUARD = bopGENERAL:AUTO_PERCENT
+L_EFF_DATE = sfpNAME:EFF_DATE
+
+Include "sfsinflation.inc"
+
+If L_INFLATION_FACTOR = 0 Then
+    L_INFLATION_FACTOR = 1.00
+
+End
+
+Procedure GET_LIABILITY
+Begin
+Switch(L_LIABILITY_CODE)
+  Case 2  : Begin
+            L_RATING_ID = "7"
+            L_CONSTRUCTION_STRING = "7"
+            End
+  Case 3  : Begin
+            L_RATING_ID = "8"
+            L_CONSTRUCTION_STRING = "8"
+            End
+  Case 4  : Begin
+            L_RATING_ID = "A"
+            L_CONSTRUCTION_STRING = "A"
+            End
+  Default : Begin
+            L_RATING_ID = "6"
+            L_CONSTRUCTION_STRING = "6"
+            End
+  End
+L_COMPANY_ID = bopgeneral:company_id
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_TERRITORY = 999
+L_PROTECTION = bopGENERAL:PROTECTION
+L_STATE = bopGENERAL:STATE
+L_EFF_DATE = sfpNAME:EFF_DATE
+L_TYPE = bopGENERAL:BOP_TYPE
+L_RECORD_TYPE = 2
+Access BPSCREDITS, Set BPSCREDITS:COMPANY_ID = L_COMPANY_ID,
+                       BPSCREDITS:STATE = L_STATE,
+                       BPSCREDITS:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS, Generic
+
+while BPSCREDITS:COMPANY_ID       = L_COMPANY_ID and
+      BPSCREDITS:STATE            = L_STATE and
+      BPSCREDITS:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS
+    begin
+    If L_EFF_DATE >= BPSCREDITS:EFF_DATE Then
+        L_PERCENT_OCCUPIED  = BPSCREDITS:PERCENT_OCCUPIED
+
+    Next BPSCREDITS
+    End
+
+If bopGENERAL:TENANT = "N" And
+   bopGENERAL:PERCENT_OCCUPIED  >= L_PERCENT_OCCUPIED Then
+    L_OCCUPIED = "O"
+Else
+    L_OCCUPIED = "L"
+L_RATE_NO = bopGENERAL:RATE_NO
+
+Include "bpsliab.inc"
+
+If L_LIABILITY_RATE = 0 Then
+    L_LIABILITY_RATE = 1.00
+
+End
+
+Procedure CALC_PROPERTY_PREM
+Begin
+Do ACCESS_LOSSCOST
+
+L_RECORD_TYPE = 1
+L_COMPANY_ID = bopgeneral:company_id
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_TERRITORY = 999
+L_RATING_ID = "4"
+L_CONSTRUCTION = bopGENERAL:CONSTRUCTION
+L_STATE = bopGENERAL:STATE
+L_PROTECTION = bopGENERAL:PROTECTION
+L_EFF_DATE = sfpNAME:EFF_DATE
+L_TYPE = bopGENERAL:BOP_TYPE
+L_RATE_NO = bopGENERAL:RATE_NO
+Access BPSCREDITS, Set BPSCREDITS:COMPANY_ID = L_COMPANY_ID,
+                       BPSCREDITS:STATE = L_STATE,
+                       BPSCREDITS:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS, Generic
+
+while BPSCREDITS:COMPANY_ID       = L_COMPANY_ID and
+      BPSCREDITS:STATE            = L_STATE and
+      BPSCREDITS:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS
+    begin
+    If L_EFF_DATE >= BPSCREDITS:EFF_DATE Then
+        L_PERCENT_OCCUPIED  = BPSCREDITS:PERCENT_OCCUPIED
+
+    Next BPSCREDITS
+    End
+
+If bopGENERAL:TENANT = "N" And
+   bopGENERAL:PERCENT_OCCUPIED >= L_PERCENT_OCCUPIED Then
+    L_OCCUPIED = "O"
+Else
+    L_OCCUPIED = "L"
+
+If (L_TYPE = 1 Or
+   L_TYPE = 2 Or
+   L_TYPE = 8 Or
+   L_TYPE = 9 or
+   (sfscompany:property_rating = 1 and
+   bopgeneral:rate_no <> 0)) Then
+    Include "bpsprop.inc"
+
+-- if apartment/condo use building rates
+If (L_TYPE <> 1 And
+   L_TYPE <> 2 And
+   L_TYPE <> 8 And
+   L_TYPE <> 9 and
+   (sfscompany:property_rating not one of 1 or
+   bopgeneral:rate_no = 0)) Then
+    Begin
+    L_RECORD_TYPE = 2
+    L_COMPANY_ID = bopgeneral:company_id
+    L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+    L_TERRITORY = 999
+    L_RATING_ID = "4"
+    L_CONSTRUCTION_STRING = Str(bopGENERAL:CONSTRUCTION)
+    L_STATE = bopGENERAL:STATE
+    L_PROTECTION = bopGENERAL:PROTECTION
+    L_EFF_DATE = sfpNAME:EFF_DATE
+    L_TYPE = bopGENERAL:BOP_TYPE
+    L_RATE_NO = bopGENERAL:RATE_NO
+    Access BPSCREDITS, Set BPSCREDITS:COMPANY_ID = L_COMPANY_ID,
+                           BPSCREDITS:STATE = L_STATE,
+                           BPSCREDITS:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS, Generic
+
+    while BPSCREDITS:COMPANY_ID       = L_COMPANY_ID and
+          BPSCREDITS:STATE            = L_STATE and
+          BPSCREDITS:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS
+        begin
+        If L_EFF_DATE >= BPSCREDITS:EFF_DATE Then
+            L_PERCENT_OCCUPIED  = BPSCREDITS:PERCENT_OCCUPIED
+
+        Next BPSCREDITS
+        End
+
+    If bopGENERAL:TENANT = "N" And
+       bopGENERAL:PERCENT_OCCUPIED >= L_PERCENT_OCCUPIED Then
+        L_OCCUPIED = "O"
+    Else
+        L_OCCUPIED = "L"
+
+    if bopgeneral:company_id = "WHMIC" then
+        begin
+        include "bpsbuild1.inc"
+        end
+    else
+        begin
+        Include "bpsbuild.inc"
+        end
+
+    L_PROPERTY_RATE = L_BUILDING_RATE
+    End
+
+Do GET_CREDITS
+Do GET_LIABILITY
+If L_LIABILITY_RATE = 0 Then
+    L_LIABILITY_RATE = 1.00
+
+Do GET_TERRITORY_FACTORS
+l_wind_deduct_factor = 0
+Do GET_WIND_DEDUCTIBLE
+
+L_PROPERTY_LIMIT = bopGENERAL:PROPERTY_LIMIT Divide 1000
+access bpsrate, set bpsrate:company_id = bopgeneral:company_id,
+                    bpsrate:state = bopgeneral:state,
+                    bpsrate:line_of_business = bopgeneral:line_of_business, generic
+
+while bpsrate:company_id = bopgeneral:company_id and
+      bpsrate:state = bopgeneral:state and
+      bpsrate:line_of_business = bopgeneral:line_of_business
+        begin
+        if sfpname:eff_date >= bpsrate:eff_date then
+            begin
+            l_liability_rate_or_charge = bpsrate:liability_rate_or_charge
+
+            end
+
+        next bpsrate
+        end
+
+l_tier = bopgeneral:tier
+include "sfstier.pro"
+
+if l_tier_factor = 0 then
+    l_tier_factor = 1.00
+
+if l_liability_rate_or_charge not one of 1 then
+    begin
+    L_PROPERTY_ADJUSTMENTS = L_PROPERTY_CREDIT_FACTORS * L_LIABILITY_RATE *
+                             L_TERRITORY_CONTENTS * L_WIND_DEDUCT_FACTOR *
+                             L_AGGREGATE_FACTOR * L_CONTENTS_SPRINKLER *
+                             L_FMA_FACTOR * l_tier_factor
+    end
+else
+    begin
+    L_PROPERTY_ADJUSTMENTS = L_PROPERTY_CREDIT_FACTORS * l_aggregate_factor *
+                             L_TERRITORY_CONTENTS * L_WIND_DEDUCT_FACTOR *
+                             L_CONTENTS_SPRINKLER *
+                             L_FMA_FACTOR * l_tier_factor
+    end
+
+L_PROPERTY_RATE = L_PROPERTY_RATE * L_LOSS_COST
+L_PROPERTY_RATE_1 = L_PROPERTY_RATE
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+if l_liability_rate_or_charge not one of 1 then
+    begin
+    If bopGENERAL_ALIAS:ALARM_OPTION[1] = "Y" And
+       bopGENERAL_ALIAS:ALARM_OPTION[2] = "Y" And
+       bopGENERAL_ALIAS:ALARM_OPTION[3] = "N" Then
+        L_PROPERTY_ADJUSTMENTS = L_PROPERTY_ADJUSTMENTS * bopGENERAL_ALIAS:ALARM_FACTOR
+    If bopGENERAL_ALIAS:ALARM_OPTION[1] = "Y" And
+       bopGENERAL_ALIAS:ALARM_OPTION[2] = "N" And
+       bopGENERAL_ALIAS:ALARM_OPTION[3] = "N" Then
+        L_PROPERTY_ADJUSTMENTS = L_PROPERTY_ADJUSTMENTS * bopGENERAL_ALIAS:ALARM_FACTOR
+    If bopGENERAL_ALIAS:ALARM_OPTION[3] = "Y" Then
+        L_PROPERTY_ADJUSTMENTS = L_PROPERTY_ADJUSTMENTS * bopGENERAL_ALIAS:ALARM_FACTOR
+    end
+else
+    begin
+    if bopgeneral_alias:alarm_option[1] = "Y" and
+       bopgeneral_alias:alarm_option[2] = "Y" then
+        L_PROPERTY_ADJUSTMENTS = L_PROPERTY_ADJUSTMENTS *
+                                 bopGENERAL_ALIAS:ALARM_FACTOR
+    if bopgeneral_alias:alarm_option[1] = "Y" and
+       bopgeneral_alias:alarm_option[2] = "N" then
+        L_PROPERTY_ADJUSTMENTS = L_PROPERTY_ADJUSTMENTS *
+                                 bopGENERAL_ALIAS:ALARM_FACTOR
+    end
+
+End
+
+Procedure CALC_EXPANDED
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_RECORD_TYPE = 3
+L_TERRITORY = 999
+If bopGENERAL:PROPERTY_LIMIT <= 10000 Then
+    L_SPECIAL_LIMIT = 100
+Else
+    L_SPECIAL_LIMIT = bopGENERAL:PROPERTY_LIMIT Divide 100
+L_EFF_DATE = sfpNAME:EFF_DATE
+L_RATE_GROUP = bopGENERAL:RATE_GROUP
+
+If L_SPECIAL_LIMIT < 2001 and
+   bopgeneral:property_limit < 1000000 Then
+    Begin
+    Include "bpsspecprop.inc"
+    End
+Else
+if l_special_limit => 2001 or
+   bopgeneral:property_limit > 999999 then
+    Begin
+    L_SPECIAL_LIMIT = 2000
+    Include "bpsspecprop1.inc"
+    L_SPECIAL_LIMIT_1 = 200000
+    L_SPECIAL_LIMIT_2 = ((bopGENERAL:PROPERTY_LIMIT -
+                        L_SPECIAL_LIMIT_1) Divide 50000)
+    L_SPECIAL_PREMIUM = ((L_SPECIAL_LIMIT_2 * L_SPECIAL_EACH_ADDL) +
+                        L_SPECIAL)
+    L_SPECIAL = L_SPECIAL_PREMIUM
+    End
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = G_policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+if l_liability_rate_or_charge not one of 1 then
+    begin
+    If bopGENERAL_ALIAS:ALARM_OPTION[1] = "Y" And
+       bopGENERAL_ALIAS:ALARM_OPTION[2] = "Y" And
+       bopGENERAL_ALIAS:ALARM_OPTION[3] = "N" Then
+        L_PROPERTY_CREDIT_FACTORS = L_PROPERTY_CREDIT_FACTORS *
+                                    bopGENERAL_ALIAS:ALARM_FACTOR
+    If bopGENERAL_ALIAS:ALARM_OPTION[1] = "Y" And
+       bopGENERAL_ALIAS:ALARM_OPTION[2] = "N" And
+       bopGENERAL_ALIAS:ALARM_OPTION[3] = "N" Then
+        L_PROPERTY_CREDIT_FACTORS = L_PROPERTY_CREDIT_FACTORS *
+                                    bopGENERAL_ALIAS:ALARM_FACTOR
+
+    If bopGENERAL_ALIAS:ALARM_OPTION[3] = "Y" Then
+        L_PROPERTY_CREDIT_FACTORS = L_PROPERTY_CREDIT_FACTORS *
+                                    bopGENERAL_ALIAS:ALARM_FACTOR
+    end
+else
+    begin
+    if bopgeneral_alias:alarm_option[1] = "Y" and
+       bopgeneral_alias:alarm_option[2] = "Y" then
+        l_property_credit_factors = l_property_credit_factors *
+                                    bopgeneral_alias:alarm_factor
+    if bopgeneral_alias:alarm_option[1] = "N" and
+       bopgeneral_alias:alarm_option[2] = "Y" then
+        l_property_credit_factors = l_property_credit_factors *
+                                    bopgeneral_alias:alarm_factor
+    end
+
+/* end of calc_property_special */
+End
+
+Procedure GET_CREDITS
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_EFF_DATE = sfpNAME:EFF_DATE
+L_LOSSES = bopGENERAL:LOSS_YEARS
+L_MULTI_LOCATION = L_LOCATION_CREDIT
+L_BUILDING_YEAR = Year(sfpNAME:EFF_DATE) - bopGENERAL:CONSTRUCTION_YEAR
+L_TYPE = bopGENERAL:BOP_TYPE
+L_SINGLE_OCCUPANCY = bopGENERAL:SINGLE_OCCUPANCY
+Access BPSCREDITS, Set BPSCREDITS:COMPANY_ID = L_COMPANY_ID,
+                       BPSCREDITS:STATE = L_STATE,
+                       BPSCREDITS:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS, Generic
+
+while BPSCREDITS:COMPANY_ID       = L_COMPANY_ID and
+      BPSCREDITS:STATE            = L_STATE and
+      BPSCREDITS:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS
+    begin
+    If L_EFF_DATE >= BPSCREDITS:EFF_DATE Then
+        L_PERCENT_OCCUPIED  = BPSCREDITS:PERCENT_OCCUPIED
+
+    Next BPSCREDITS
+    End
+
+If bopGENERAL:TENANT = "N" And
+   bopGENERAL:PERCENT_OCCUPIED  >= L_PERCENT_OCCUPIED Then
+    L_OWNER = "O"
+Else
+    L_OWNER = "L"
+L_SPRINKLERED = bopGENERAL:SPRINKLERS
+
+Include "bpscredit.inc"
+
+Do GET_DEDUCTIBLE
+
+If SFSCOMPANY:CUSTOMER_PROPERTY_RATING = 2 or -- ficof
+   sfscompany:loss_income_rating = 3 Then  -- lebins
+    Begin
+    L_LOSS_INCOME_FACTOR_1 = 1.00
+    If bopGENERAL:LIMIT_LOSS_INCOME = "Y" Then
+        Begin
+        L_LOSS_INCOME_LIMIT = 99999999
+        Do GET_LOSS_INCOME
+        L_LOSS_INCOME_FACTOR_1 = L_LOSS_INCOME_FACTOR_1 * L_LOSS_INCOME_FACTOR
+        End
+
+    If bopGENERAL:DELETE_LOSS_INCOME = "Y" Then
+        Begin
+        L_LOSS_INCOME_LIMIT = 99999998
+        Do GET_LOSS_INCOME
+        L_LOSS_INCOME_FACTOR_1 = L_LOSS_INCOME_FACTOR_1 * L_LOSS_INCOME_FACTOR
+        End
+
+    If bopGENERAL:WHOLESALER = "Y" Then
+        Begin
+        If bopGENERAL:WHOLESALER_PERCENT = 200  Then
+            L_LOSS_INCOME_LIMIT = 99999997
+        If bopGENERAL:WHOLESALER_PERCENT = 100 Then
+            L_LOSS_INCOME_LIMIT = 99999996
+        Do GET_LOSS_INCOME
+        L_LOSS_INCOME_FACTOR_1 = L_LOSS_INCOME_FACTOR_1 * L_LOSS_INCOME_FACTOR
+        End
+
+    If bopGENERAL:LOSS_INCOME_LIMIT <> 0 Then
+        Begin
+        L_LOSS_INCOME_LIMIT = bopGENERAL:LOSS_INCOME_LIMIT
+        Do GET_LOSS_INCOME
+        L_LOSS_INCOME_FACTOR_1 = L_LOSS_INCOME_FACTOR_1 * L_LOSS_INCOME_FACTOR
+        End
+
+    L_LOSS_INCOME_FACTOR = L_LOSS_INCOME_FACTOR_1
+    End
+Else
+    Begin
+    If bopGENERAL:LIMIT_LOSS_INCOME = "Y" Then
+        L_LOSS_INCOME_LIMIT = 99999999
+    Else
+    If bopGENERAL:DELETE_LOSS_INCOME = "Y" Then
+        L_LOSS_INCOME_LIMIT = 99999998
+    Else
+    If bopGENERAL:WHOLESALER = "Y" And
+       bopGENERAL:WHOLESALER_PERCENT = 200  Then
+        L_LOSS_INCOME_LIMIT = 99999997
+    Else
+    If bopGENERAL:WHOLESALER = "Y" And
+       bopGENERAL:WHOLESALER_PERCENT = 100 Then
+        L_LOSS_INCOME_LIMIT = 99999996
+    Else
+        L_LOSS_INCOME_LIMIT = bopGENERAL:LOSS_INCOME_LIMIT
+
+    Do GET_LOSS_INCOME
+    End
+
+L_MAX_CREDITS = L_NEW_BUILDING_FACTOR * L_EXPERIENCE_FACTOR *
+                L_MULTI_LOCATION_FACTOR
+If ((bopGENERAL:ALARM_OPTION[1] = "Y" Or
+   bopGENERAL:ALARM_OPTION[2] = "Y") And
+   bopGENERAL:ALARM_OPTION[3] = "N") Then
+    L_MAX_CREDITS = L_MAX_CREDITS * L_FACTOR
+If bopGENERAL:ALARM_OPTION[3] = "Y" Then
+    L_MAX_CREDITS = L_MAX_CREDITS * L_SUPERIOR_FACTOR
+
+If bopGENERAL:LOSS_INCOME_FACTOR <> 0 Then
+    L_LOSS_INCOME_FACTOR = bopGENERAL:LOSS_INCOME_FACTOR
+
+L_BUILDING_CREDIT_FACTORS = L_EXPERIENCE_FACTOR *
+                            L_NEW_BUILDING_FACTOR * L_MULTI_LOCATION_FACTOR *
+                            L_APT_CONDO_FACTOR * L_DEDUCTIBLE_FACTOR *
+                            L_LOSS_INCOME_FACTOR * L_SINGLE_OWNER_FACTOR
+L_PROPERTY_CREDIT_FACTORS = L_EXPERIENCE_FACTOR *
+                            L_MULTI_LOCATION_FACTOR * L_APT_CONDO_FACTOR *
+                            L_DEDUCTIBLE_FACTOR * L_LOSS_INCOME_FACTOR *
+                            L_SINGLE_OWNER_FACTOR
+End
+
+Procedure GET_DEDUCTIBLE
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_DEDUCTIBLE = L_DEDUCTIBLE
+L_DEDUCTIBLE_LIMIT = 99999999
+L_EFF_DATE = sfpNAME:EFF_DATE
+
+Include "sfsdeductible.inc"
+
+End
+
+Procedure GET_LOSS_INCOME
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_EFF_DATE = sfpNAME:EFF_DATE
+
+Include "bpslossincome.inc"
+
+End
+
+Procedure GET_TERRITORY_FACTORS
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_TERRITORY = bopGENERAL:TERRITORY
+L_EFF_DATE = sfpNAME:EFF_DATE
+
+Include "sfsterrfactor.inc"
+
+End
+
+Procedure GET_WIND_DEDUCTIBLE
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_DEDUCTIBLE = L_DEDUCTIBLE
+L_WIND_DEDUCTIBLE = bopGENERAL:WIND_DEDUCTIBLE
+L_EFF_DATE = sfpNAME:EFF_DATE
+
+Include "sfswinddeduct.inc"
+
+If L_WIND_DEDUCT_FACTOR = 0 Then
+    L_WIND_DEDUCT_FACTOR = 1.00
+
+End
+
+Procedure ACCESS_LOSSCOST
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+Access SFSLOSSCOST, Set SFSLOSSCOST:COMPANY_ID = L_COMPANY_ID,
+                        SFSLOSSCOST:STATE = L_STATE,
+                        SFSLOSSCOST:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS, Generic
+
+while SFSLOSSCOST:COMPANY_ID       = L_COMPANY_ID and
+      SFSLOSSCOST:STATE            = L_STATE and
+      SFSLOSSCOST:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS
+    begin
+    If sfpNAME:EFF_DATE >= SFSLOSSCOST:EFF_DATE Then
+        L_LOSS_COST = SFSLOSSCOST:RATE
+
+    Next SFSLOSSCOST
+    End
+
+If L_LOSS_COST = 0 Then
+    L_LOSS_COST = 1.0000
+
+/* end of access_sfslosscost */
+End
+
+Procedure RATE_RESTAURANTS
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_RECEIPTS = bopGENERAL:RECEIPTS
+L_EFF_DATE = sfpNAME:EFF_DATE
+
+Include "rest.pro"
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:RESTAURANT_ENHANCEMENT = L_RECEIPTS_CHARGE
+        End
+
+End
+
+Procedure RATE_SIGNS
+Begin
+-- this is for signs attached to the building, the rates are entered into bpsglass
+
+L_COMPANY_ID = bopgeneral:company_id
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_STATE = bopGENERAL:STATE
+L_EFF_DATE = sfpNAME:EFF_DATE
+L_RECORD_TYPE = 6
+L_TERRITORY = 999
+
+Include "bpssigns.inc"
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:SIGNS_PREMIUM = (((bopGENERAL_ALIAS:SIGNS_LIMIT -
+                                         L_EXTERIOR_SIGNS_LIMIT)
+                                         Divide L_LIMIT) * L_CHARGE)
+        End
+
+End
+
+Procedure RATE_SIGNS_NOT_ATTACHED
+Begin
+Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                    BPSRATE:STATE = bopGENERAL:STATE,
+                    BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+while BPSRATE:COMPANY_ID       = bopgeneral:company_id and
+      BPSRATE:STATE            = bopGENERAL:STATE and
+      BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+        Begin
+        Switch(L_FORM)
+          Case 1 :  Begin
+                    L_CHARGE = BPSRATE:SIGNS_NOT_ATTACHED_CHARGE
+                    L_LIMIT = BPSRATE:SIGNS_NOT_ATTACHED_LIMIT
+                    L_DEDUCTIBLE_CHARGE = 1.00
+                    End
+          Default : Begin
+                    L_CHARGE = BPSRATE:SIGNS_ALL_RISK_CHARGE
+                    L_LIMIT = BPSRATE:SIGNS_ALL_RISK_LIMIT
+                    L_DEDUCTIBLE_CHARGE = 1.00
+                    If bopGENERAL:SIGNS_DEDUCTIBLE[2] = BPSRATE:SIGNS_DEDUCTIBLE[1] Then
+                        L_DEDUCTIBLE_CHARGE = BPSRATE:SIGNS_DEDUCTIBLE_FACTOR[1]
+                    If bopGENERAL:SIGNS_DEDUCTIBLE[2] = BPSRATE:SIGNS_DEDUCTIBLE[2] Then
+                        L_DEDUCTIBLE_CHARGE = BPSRATE:SIGNS_DEDUCTIBLE_FACTOR[2]
+                    If bopGENERAL:SIGNS_DEDUCTIBLE[2] = BPSRATE:SIGNS_DEDUCTIBLE[3] Then
+                        L_DEDUCTIBLE_CHARGE = BPSRATE:SIGNS_DEDUCTIBLE_FACTOR[3]
+                    If bopGENERAL:SIGNS_DEDUCTIBLE[2] = BPSRATE:SIGNS_DEDUCTIBLE[4] Then
+                        L_DEDUCTIBLE_CHARGE = BPSRATE:SIGNS_DEDUCTIBLE_FACTOR[4]
+                    End
+          End
+        End
+
+   Next BPSRATE
+   End
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:SIGNS_NOT_ATTACHED_PREMIUM = (((bopGENERAL_ALIAS:SIGNS_NOT_ATTACHED_LIMIT
+                                                      Divide L_LIMIT) * L_CHARGE) *
+                                                      L_DEDUCTIBLE_CHARGE)
+        End
+
+End
+
+Procedure RATE_GLASS
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_EFF_DATE = sfpNAME:EFF_DATE
+L_RECORD_TYPE = 5
+L_TERRITORY = bopGENERAL:TERRITORY
+L_TYPE = bopGENERAL:BOP_TYPE
+
+Include "bpsglass.inc"
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:GLASS_PREMIUM = ((bopGENERAL_ALIAS:GLASS_LIMIT Divide
+                                         L_LIMIT) * L_GLASS_CHARGE)
+        If bopGENERAL_ALIAS:INCLUDE_GLASS_DEDUCTIBLE = "Y" Then
+            Begin
+            If SFSLINE_ALIAS:OPTION = "P" Then
+                Begin
+                bopGENERAL_ALIAS:GLASS_PREMIUM = ((bopGENERAL_ALIAS:GLASS_LIMIT
+                                                 Divide L_LIMIT) * L_FACTOR_1)
+                End
+            Else
+                Begin
+                bopGENERAL_ALIAS:GLASS_PREMIUM = bopGENERAL_ALIAS:GLASS_PREMIUM *
+                                                 L_FACTOR_1
+                End
+            bopGENERAL_ALIAS:GLASS_DEDUCTIBLE = L_GLASS_DEDUCTIBLE
+            End
+        Else
+            Begin
+            bopGENERAL_ALIAS:INCLUDE_GLASS_DEDUCTIBLE = "N"
+            bopGENERAL_ALIAS:GLASS_DEDUCTIBLE = 0
+            End
+        End
+
+End
+
+Procedure RATE_BURGLARY
+Begin
+Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                    BPSRATE:STATE = bopGENERAL:STATE,
+                    BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+while BPSRATE:COMPANY_ID       = bopgeneral:company_id and
+      BPSRATE:STATE            = bopGENERAL:STATE and
+      BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+        Begin
+        L_FACTOR_1 = BPSRATE:BURGLARY_FACTOR[1]
+        L_FACTOR_2 = BPSRATE:BURGLARY_FACTOR[2]
+        L_LIMIT = BPSRATE:BURGLARY_LIMIT_ON[2]
+        End
+
+    Next BPSRATE
+    End
+
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_RECORD_TYPE = 3
+L_TERRITORY = 999
+If bopGENERAL:PROPERTY_LIMIT <= 10000 Then
+    L_SPECIAL_LIMIT = 100
+Else
+    L_SPECIAL_LIMIT = bopGENERAL:PROPERTY_LIMIT Divide 100
+L_EFF_DATE = sfpNAME:EFF_DATE
+L_RATE_GROUP = bopGENERAL:RATE_GROUP
+
+If L_SPECIAL_LIMIT < 2500 Then
+    Begin
+    Include "bpsspecprop.inc"
+    End
+Else
+    Begin
+    L_SPECIAL_LIMIT = 2000
+    Include "bpsspecprop1.inc"
+    L_SPECIAL_LIMIT_1 = 200000
+    L_SPECIAL_LIMIT_2 = ((bopGENERAL:PROPERTY_LIMIT -
+                        L_SPECIAL_LIMIT_1) Divide 50000)
+    L_SPECIAL_PREMIUM = ((L_SPECIAL_LIMIT_2 * L_SPECIAL_EACH_ADDL) +
+                        L_SPECIAL)
+    L_SPECIAL = L_SPECIAL_PREMIUM
+    End
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:BURGLARY_PREMIUM = 0
+        bopGENERAL_ALIAS:BURGLARY_PREMIUM = L_SPECIAL * L_LOSS_COST *
+                                            L_TERRITORY_EXPANDED
+                                            * L_PROPERTY_CREDIT_FACTORS
+                                            * L_FACTOR_1
+        End
+
+If bopGENERAL:BURGLARY_LIMIT_ON = L_LIMIT Then
+    Begin
+    L_COMPANY_ID = bopgeneral:company_id
+    L_STATE = bopGENERAL:STATE
+    L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+    L_RECORD_TYPE = 3
+    L_TERRITORY = 999
+    L_SPECIAL_LIMIT = 100
+    L_EFF_DATE = sfpNAME:EFF_DATE
+    L_RATE_GROUP = bopGENERAL:RATE_GROUP
+
+    Include "bpsspecprop.inc"
+
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+       bopgeneral_alias:pol_year = bopgeneral:pol_year and
+       bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+       bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+       bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+        Change bopGENERAL_ALIAS
+            Begin
+            bopGENERAL_ALIAS:BURGLARY_PREMIUM = (bopGENERAL_ALIAS:BURGLARY_PREMIUM +
+                                                (L_SPECIAL * L_LOSS_COST *
+                                                L_TERRITORY_EXPANDED
+                                                * L_PROPERTY_CREDIT_FACTORS *
+                                                L_FACTOR_2))
+            End
+    End
+
+End
+
+Procedure RATE_MONEY
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_EFF_DATE = sfpNAME:EFF_DATE
+L_RECORD_TYPE = 7
+L_TERRITORY = 999
+L_FILLER[1,3] = "   "
+If bopGENERAL:MONEY_LIMIT_ON <> 0 Then
+    Begin
+    If bopGENERAL:MONEY_LIMIT_ON = BPSDEFAULT:MONEY_LIMIT_ON Then
+        L_MONEY_LIMITS = 1
+    Else
+        L_MONEY_LIMITS = 2
+    End
+Else
+    L_MONEY_LIMITS = 1
+
+Include "bpsmoney.inc"
+
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_RECORD_TYPE = 3
+L_TERRITORY = 999
+L_SPECIAL_LIMIT = 100
+L_EFF_DATE = sfpNAME:EFF_DATE
+L_RATE_GROUP = bopGENERAL:RATE_GROUP
+
+Include "bpsspecprop.inc"
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:MONEY_PREMIUM = 0
+        If bopGENERAL_ALIAS:MONEY_LIMIT_ON = 0 Then
+            Begin
+            bopGENERAL_ALIAS:MONEY_PREMIUM = L_SPECIAL * L_MONEY_RATE_1 *
+                                             bopGENERAL_ALIAS:ADJUSTMENT_FACTORS
+            bopGENERAL_ALIAS:MONEY_PREMIUM = bopGENERAL_ALIAS:MONEY_PREMIUM * -1
+            End
+        If bopGENERAL_ALIAS:ATTACH_BU5001 = "Y" Then
+            Begin
+            bopGENERAL_ALIAS:MONEY_PREMIUM = L_SPECIAL * L_MONEY_RATE_2
+            End
+        If ((bopGENERAL_ALIAS:MONEY_LIMIT_ON <> BPSDEFAULT:MONEY_LIMIT_ON And
+           bopGENERAL_ALIAS:MONEY_LIMIT_ON <> 0)  Or
+           (bopGENERAL_ALIAS:ATTACH_BU5001 = "Y" And
+           bopGENERAL_ALIAS:MONEY_LIMIT_ON <> BPSDEFAULT:MONEY_LIMIT_ON)) Then
+            begin
+            if sfscompany:boiler_rating = 3 then
+                begin
+                bopGENERAL_ALIAS:MONEY_PREMIUM = (bopGENERAL_ALIAS:MONEY_PREMIUM +
+                                                 (L_SPECIAL * L_MONEY_RATE_3 *
+                                                 bopgeneral_alias:adjustment_factors))
+                end
+            else
+                begin
+                bopGENERAL_ALIAS:MONEY_PREMIUM = (bopGENERAL_ALIAS:MONEY_PREMIUM +
+                                                 (L_SPECIAL * L_MONEY_RATE_3))
+                end
+            end
+        If bopGENERAL_ALIAS:MONEY_LIMIT_ON = BPSDEFAULT:MONEY_LIMIT_ON And
+           bopGENERAL_ALIAS:ATTACH_BU5001 = "N" Then
+            bopGENERAL_ALIAS:MONEY_PREMIUM = 0
+        End
+
+End
+
+Procedure RATE_AR
+Begin
+Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                    BPSRATE:STATE = bopGENERAL:STATE,
+                    BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+while BPSRATE:COMPANY_ID       = bopgeneral:company_id and
+      BPSRATE:STATE            = bopGENERAL:STATE and
+      BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+        Begin
+        L_FACTOR_1 = BPSRATE:AR_FACTOR
+        L_LIMIT = BPSRATE:AR_LIMIT
+        End
+
+    Next BPSRATE
+    End
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        If bopGENERAL_ALIAS:AR_LIMIT <> L_AR_LIMIT_1 Then
+            begin
+            if l_liability_rate_or_charge = 1 then
+                bopGENERAL_ALIAS:AR_PREMIUM = ((bopGENERAL_ALIAS:PROPERTY_RATE *
+                                              l_liability_Rate) *
+                                              (((bopGENERAL_ALIAS:AR_LIMIT - L_AR_LIMIT_1)
+                                               Divide L_LIMIT) * L_FACTOR_1))
+            else
+                bopGENERAL_ALIAS:AR_PREMIUM = (bopGENERAL_ALIAS:PROPERTY_RATE *
+                                              (((bopGENERAL_ALIAS:AR_LIMIT - L_AR_LIMIT_1)
+                                               Divide L_LIMIT) * L_FACTOR_1))
+            end
+        End
+
+End
+
+Procedure RATE_UTILITY
+Begin
+Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                    BPSRATE:STATE = bopGENERAL:STATE,
+                    BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+while BPSRATE:COMPANY_ID       = bopgeneral:company_id and
+      BPSRATE:STATE            = bopGENERAL:STATE and
+      BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+        Begin
+        L_CHARGE = BPSRATE:UTILITY_CHARGE
+        L_LIMIT = BPSRATE:UTILITY_LIMIT
+        End
+
+    Next BPSRATE
+    End
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        If bopGENERAL_ALIAS:UTILITY_LIMIT <> L_UTILITY_LIMIT Then
+            bopGENERAL_ALIAS:UTILITY_PREMIUM = (((bopGENERAL_ALIAS:UTILITY_LIMIT -
+                                               L_UTILITY_LIMIT) Divide
+                                               L_LIMIT) * L_CHARGE)
+        End
+
+End
+
+Procedure RATE_WATERBACKUP
+Begin
+Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                    BPSRATE:STATE = bopGENERAL:STATE,
+                    BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+while BPSRATE:COMPANY_ID       = bopgeneral:company_id and
+      BPSRATE:STATE            = bopGENERAL:STATE and
+      BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+        Begin
+        L_CHARGE = BPSRATE:WATERBKUP_CHARGE
+        L_LIMIT = BPSRATE:WATERBKUP_PER
+        L_CHARGE_1  = BPSRATE:WATERBKUP_INCREASE
+        End
+
+    Next BPSRATE
+    End
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        If bopGENERAL_ALIAS:WATER_BACKUP_LIMIT = L_WATER_BKUP_LIMIT And
+           SFSLINE_ALIAS:OPTION <> "P" Then
+            Begin
+            bopGENERAL_ALIAS:WATER_BACKUP_PREMIUM = L_CHARGE
+            End
+        Else
+            Begin
+            bopGENERAL_ALIAS:WATER_BACKUP_PREMIUM = 0
+            End
+        If bopGENERAL_ALIAS:WATER_BACKUP_LIMIT <> L_WATER_BKUP_LIMIT Then
+            Begin
+            bopGENERAL_ALIAS:WATER_BACKUP_PREMIUM = (L_CHARGE +
+                                             (((bopGENERAL_ALIAS:WATER_BACKUP_LIMIT -
+                                             L_WATER_BKUP_LIMIT)
+                                             Divide L_LIMIT) * L_CHARGE_1))
+            End
+        End
+End
+
+Procedure RATE_BUILDING_CODE
+Begin
+Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                    BPSRATE:STATE = bopGENERAL:STATE,
+                    BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+while BPSRATE:COMPANY_ID       = bopgeneral:company_id and
+      BPSRATE:STATE            = bopGENERAL:STATE and
+      BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+        Begin
+        If bopGENERAL:BUILDING_CODE_PERCENT = 0 Then
+            L_FACTOR_1 = BPSRATE:BUILDING_CODE_DELETE
+        Else
+            Begin
+            L_FACTOR_1 = BPSRATE:BUILDING_CODE_FACTOR
+            L_LIMIT = BPSRATE:BUILDING_CODE_PER
+            End
+        End
+
+    Next BPSRATE
+    End
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        If bopGENERAL_ALIAS:BUILDING_CODE_PERCENT = 0 Then
+            bopGENERAL_ALIAS:BUILDING_CODE_PREMIUM = ((bopGENERAL_ALIAS:BUILDING_PREMIUM *
+                                                     L_FACTOR_1) -
+                                                     bopGENERAL_ALIAS:BUILDING_PREMIUM)
+        Else
+            Begin
+            L_BUILDING_CODE_FACTOR = ((((bopGENERAL_ALIAS:BUILDING_CODE_PERCENT -
+                                      L_LIMIT) Divide L_LIMIT) * L_FACTOR_1) + 1)
+            L_BUILDING_CODE_PREM = bopGENERAL_ALIAS:BUILDING_PREMIUM * L_BUILDING_CODE_FACTOR
+            bopGENERAL_ALIAS:BUILDING_CODE_PREMIUM = L_BUILDING_CODE_PREM -
+                                              bopGENERAL_ALIAS:BUILDING_PREMIUM
+        End
+    End
+End
+
+Procedure RATE_MECHANICAL
+Begin
+Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                    BPSRATE:STATE = bopGENERAL:STATE,
+                    BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+Repeat Begin
+    Exit If BPSRATE:COMPANY_ID <> bopgeneral:company_id Or
+            BPSRATE:STATE <> bopGENERAL:STATE Or
+            BPSRATE:LINE_OF_BUSINESS <> bopgeneral:line_of_business
+
+    If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+        Begin
+        L_CHARGE = BPSRATE:MECHANICAL_CHARGE
+        L_LIMIT = BPSRATE:MECHANICAL_LIMIT
+        End
+
+    Next BPSRATE
+    End
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        If bopGENERAL_ALIAS:MECHANICAL_LIMIT <> L_MECHANICAL_LIMIT Then
+            bopGENERAL_ALIAS:MECHANICAL_PREMIUM = (((bopGENERAL_ALIAS:MECHANICAL_LIMIT -
+                                                  L_MECHANICAL_LIMIT)
+                                                  Divide L_LIMIT) * L_CHARGE)
+        End
+
+End
+
+Procedure RATE_HIRED_NONOWNED
+Begin
+Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                    BPSRATE:STATE = bopGENERAL:STATE,
+                    BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+while BPSRATE:COMPANY_ID       = bopgeneral:company_id and
+      BPSRATE:STATE            = bopGENERAL:STATE and
+      BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+        Begin
+        L_CREDIT = BPSRATE:HIRED_NONOWNED_CREDIT
+        L_CHARGE = BPSRATE:HIRED_NONOWNED_CHARGE
+        End
+
+    Next BPSRATE
+    End
+
+if sfsline:lob_code one of "CPORTFOLIO" then
+    begin
+    l_line_of_business = bopgeneral:line_of_business
+    Access sfpmastsupp, Set sfpmastsupp:policy_NO = G_policy_NO,
+                            sfpmastsupp:pol_year = g_year,
+                            sfpmastsupp:end_sequence = g_end_sequence,
+                            sfpmastsupp:line_of_business = l_line_of_business, generic
+
+    If sfpmastsupp:policy_NO = G_policy_NO and
+       sfpmastsupp:pol_year = g_year and
+       sfpmastsupp:end_sequence = g_End_sequence and
+       sfpmastsupp:line_of_business = l_line_of_business Then
+        begin
+        Change sfpmastsupp
+            Begin
+            If sfpmastsupp:DELETE_HIRED_NONOWNED = "Y" Then
+                begin
+                sfpmastsupp:HIRED_NONOWNED_PREMIUM = L_CREDIT
+                l_hired_nonowned_premium = l_credit
+                end
+            If sfpmastsupp:EXTEND_HIRED_NONOWNED = "Y" Then
+                begin
+                sfpmastsupp:HIRED_NONOWNED_PREMIUM = L_CHARGE
+                l_hired_nonowned_premium = l_charge
+                end
+            End
+        end
+    end
+else
+    begin
+    Access sfpMASTER, Set sfpMASTER:policy_NO = G_policy_NO,
+                          sfpmaster:pol_year = g_year,
+                          sfpmaster:end_sequence = g_end_sequence, Exact
+
+    If sfpMASTER:policy_NO = G_policy_NO and
+       sfpmaster:pol_year = g_year and
+       sfpmaster:End_sequence = g_End_sequence Then
+        begin
+        Change sfpMASTER
+            Begin
+            If sfpMASTER:DELETE_HIRED_NONOWNED = "Y" Then
+                begin
+                sfpMASTER:HIRED_NONOWNED_PREMIUM = L_CREDIT
+                l_hired_nonowned_premium = l_credit
+                end
+            If sfpMASTER:EXTEND_HIRED_NONOWNED = "Y" Then
+                begin
+                sfpMASTER:HIRED_NONOWNED_PREMIUM = L_CHARGE
+                l_hired_nonowned_premium = l_charge
+                end
+            End
+        end
+    end
+
+End
+
+Procedure RATE_OFF_PREMISES
+Begin
+Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                    BPSRATE:STATE = bopGENERAL:STATE,
+                    BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+L_CHARGE = 0
+while BPSRATE:COMPANY_ID       = bopgeneral:company_id and
+      BPSRATE:STATE            = bopGENERAL:STATE and
+      BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+        Begin
+        If L_OFF_PREMISES_LIMIT = BPSRATE:OFF_PREMISE_LIMIT[1] Then
+            L_CHARGE = BPSRATE:OFF_PREMISE_CHARGE[1]
+        Else
+        If L_OFF_PREMISES_LIMIT = BPSRATE:OFF_PREMISE_LIMIT[2] Then
+            L_CHARGE = BPSRATE:OFF_PREMISE_CHARGE[2]
+        Else
+        If L_OFF_PREMISES_LIMIT = BPSRATE:OFF_PREMISE_LIMIT[3] Then
+            L_CHARGE = BPSRATE:OFF_PREMISE_CHARGE[3]
+        Else
+        If L_OFF_PREMISES_LIMIT = BPSRATE:OFF_PREMISE_LIMIT[4] Then
+            L_CHARGE = BPSRATE:OFF_PREMISE_CHARGE[4]
+        Else
+        If L_OFF_PREMISES_LIMIT = BPSRATE:OFF_PREMISE_LIMIT[5] Then
+            L_CHARGE = BPSRATE:OFF_PREMISE_CHARGE[5]
+        Else
+        If L_OFF_PREMISES_LIMIT = BPSRATE:OFF_PREMISE_LIMIT[6] Then
+            L_CHARGE = BPSRATE:OFF_PREMISE_CHARGE[6]
+        Else
+            L_CHARGE = 0
+
+        If bopGENERAL:OFF_PREMISES_LIMIT <> L_OFF_PREMISES_LIMIT And
+           bopGENERAL:OFF_PREMISES_LIMIT <> 0 Then
+            Begin
+            If bopGENERAL:OFF_PREMISES_LIMIT = BPSRATE:OFF_PREMISE_LIMIT[1] Then
+                L_CHARGE = BPSRATE:OFF_PREMISE_CHARGE[1]
+            Else
+            If bopGENERAL:OFF_PREMISES_LIMIT = BPSRATE:OFF_PREMISE_LIMIT[2] Then
+                L_CHARGE = BPSRATE:OFF_PREMISE_CHARGE[2]
+            Else
+            If bopGENERAL:OFF_PREMISES_LIMIT = BPSRATE:OFF_PREMISE_LIMIT[3] Then
+                L_CHARGE = BPSRATE:OFF_PREMISE_CHARGE[3]
+            Else
+            If bopGENERAL:OFF_PREMISES_LIMIT = BPSRATE:OFF_PREMISE_LIMIT[4] Then
+                L_CHARGE = BPSRATE:OFF_PREMISE_CHARGE[4]
+            Else
+            If bopGENERAL:OFF_PREMISES_LIMIT = BPSRATE:OFF_PREMISE_LIMIT[5] Then
+                L_CHARGE = BPSRATE:OFF_PREMISE_CHARGE[5]
+            Else
+            If bopGENERAL:OFF_PREMISES_LIMIT = BPSRATE:OFF_PREMISE_LIMIT[6] Then
+                L_CHARGE = BPSRATE:OFF_PREMISE_CHARGE[6]
+            Else
+                L_CHARGE = 0
+            End
+        End
+
+    Next BPSRATE
+    End
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:OFF_PREMISES_LIMIT = L_OFF_PREMISES_LIMIT Then
+    begin
+    l_line_of_business = bopgeneral:line_of_business
+    if sfsline:lob_code = "CPORTFOLIO" then
+        begin
+        Access sfpmastsupp, Set sfpmastsupp:policy_NO = G_policy_NO,
+                                sfpmastsupp:pol_year = g_year,
+                                sfpmastsupp:end_sequence = g_End_sequence,
+                                sfpmastsupp:line_of_business = l_line_of_business, generic
+
+        Change sfpmastsupp
+            Begin
+            sfpmastsupp:OFF_PREMISES_PREMIUM = L_CHARGE
+            l_off_premises_premium = l_charge
+            End
+        end
+    else
+        begin
+        Access sfpmaster, Set sfpmaster:policy_NO = G_policy_NO,
+                              sfpmaster:pol_year = g_Year,
+                              sfpmaster:end_sequence = g_End_sequence, generic
+
+        Change sfpMASTER
+            Begin
+            sfpMASTER:OFF_PREMISES_PREMIUM = L_CHARGE
+            l_off_premises_premium = l_charge
+            End
+        end
+    end
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_Year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:OFF_PREMISES_PREMIUM = L_CHARGE
+        End
+
+End
+
+Procedure RATE_CUSTOMER_PROPERTY
+Begin
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If L_PROP_ACV = 0 Then
+    L_PROP_ACV = 1.00
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Begin
+    If bopGENERAL_ALIAS:CUSTOMER_PROP_LIMIT <> BPSDEFAULT:CUSTOMER_PROP_LIMIT Then
+        Begin
+        If SFSCOMPANY:CUSTOMER_PROPERTY_RATING = 1 Then
+            Begin
+            Change bopGENERAL_ALIAS
+                Begin
+                bopGENERAL_ALIAS:CUSTOMER_PROP_PREMIUM = (bopGENERAL_ALIAS:PROPERTY_RATE *
+                                                         ((bopGENERAL_ALIAS:CUSTOMER_PROP_LIMIT -
+                                                         BPSDEFAULT:CUSTOMER_PROP_LIMIT) Divide
+                                                         1000))
+                End
+            End
+
+        If SFSCOMPANY:CUSTOMER_PROPERTY_RATING = 2 Then
+            Begin
+            Change bopGENERAL_ALIAS
+                Begin
+                L_CUSTOMER_ADJ_RATE = L_PROPERTY_RATE * L_PROPERTY_ADJUSTMENTS * l_prop_acv
+                bopGENERAL_ALIAS:CUSTOMER_PROP_PREMIUM = (((bopGENERAL_ALIAS:CUSTOMER_PROP_LIMIT
+                                                         - BPSDEFAULT:CUSTOMER_PROP_LIMIT) Divide 1000) *
+                                                         L_CUSTOMER_ADJ_RATE)
+                End
+            If L_FORM = 3 Then
+                Begin
+                L_SPECIAL_LIMIT = ((bopGENERAL_ALIAS:CUSTOMER_PROP_LIMIT -
+                                  BPSDEFAULT:CUSTOMER_PROP_LIMIT) Divide 100)
+                If L_SPECIAL_LIMIT <= 100 Then
+                    L_SPECIAL_LIMIT = 100
+                Do CUSTOMER_PROPERTY_SPECIAL
+                If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+                   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+                   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+                    Change bopGENERAL_ALIAS
+                        Begin
+                        L_CUSTOMER_ADJ_RATE_SPECIAL = bopGENERAL_ALIAS:ADJUSTMENT_FACTORS
+                        bopGENERAL_ALIAS:CUSTOMER_PROP_PREMIUM = (bopGENERAL_ALIAS:CUSTOMER_PROP_PREMIUM +
+                                                                 (L_SPECIAL *
+                                                                 L_CUSTOMER_ADJ_RATE_SPECIAL))
+                        End
+                End
+            End
+
+        If SFSCOMPANY:CUSTOMER_PROPERTY_RATING = 3 Then
+            Begin
+            Change bopGENERAL_ALIAS
+                Begin
+                L_CUSTOMER_ADJ_RATE = L_PROPERTY_RATE * L_PROPERTY_ADJUSTMENTS
+                bopGENERAL_ALIAS:CUSTOMER_PROP_PREMIUM = (((bopGENERAL_ALIAS:CUSTOMER_PROP_LIMIT
+                                                         - BPSDEFAULT:CUSTOMER_PROP_LIMIT) Divide 1000) *
+                                                         L_CUSTOMER_ADJ_RATE)
+                End
+            end
+        End
+    End
+
+
+End
+
+Procedure CUSTOMER_PROPERTY_SPECIAL
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_RECORD_TYPE = 3
+L_TERRITORY = 999
+L_EFF_DATE = sfpNAME:EFF_DATE
+L_RATE_GROUP = bopGENERAL:RATE_GROUP
+
+Include "bpsspecprop.inc"
+
+End
+
+Procedure RATE_VALUABLE_PAPERS
+Begin
+Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                    BPSRATE:STATE = bopGENERAL:STATE,
+                    BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+while BPSRATE:COMPANY_ID       = bopgeneral:company_id and
+      BPSRATE:STATE            = bopGENERAL:STATE and
+      BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+        Begin
+        L_FACTOR_1 = BPSRATE:VALUABLE_PAPERS_FACTOR
+        L_LIMIT = BPSRATE:VALUABLE_PAPERS_LIMIT
+        End
+
+    Next BPSRATE
+    End
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        If bopGENERAL_ALIAS:VALUABLE_PAPERS_LIMIT <> L_VALUE_LIMIT_1 Then
+            begin
+            if l_liability_rate_or_charge = 1 then
+                bopGENERAL_ALIAS:VALUABLE_PAPERS_PREMIUM = ((bopGENERAL_ALIAS:PROPERTY_RATE *
+                                                           l_liability_rate) *
+                                                           (((bopGENERAL_ALIAS:VALUABLE_PAPERS_LIMIT -
+                                                           L_VALUE_LIMIT_1) Divide
+                                                           L_LIMIT) * L_FACTOR_1))
+            else
+                bopGENERAL_ALIAS:VALUABLE_PAPERS_PREMIUM = (bopGENERAL_ALIAS:PROPERTY_RATE *
+                                                (((bopGENERAL_ALIAS:VALUABLE_PAPERS_LIMIT
+                                                - L_VALUE_LIMIT_1) Divide
+                                                L_LIMIT) * L_FACTOR_1))
+            end
+
+        End
+
+End
+
+Procedure RATE_ACV_BUILDING
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_EFF_DATE = sfpNAME:EFF_DATE
+
+Include "bpsacv.inc"
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:ACV_BUILDING_PREMIUM = ((bopGENERAL_ALIAS:BUILDING_PREMIUM * L_FACTOR_1) -
+                                bopGENERAL_ALIAS:BUILDING_PREMIUM)
+        End
+End
+
+Procedure RATE_ACV_CONTENTS
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_EFF_DATE = sfpNAME:EFF_DATE
+
+Include "bpsacv.inc"
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:ACV_CONTENTS_PREMIUM = ((bopGENERAL_ALIAS:PROPERTY_PREMIUM *
+                                         L_FACTOR_2) - bopGENERAL_ALIAS:PROPERTY_PREMIUM)
+        If L_FACTOR_2 <> 0 Then
+            L_PROP_ACV = L_FACTOR_2
+        Else
+            L_PROP_ACV = 1.00
+        End
+
+End
+Procedure RATE_FIRE_LEGAL
+Begin
+L_COMPANY_ID = bopgeneral:company_id
+L_STATE = bopGENERAL:STATE
+L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+L_EFF_DATE = sfpNAME:EFF_DATE
+L_FIRE_LIMIT = bopGENERAL:FIRE_LIMIT
+
+Include "bpsfire.inc"
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:FIRE_PREMIUM = L_CHARGE
+        End
+
+End
+
+Procedure BOILER_MINIMUM
+Begin
+Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                    BPSRATE:STATE = bopGENERAL:STATE,
+                    BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+while BPSRATE:COMPANY_ID       = bopgeneral:company_id and
+      BPSRATE:STATE            = bopGENERAL:STATE and
+      BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+        Begin
+        L_MINIMUM_boiler = BPSRATE:BOILER_MINIMUM
+        End
+
+    Next BPSRATE
+    End
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence, generic
+
+L_BOILER_PREM_TOTAL = 0
+while bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO and
+      bopgeneral_alias:pol_year = bopgeneral:pol_year and
+      bopgeneral_alias:end_sequence = bopgeneral:end_sequence
+    begin
+    L_BOILER_PREM_TOTAL = bopGENERAL_ALIAS:BOILERS_PREMIUM +
+                          L_BOILER_PREM_TOTAL
+
+    Next bopGENERAL_ALIAS
+    End
+
+/*If L_BOILER_PREM_TOTAL < L_MINIMUM_boiler And
+   L_BOILER_PREM_TOTAL <> 0 Then
+    Begin
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence, generic
+
+    If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO and
+       bopgeneral_alias:pol_year = bopgeneral:pol_year and
+       bopgeneral_alias:end_sequence = bopgeneral:end_sequence Then
+        Change bopGENERAL_ALIAS
+            Begin
+            bopGENERAL_ALIAS:BOILERS_PREMIUM = L_MINIMUM_boiler
+            bopGENERAL_ALIAS:OPTIONAL_TOTAL = ((bopGENERAL_ALIAS:OPTIONAL_TOTAL -
+                                              L_BOILER_PREM_TOTAL) +
+                                              L_MINIMUM_boiler)
+            L_BOILER_PREM_TOTAL = L_MINIMUM_boiler
+            End
+    End*/
+
+End
+
+Procedure TERRITORY_RATING
+Begin
+-- special territory rating, if sfscompany:special territory rate set to 1
+If SFSCOMPANY:SPECIAL_TERRITORY_RATING = 1 Then
+    Begin
+    Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                        BPSRATE:STATE = bopGENERAL:STATE,
+                        BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+    while BPSRATE:COMPANY_ID       = bopgeneral:company_id and
+          BPSRATE:STATE            = bopGENERAL:STATE and
+          BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business
+        begin
+        If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+            Begin
+            L_MINIMUM_boiler = BPSRATE:BOILER_MINIMUM
+            End
+
+        Next BPSRATE
+        End
+
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = G_policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence, generic
+
+    L_TERRITORY_BOILER_MINIMUM = 0
+    L_COUNT = 0
+    while bopGENERAL_ALIAS:policy_NO = G_policy_NO and
+          bopgeneral_alias:pol_year = bopgeneral:pol_year and
+          bopgeneral_alias:end_sequence = bopgeneral:end_sequence
+        begin
+        L_COUNT = L_COUNT + 1
+        L_TERRITORY_BOILER_MINIMUM = L_TERRITORY_BOILER_MINIMUM +
+                                     bopGENERAL_ALIAS:BOILERS_PREMIUM
+
+        Next bopGENERAL_ALIAS
+        End
+
+    If bopGENERAL:BOILERS = "Y" Then
+        Begin
+        If L_TERRITORY_BOILER_MINIMUM < L_MINIMUM_boiler And
+           L_COUNT = 1 Then
+            L_TERRITORY_BOILER_MINIMUM = L_MINIMUM_boiler
+        Else
+            L_TERRITORY_BOILER_MINIMUM = L_BOILERS_PREM
+        End
+    Else
+        L_TERRITORY_BOILER_MINIMUM = 0
+
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = G_policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopgeneral_alias:prem_no  = bopgeneral:prem_no,
+                                 bopgeneral_alias:build_no = bopgeneral:build_no, generic
+
+    If bopGENERAL:RATING_TERRITORY_FACTOR = 0 Then
+        Change bopGENERAL_ALIAS
+            Begin
+            bopGENERAL_ALIAS:RATING_TERRITORY_FACTOR = 1.00
+            End
+
+    L_LOC_TOTAL_1 = (L_LOC_TOTAL_1 + ((L_LOC_TOTAL +
+                    L_TERRITORY_BOILER_MINIMUM
+                    + L_PRINTERS_ERROR) *
+                    bopGENERAL:RATING_TERRITORY_FACTOR))
+    L_LOC_TOTAL_2 = L_LOC_TOTAL_2 + L_LOC_TOTAL
+
+    End
+End
+
+Procedure RATE_BOILERS
+Begin
+Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                    BPSRATE:STATE = bopGENERAL:STATE,
+                    BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+while BPSRATE:COMPANY_ID       = bopgeneral:company_id and
+      BPSRATE:STATE            = bopGENERAL:STATE and
+      BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+        Begin
+        L_FACTOR_1 = BPSRATE:BOILERS_FACTOR
+        L_LIMIT = BPSRATE:BOILERS_LIMIT
+        L_BOILERS_LOSS_INCOME = BPSRATE:BOILER_LOSS_INCOME
+        End
+
+    Next BPSRATE
+    End
+
+Access bopCOMPUTER, Set bopCOMPUTER:policy_NO = bopGENERAL:policy_NO,
+                        bopcomputer:pol_year = bopgeneral:pol_year,
+                        bopcomputer:end_sequence = bopgeneral:end_sequence,
+                        bopCOMPUTER:PREM_NO = bopGENERAL:PREM_NO,
+                        bopCOMPUTER:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        If bopGENERAL_ALIAS:LOSS_INCOME_LIMIT = 0 Then
+            L_LOSS_INCOME_LIMIT = L_BOILERS_LOSS_INCOME
+        Else
+            L_LOSS_INCOME_LIMIT = 0
+
+        If SFSCOMPANY:BOILER_RATING = 1 Then  -- Salem
+            Begin
+            bopGENERAL_ALIAS:BOILERS_PREMIUM = (((bopGENERAL_ALIAS:BUILDING_LIMIT +
+                                               bopGENERAL_ALIAS:OTHER_STRUCTURES +
+                                               bopGENERAL_ALIAS:PROPERTY_LIMIT +
+                                               bopCOMPUTER:LIMIT[1] + bopCOMPUTER:LIMIT[2])
+                                               Divide L_LIMIT)
+                                               * L_FACTOR_1)
+            End
+        If SFSCOMPANY:BOILER_RATING = 2 Then -- Flemington
+            Begin
+            bopGENERAL_ALIAS:BOILERS_PREMIUM = ((((bopGENERAL_ALIAS:BUILDING_LIMIT +
+                                               bopGENERAL_ALIAS:OTHER_STRUCTURES +
+                                               bopGENERAL_ALIAS:PROPERTY_LIMIT)
+                                               * L_DEDUCTIBLE_FACTOR)
+                                               Divide L_LIMIT)
+                                               * L_FACTOR_1)
+            End
+        If SFSCOMPANY:BOILER_RATING = 3 Then -- lebins
+            Begin
+            bopGENERAL_ALIAS:BOILERS_PREMIUM = (((bopGENERAL_ALIAS:BUILDING_LIMIT +
+                                               bopGENERAL_ALIAS:PROPERTY_LIMIT +
+                                               bopGENERAL_ALIAS:LOSS_INCOME_LIMIT)
+                                               Divide L_LIMIT)
+                                               * L_FACTOR_1)
+            End
+        If bopGENERAL_ALIAS:BOILERS_PREMIUM = 0 Then
+            bopGENERAL_ALIAS:BOILERS_PREMIUM = 1
+        L_BOILERS_PREM = bopGENERAL_ALIAS:BOILERS_PREMIUM
+        End
+
+End
+
+Procedure GET_RATE
+Begin
+Access SFSPACKAGE, Set SFSPACKAGE:COMPANY_ID = bopgeneral:company_id,
+                       SFSPACKAGE:STATE = bopGENERAL:STATE,
+                       SFSPACKAGE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+while SFSPACKAGE:COMPANY_ID       = bopgeneral:company_id and
+      SFSPACKAGE:STATE            = bopGENERAL:STATE and
+      SFSPACKAGE:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= SFSPACKAGE:EFF_DATE Then
+        L_PACKAGE = SFSPACKAGE:PACKAGE_MOD
+
+    Next SFSPACKAGE
+    End
+
+access sfsline, set sfsline:company_Id = sfpname:company_id,
+                    sfsline:line_of_business = sfpname:line_of_business,
+                    sfsline:lob_subline = "00", generic
+
+l_line_of_business = bopgeneral:line_of_business
+if sfsline:lob_code one of "CPORTFOLIO" then
+    begin
+    Access sfpmastsupp, Set sfpmastsupp:policy_NO = bopGENERAL:policy_NO,
+                            sfpmastsupp:pol_year = bopgeneral:pol_year,
+                            sfpmastsupp:end_sequence = bopgeneral:end_sequence,
+                            sfpmastsupp:line_of_business = l_line_of_business, Generic
+
+    l_package_deviation = sfpmastsupp:package_deviation
+    l_irpm = sfpmastsupp:irpm
+    If sfpmastsupp:policy_NO = bopGENERAL:policy_NO and
+       sfpmastsupp:pol_Year = bopgeneral:pol_year and
+       sfpmastsupp:end_sequence = bopgeneral:end_sequence Then
+        begin
+        Change sfpmastsupp
+            Begin
+            sfpmastsupp:PACKAGE_DEVIATION = L_PACKAGE
+            end
+        End
+    end
+else
+    begin
+    Access sfpMASTER, Set sfpMASTER:policy_NO = bopGENERAL:policy_NO,
+                          sfpmaster:pol_year = bopgeneral:pol_year,
+                          sfpmaster:end_sequence = bopgeneral:end_sequence, Generic
+
+    l_package_deviation = sfpmaster:package_deviation
+    l_irpm = sfpmaster:irpm
+    If sfpMASTER:policy_NO = bopGENERAL:policy_NO and
+       sfpmaster:pol_year = bopgeneral:pol_year and
+       sfpmaster:end_sequence = bopgeneral:end_sequence Then
+        begin
+        Change sfpMASTER
+            Begin
+            sfpMASTER:PACKAGE_DEVIATION = L_PACKAGE
+            end
+        End
+    end
+
+L_PACKAGE = 0
+L_RATE_FACTOR = 0.01
+
+l_split_comm = sfpmaster:split_comm
+l_line_of_business = bopgeneral:line_of_business
+Access SFSAGTCOMM, Set SFSAGTCOMM:COMPANY_ID = sfpname:company_id,
+                       SFSAGTCOMM:AGENT_NO = sfpNAME:AGENT_NO,
+                       SFSAGTCOMM:LINE_OF_BUSINESS = l_line_of_business, Generic
+
+while SFSAGTCOMM:COMPANY_ID       = sfpname:company_id and
+      SFSAGTCOMM:AGENT_NO         = sfpNAME:AGENT_NO and
+      SFSAGTCOMM:LINE_OF_BUSINESS = l_line_of_business
+    begin
+    If sfpNAME:EFF_DATE >= SFSAGTCOMM:EFF_DATE Then
+        Begin
+        If sfpNAME:policy_TYPE = "N" Then
+            L_AGENT_COMM = SFSAGTCOMM:COMM_RATE
+        Else
+            L_AGENT_COMM = SFSAGTCOMM:RENEWAL_COMM_RATE
+        End
+
+    Next SFSAGTCOMM
+    End
+
+If L_SPLIT_COMM = "B" Then
+    L_COMM = (1 - (((L_AGENT_COMM - sfpNAME:SPEC_COMM_RATE) * L_RATE_FACTOR) * 2))
+If L_SPLIT_COMM = "A" Then
+    L_COMM = (1 - (((L_AGENT_COMM - sfpNAME:SPEC_COMM_RATE) * L_RATE_FACTOR) * 1))
+If L_COMM = 0 Then
+    L_COMM = 1
+L_PACKAGE = (1 - (L_PACKAGE_DEVIATION * L_RATE_FACTOR))
+If L_PACKAGE = 0 Then
+    L_PACKAGE = 1
+L_CREDIT_FACTOR = L_COMM * L_PACKAGE
+L_LOC_TOTAL = (((L_PREM + L_TOTAL_END) * L_CREDIT_FACTOR) +
+              L_MISC_PREMIUM)
+
+Access sfpLOCATION, Set sfpLOCATION:policy_NO = bopGENERAL:policy_NO,
+                        sfplocation:pol_Year = bopgeneral:pol_year,
+                        sfplocation:end_sequence = bopgeneral:end_sequence,
+                        sfpLOCATION:PREM_NO = bopGENERAL:PREM_NO,
+                        sfpLOCATION:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If sfpLOCATION:policy_NO = bopGENERAL:policy_NO And
+   sfplocation:pol_year = bopgeneral:pol_Year and
+   sfplocation:end_sequence = bopgeneral:end_sequence and
+   sfpLOCATION:PREM_NO = bopGENERAL:PREM_NO And
+   sfpLOCATION:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change sfpLOCATION
+        Begin
+        sfpLOCATION:LINE_OF_BUSINESS = bopgeneral:line_of_business
+        sfpLOCATION:STATE = bopGENERAL:STATE
+        sfpLOCATION:COUNTY = bopGENERAL:COUNTY
+        sfpLOCATION:TRANS_CODE = 10
+        sfpLOCATION:TRANS_DATE = sfpNAME:TRANS_DATE
+        sfpLOCATION:EFF_DATE = sfpNAME:EFF_DATE
+        sfpLOCATION:EXP_DATE = sfpNAME:EXP_DATE
+        sfpLOCATION:LIMIT_CODE[1] = "A"
+        sfpLOCATION:LIMIT[1] = bopGENERAL:BUILDING_LIMIT + bopGENERAL:OTHER_STRUCTURES
+        sfpLOCATION:LIMIT_CODE[2] = "B"
+        sfpLOCATION:LIMIT[2] = bopGENERAL:PROPERTY_LIMIT
+        sfpLOCATION:LIMIT_CODE[3] = "C"
+        sfpLOCATION:LIMIT[3] = bopGENERAL:LOSS_INCOME_LIMIT
+        sfpLOCATION:LIMIT_CODE[4] = "D"
+        sfpLOCATION:LIMIT[4] = bopGENERAL:MONEY_LIMIT_ON + bopGENERAL:MONEY_LIMIT_OFF
+        sfpLOCATION:LIMIT_CODE[5] = "L"
+        sfpLOCATION:LIMIT[5] = SFSLIABILITY:LIMIT
+        sfplocation:premium[6] = l_boilers_prem
+        sfpLOCATION:LIMIT_CODE[10] = "T"
+        sfpLOCATION:LIMIT[10] = bopGENERAL:BUILDING_LIMIT +
+                                bopGENERAL:PROPERTY_LIMIT +
+                                bopGENERAL:OTHER_STRUCTURES +
+                                L_AR_LIMIT_1 + L_VALUE_LIMIT_1 + L_EDP_LIMIT +
+                                bopGENERAL:LOSS_INCOME_LIMIT
+--        L_IRPM = (1 + (L_IRPM * L_RATE_FACTOR))
+--        If L_IRPM = 0 Then
+--            L_IRPM = 1
+        if bopgeneral:rating_territory_Factor <> 0 then
+            l_rating_territory_factor = bopgeneral:rating_territory_factor
+        else
+            l_rating_territory_factor = 1.00
+        l_location_premium_11 = l_loc_total *
+                                l_rating_territory_factor *
+                                l_irpm
+        sfpLOCATION:PREMIUM[10] = l_location_premium_11
+        l_location_premium_10 = sfplocation:premium[10] + l_location_premium_10
+        End
+
+access bopgeneral_alias, set bopgeneral_alias:policy_no    = bopgeneral:policy_no,
+                             bopgeneral_alias:pol_year     = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopgeneral_alias:prem_no      = bopgeneral:prem_no,
+                             bopgeneral_alias:build_no     = bopgeneral:build_no, generic
+
+if bopgeneral_alias:policy_no    = bopgeneral:policy_no and
+   bopgeneral_alias:pol_year     = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopgeneral_alias:prem_no      = bopgeneral:prem_no and
+   bopgeneral_alias:build_no     = bopgeneral:build_no then
+    change bopgeneral_alias
+        begin
+        bopgeneral_alias:location_premium = l_loc_total
+        end
+
+L_TOTAL = L_LOC_TOTAL + L_TOTAL
+
+/* end of get rate */
+End
+
+procedure printers_credit
+begin
+If bopGENERAL:CLASS_CODE = 60 Then
+    Begin
+    Access BPSCREDITS, Set BPSCREDITS:COMPANY_ID = bopgeneral:company_id,
+                           BPSCREDITS:STATE = bopGENERAL:STATE,
+                           BPSCREDITS:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+    while BPSCREDITS:COMPANY_ID       = bopgeneral:company_id and
+          BPSCREDITS:STATE            = bopGENERAL:STATE and
+          BPSCREDITS:LINE_OF_BUSINESS = bopgeneral:line_of_business
+        begin
+        If sfpNAME:EFF_DATE >= BPSCREDITS:EFF_DATE Then
+            L_PRINTERS_PERCENT = BPSCREDITS:PRINTERS_CREDIT
+
+        Next BPSCREDITS
+        End
+
+    L_PRINTERS_PERCENT = (1 + (L_PRINTERS_PERCENT * L_RATE_FACTOR))
+    If L_PRINTERS_PERCENT = 0 Then
+        L_PRINTERS_PERCENT = 1
+    End
+
+do boiler_minimum
+If bopGENERAL:CLASS_CODE = 60 Then
+    Begin
+    l_printers_total = l_prem + l_total_end + l_misc_premium + l_boiler_prem_total
+    l_prem            = l_prem * l_printers_percent
+    if bopgeneral:bop_premium = l_minimum and
+       l_change_minimum_rating = 1 then
+        l_prem        = l_minimum
+    l_boiler_printer_total = l_boiler_prem_total * l_printers_percent
+    if bopgeneral:boilers_premium = l_minimum_boiler then
+        l_boiler_printer_total = l_minimum_boiler
+    l_total_end       = l_total_end * l_printers_percent
+    l_misc_premium    = l_misc_premium * l_printers_percent
+    l_printers_credit = l_prem + l_total_end + l_misc_premium + l_boiler_printer_total
+
+    L_PRINTERS_CREDIT = ((l_printers_total - L_PRINTERS_CREDIT) * -1)
+
+    Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                 bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                                 bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                 bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                 bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Exact
+
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:PRINTERS_ERRORS_CREDITS = L_PRINTERS_CREDIT
+        End
+    End
+
+if sfsline:lob_code one of "CPORTFOLIO" then
+    begin
+    access sfpmastsupp, set sfpmastsupp:policy_no        = bopgeneral:policy_no,
+                            sfpmastsupp:pol_year         = bopgeneral:pol_year,
+                            sfpmastsupp:end_sequence     = bopgeneral:end_sequence,
+                            sfpmastsupp:line_of_business = bopgeneral:line_of_business, generic
+
+    change sfpmastsupp
+        begin
+        sfpmastsupp:total[4] = l_printers_credit
+        end
+    end
+else
+    begin
+    access sfpmaster, set sfpmaster:policy_no    = bopgeneral:policy_no,
+                          sfpmaster:pol_year     = bopgeneral:pol_year,
+                          sfpmaster:end_sequence = bopgeneral:end_sequence, generic
+
+    change sfpmaster
+        begin
+        sfpmaster:total[4] = l_printers_credit
+        end
+    end
+
+Access sfpLOCATION, Set sfpLOCATION:policy_NO = bopGENERAL:policy_NO,
+                        sfplocation:pol_year = bopgeneral:pol_year,
+                        sfplocation:end_sequence = bopgeneral:end_sequence,
+                        sfpLOCATION:PREM_NO = bopGENERAL:PREM_NO,
+                        sfpLOCATION:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If sfpLOCATION:policy_NO = bopGENERAL:policy_NO And
+   sfplocation:pol_year = bopgeneral:pol_year and
+   sfplocation:end_sequence = bopgeneral:end_sequence and
+   sfpLOCATION:PREM_NO = bopGENERAL:PREM_NO And
+   sfpLOCATION:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change sfpLOCATION
+        Begin
+        sfplocation:premium[7] = l_printers_error * l_printers_percent
+        End
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                             bopgeneral_alias:pol_year = bopgeneral:pol_year,
+                             bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                             bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+If bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO And
+   bopgeneral_alias:pol_year = bopgeneral:pol_year and
+   bopgeneral_alias:end_sequence = bopgeneral:end_sequence and
+   bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO And
+   bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO Then
+    Change bopGENERAL_ALIAS
+        Begin
+        bopGENERAL_ALIAS:LOCATION_PREMIUM = L_LOC_TOTAL
+        bopGENERAL_ALIAS:PRINTERS_ERROR_PREMIUM = L_PRINTERS_ERROR * l_printers_percent
+        End
+
+l_printers_error = l_printers_error * l_printers_percent
+L_TOTAL_PRINTERS = L_PRINTERS_ERROR + L_TOTAL_PRINTERS
+
+End
+
+procedure minimum_premium
+begin
+Access SFSCONTROL, Set SFSCONTROL:COMPANY_ID = bopgeneral:company_id,
+                       SFSCONTROL:STATE = bopGENERAL:STATE,
+                       SFSCONTROL:LINE_OF_BUSINESS = bopgeneral:line_of_business, Approximate
+
+l_change_minimum_rating = 0
+while SFSCONTROL:COMPANY_ID       = bopgeneral:company_id and
+      SFSCONTROL:STATE            = bopGENERAL:STATE and
+      SFSCONTROL:LINE_OF_BUSINESS = bopgeneral:line_of_business
+    begin
+    If (sfpNAME:EFF_DATE >= SFSCONTROL:EFF_DATE and
+       (sfpname:eff_date <= sfscontrol:exp_date or
+       sfscontrol:exp_date = 0)) Then
+        begin
+        L_MINIMUM = SFSCONTROL:MINIMUM_PREMIUM
+        l_minimum_1 = sfscontrol:minimum_premium_1
+        l_change_minimum_rating = sfscontrol:change_minimum_rating
+        l_mp_building_property = sfscontrol:mp_building_property
+        end
+
+    Next SFSCONTROL
+    End
+
+end
+
+Procedure RATE_ENDORSEMENTS
+Begin
+Access SFSOPTEND, Set SFSOPTEND:COMPANY_ID = bopgeneral:company_id,
+                      SFSOPTEND:STATE = bopGENERAL:STATE,
+                      SFSOPTEND:LINE_OF_BUSINESS = bopgeneral:line_of_business,
+                      SFSOPTEND:CODE = L_CODE, Generic
+
+while SFSOPTEND:COMPANY_ID       = bopgeneral:company_id and
+      SFSOPTEND:STATE            = bopGENERAL:STATE and
+      SFSOPTEND:LINE_OF_BUSINESS = bopgeneral:line_of_business and
+      SFSOPTEND:CODE             =  L_CODE
+    begin
+    If (sfpNAME:EFF_DATE >= SFSOPTEND:EFF_DATE and
+       (sfpname:eff_date <= sfsoptend:exp_date or
+       sfsoptend:exp_date = 0)) Then
+        Begin
+        L_END_FACTOR = SFSOPTEND:PREMIUM_1[1]
+        L_END_LIMIT = SFSOPTEND:LIMIT[1]
+        L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[1]
+
+        if l_code one of "MCP140", "MCP141" then
+            begin
+            Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                                   bopendorse:pol_year = bopgeneral:poL_year,
+                                   bopendorse:end_sequence = bopgeneral:end_sequence,
+                                   bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                                   bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                                   bopENDORSE:CODE = L_CODE, Generic
+
+            if sfsoptend:limit[1] = bopendorse:limit[1] then
+                l_end_premium1 = sfsoptend:premium_1[1]
+            if sfsoptend:limit[2] = bopendorse:limit[1] then
+                l_end_premium1 = sfsoptend:premium_1[2]
+            if sfsoptend:limit[3] = bopendorse:limit[1] then
+                l_end_premium1 = sfsoptend:premium_1[3]
+            end
+
+        If L_CODE = "MCL189" Then
+            Begin
+            L_BUYBACK_FACTOR = SFSOPTEND:PREMIUM_1[1]
+            L_BUYBACK_PREMIUM = SFSOPTEND:PREMIUM_1[2]
+            End
+
+        If L_CODE one of "MCL883", "MCL884" Then
+            Begin
+            Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                                   bopendorse:pol_year = bopgeneral:poL_year,
+                                   bopendorse:end_sequence = bopgeneral:end_sequence,
+                                   bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                                   bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                                   bopENDORSE:CODE = L_CODE, Generic
+
+            if bopendorse:limit[1] = sfsoptend:limit[1] then
+                L_fungi_FACTOR = SFSOPTEND:PREMIUM_1[1]
+            if bopendorse:limit[1] = sfsoptend:limit[2] then
+                l_fungi_factor = sfsoptend:premium_1[2]
+            l_fungi_minimum = sfsoptend:premium_1[3]
+            End
+
+        If L_CODE = "MCL434" Then
+            Begin
+            Switch(L_LIABILITY_CODE)
+              Case 1 : Begin
+                       L_END_LIMIT = SFSOPTEND:LIMIT[1]
+                       L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[1]
+                       End
+              Case 2 : Begin
+                       L_END_LIMIT = SFSOPTEND:LIMIT[2]
+                       L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[2]
+                       End
+              Case 3 : Begin
+                       L_END_LIMIT = SFSOPTEND:LIMIT[3]
+                       L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[3]
+                       End
+              End
+
+            L_END_MINIMUM = SFSOPTEND:PREMIUM_1[4]
+            End
+
+        If L_CODE = "BU0120" Then
+            Begin
+            Switch(L_LIABILITY_CODE)
+              Case 1 : L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[1]
+              Case 2 : L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[2]
+              Case 3 : L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[3]
+              End
+            End
+
+        If L_CODE = "BU0195" Then
+            Begin
+            Switch(L_LIABILITY_CODE)
+              Case 1 : Begin
+                       L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[1]
+                       End
+              Case 2 : Begin
+                       L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[3]
+                       End
+              Case 3 : Begin
+                       L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[5]
+                       End
+              End
+            End
+
+        If L_CODE = "BU0521" Then
+            L_END_FACTOR = SFSOPTEND:PREMIUM_1[1]
+
+        If L_CODE one of "BU0194", "BU0192", "BU0191" Then
+            Begin
+            Switch(L_LIABILITY_CODE)
+              Case 1 : Begin
+                       L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[1]
+                       End
+              Case 2 : Begin
+                       L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[2]
+                       End
+              Case 3 : Begin
+                       L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[3]
+                       End
+              End
+            End
+
+        If L_CODE = "BU0282" Then
+            Begin
+            access bopdishonesty, set bopdishonesty:policy_no = g_policy_no,
+                                      bopdishonesty:pol_year = g_year,
+                                      bopdishonesty:end_sequence = g_end_sequence,
+                                      bopdishonesty:prem_no = g_prem_no,
+                                      bopdishonesty:build_no = g_build_no, generic
+
+            L_END_PREMIUM1 = 0
+            If SFSLINE_ALIAS:OPTION = "P" Then
+                Begin
+                If bopDISHONESTY:LIMIT > BPSDEFAULT:EMPLOYEE_DISHONESTY Then
+                    Begin
+                    If bopDISHONESTY:LIMIT = SFSOPTEND:LIMIT[1] Then
+                        L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[1]
+                    Else
+                        L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[2]
+
+                    If bopDISHONESTY:NO_EMPLOYEES > 5 Then
+                        Begin
+                        If bopDISHONESTY:LIMIT = SFSOPTEND:LIMIT[1] Then
+                            L_END_PREMIUM1 = (L_END_PREMIUM1 + ((bopDISHONESTY:NO_EMPLOYEES
+                                             - 5) * SFSOPTEND:PREMIUM_1[3]))
+                        Else
+                            L_END_PREMIUM1 = (L_END_PREMIUM1 + ((bopDISHONESTY:NO_EMPLOYEES
+                                             - 5) * SFSOPTEND:PREMIUM_1[4]))
+                        End
+                    End
+                End
+            Else
+                Begin
+                If bopDISHONESTY:LIMIT = SFSOPTEND:LIMIT[1] Then
+                    L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[1]
+                Else
+                    L_END_PREMIUM1 = SFSOPTEND:PREMIUM_1[2]
+
+                If bopDISHONESTY:NO_EMPLOYEES > 5 Then
+                    Begin
+                    If bopDISHONESTY:LIMIT = SFSOPTEND:LIMIT[1] Then
+                        L_END_PREMIUM1 = (L_END_PREMIUM1 + ((bopDISHONESTY:NO_EMPLOYEES
+                                         - 5) * SFSOPTEND:PREMIUM_1[3]))
+                    Else
+                        L_END_PREMIUM1 = (L_END_PREMIUM1 + ((bopDISHONESTY:NO_EMPLOYEES
+                                         - 5) * SFSOPTEND:PREMIUM_1[4]))
+                    End
+                End
+            End
+
+        If L_CODE = "BU0283" Then
+            Begin
+            Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                                   bopendorse:pol_year = bopgeneral:poL_year,
+                                   bopendorse:end_sequence = bopgeneral:end_sequence,
+                                   bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                                   bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                                   bopENDORSE:CODE = L_CODE, Generic
+
+            If bopENDORSE:LIMIT[1] > 15000 Then
+                Begin
+                L_END_PREMIUM1 = ((15000 Divide SFSOPTEND:LIMIT[1])
+                                 * SFSOPTEND:PREMIUM_1[1])
+                L_END_PREMIUM1 = ((((bopENDORSE:LIMIT[1] - 15000) Divide
+                                 SFSOPTEND:LIMIT[2]) * SFSOPTEND:PREMIUM_1[2]) +
+                                 L_END_PREMIUM1)
+                End
+            Else
+                L_END_PREMIUM1 = ((bopENDORSE:LIMIT[1] Divide SFSOPTEND:LIMIT[1])
+                                 * SFSOPTEND:PREMIUM_1[1])
+            End
+
+        If L_CODE = "BU0197" Then
+            Begin
+            Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                                   bopendorse:pol_year = bopgeneral:poL_year,
+                                   bopendorse:end_sequence = bopgeneral:end_sequence,
+                                   bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                                   bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                                   bopENDORSE:CODE = L_CODE, Generic
+
+            Switch(L_LIABILITY_CODE)
+              Case 1 : Begin
+                       Switch(bopENDORSE:BAR)
+                         Case "Y" : L_END_PREMIUM1 = ((bopENDORSE:LIMIT[1]
+                                                     Divide SFSOPTEND:LIMIT[1])
+                                                     * SFSOPTEND:PREMIUM_1[1])
+                         Default  : L_END_PREMIUM1 = ((bopENDORSE:LIMIT[1]
+                                                     Divide SFSOPTEND:LIMIT[4])
+                                                     * SFSOPTEND:PREMIUM_1[4])
+                          End
+                       End
+              Case 2 : Begin
+                       Switch(bopENDORSE:BAR)
+                         Case "Y" : L_END_PREMIUM1 = ((bopENDORSE:LIMIT[1]
+                                                     Divide SFSOPTEND:LIMIT[2])
+                                                     * SFSOPTEND:PREMIUM_1[2])
+                         Default  : L_END_PREMIUM1 = ((bopENDORSE:LIMIT[1]
+                                                     Divide SFSOPTEND:LIMIT[5])
+                                                     * SFSOPTEND:PREMIUM_1[5])
+                          End
+                       End
+              Case 3 : Begin
+                       Switch(bopENDORSE:BAR)
+                         Case "Y" : L_END_PREMIUM1 = ((bopENDORSE:LIMIT[1]
+                                                     Divide SFSOPTEND:LIMIT[3])
+                                                     * SFSOPTEND:PREMIUM_1[3])
+                         Default  : L_END_PREMIUM1 = ((bopENDORSE:LIMIT[1]
+                                                     Divide SFSOPTEND:LIMIT[6])
+                                                     * SFSOPTEND:PREMIUM_1[6])
+                          End
+                       End
+              End
+            End
+
+        if l_code = "BU0370" then
+            begin
+            switch(l_form)
+              case 1  : l_end_factor = sfsoptend:premium_1[1]
+              default : l_end_factor = sfsoptend:premium_1[2]
+              end
+            l_end_factor_1 = sfsoptend:premium_1[3]
+            end
+
+        if l_code one of "LM0198", "BU0196" then
+            begin
+            Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                                   bopendorse:pol_year = bopgeneral:poL_year,
+                                   bopendorse:end_sequence = bopgeneral:end_sequence,
+                                   bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                                   bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                                   bopENDORSE:CODE = L_CODE, Generic
+
+            Switch(L_LIABILITY_CODE)
+              Case 1  : l_end_premium1 = bopendorse:no_units *
+                                         sfsoptend:premium_1[1]
+              case 2  : l_end_premium1 = bopendorse:no_units *
+                                         sfsoptend:premium_1[2]
+              default : l_end_premium1 = bopendorse:no_units *
+                                         sfsoptend:premium_1[3]
+              end
+            end
+
+        If L_CODE = "BU0193" Then
+            Begin
+            access bopbshop, set bopbshop:policy_no = g_policy_no,
+                                 bopbshop:pol_year = g_year,
+                                 bopbshop:end_sequence = g_end_sequence,
+                                 bopbshop:prem_no = g_prem_no,
+                                 bopbshop:build_no = g_build_no, generic
+
+            L_BARBER_PREM_FULL = 0
+            L_BARBER_PREM_PART = 0
+            L_BEAUTY_PREM_FULL = 0
+            L_BEAUTY_PREM_PART = 0
+            L_MANICURISTS = 0
+            L_BARBER_PREMIUM = 0
+            L_BEAUTY_FULL_PREMIUM = 0
+            L_BEAUTY_PART_PREMIUM = 0
+            L_MANICURISTS_PREMIUM = 0
+            Switch(L_LIABILITY_CODE)
+              Case 1 : Begin
+                       If bopBSHOP:BARBER_FULL_TIME <> 0 Then
+                           L_BARBER_PREM_FULL = SFSOPTEND:PREMIUM_1[1]
+                       If bopBSHOP:BARBER_FULL_TIME <> 0 Then
+                           L_BARBER_PREM_PART = SFSOPTEND:PREMIUM_1[2]
+                       If bopBSHOP:BEAUTY_FULL_TIME <> 0 Then
+                           L_BEAUTY_PREM_FULL = SFSOPTEND:PREMIUM_1[7]
+                       If bopBSHOP:BEAUTY_PART_TIME <> 0 Then
+                           L_BEAUTY_PREM_PART = SFSOPTEND:PREMIUM_1[8]
+                       End
+              Case 2 : Begin
+                       If bopBSHOP:BARBER_FULL_TIME <> 0 Then
+                           L_BARBER_PREM_FULL = SFSOPTEND:PREMIUM_1[3]
+                       If bopBSHOP:BARBER_FULL_TIME <> 0 Then
+                           L_BARBER_PREM_PART = SFSOPTEND:PREMIUM_1[4]
+                       If bopBSHOP:BEAUTY_FULL_TIME <> 0 Then
+                           L_BEAUTY_PREM_FULL = SFSOPTEND:PREMIUM_1[9]
+                       If bopBSHOP:BEAUTY_PART_TIME <> 0 Then
+                           L_BEAUTY_PREM_PART = SFSOPTEND:PREMIUM_1[10]
+                       End
+              Case 3 : Begin
+                       If bopBSHOP:BARBER_FULL_TIME <> 0 Then
+                           L_BARBER_PREM_FULL = SFSOPTEND:PREMIUM_1[5]
+                       If bopBSHOP:BARBER_FULL_TIME <> 0 Then
+                           L_BARBER_PREM_PART = SFSOPTEND:PREMIUM_1[6]
+                       If bopBSHOP:BEAUTY_FULL_TIME <> 0 Then
+                           L_BEAUTY_PREM_FULL = SFSOPTEND:PREMIUM_1[11]
+                       If bopBSHOP:BEAUTY_PART_TIME <> 0 Then
+                           L_BEAUTY_PREM_PART = SFSOPTEND:PREMIUM_1[12]
+                       End
+              End
+            End
+
+        End
+    Next SFSOPTEND
+    End
+
+    if l_code one of "BU1526" then
+      {
+        access bpsemployee,
+           set bpsemployee:company_id       = boPgeneral:company_id,
+               bpsemployee:state            = l_state,
+               bpsemployee:line_of_business = boPgeneral:line_of_BUSINESS, GENERIC
+
+        while bpsemployee:company_id       = boPgeneral:company_id and
+              bpsemployee:state            = l_state and
+              bpsemployee:line_of_business = boPgeneral:line_of_BUSINESS
+          {
+            If SFPNAME:EFF_DATE >=  bpsemployee:rate_DATE Then
+              {
+                l_bu1526_eff_date = bpsemployee:rate_date
+              }
+            next bpsemployee
+          }
+
+        access bpsemployee,
+           set bpsemployee:company_id       = boPgeneral:company_id,
+               bpsemployee:state            = l_state,
+               bpsemployee:line_of_business = boPgeneral:line_of_BUSINESS,
+               bpsemployee:rate_date        = l_bu1526_eff_date
+
+        Access bopENDORSE,
+           Set bopENDORSE:policy_NO    = bopGENERAL:policy_NO,
+               bopendorse:pol_year     = bopgeneral:poL_year,
+               bopendorse:end_sequence = bopgeneral:end_sequence,
+               bopENDORSE:PREM_NO      = bopGENERAL:PREM_NO,
+               bopENDORSE:BUILD_NO     = bopGENERAL:BUILD_NO,
+               bopENDORSE:CODE         = L_CODE, Generic
+
+       switch (boPendorse:limit[1])
+         case 25000   : l_row = 1
+         case 50000   : l_row = 2
+         case 100000  : l_row = 3
+         case 500000  : l_row = 4
+         case 1000000 : l_row = 5
+         default : l_row = 1
+       end
+
+         switch (boPendorse:deductible[1])
+           case 1000 : l_bu1526_factor = bpsemployee:DEDUCTIBLE_FACTOR[1]
+           case 2500 : l_bu1526_factor = bpsemployee:DEDUCTIBLE_FACTOR[2]
+           case 5000 : l_bu1526_factor = bpsemployee:DEDUCTIBLE_FACTOR[3]
+           case 10000 : l_bu1526_factor = bpsemployee:DEDUCTIBLE_FACTOR[4]
+           default :  l_bu1526_factor = bpsemployee:DEDUCTIBLE_FACTOR[1]
+         end
+
+      if boPendorse:NO_EMPLOYEES <= 25 then
+        {
+          l_col = 1
+        }
+      else
+        if bopendorse:NO_EMPLOYEES <= 100 and
+           bopendorse:no_employees >=  26 then
+          {
+            l_col = 2
+          }
+        else  --over 100
+          {
+            l_col = 3
+          }
+
+      --the l_row - 1 is the the limit you will be put in the correct math to
+      --get to the correct array
+      --the * 3 is becak   sue they are 3 separate band for the range of employees
+      --+ l_col means it will add 1, 2, 3 to the result of the mutiplication
+      --factor is * BY the correct factor to reduse the pemium
+
+      L_UPDATE_SFPEND_PREMIUM = bpsemployee:charge[((l_row - 1) * 3) + l_col] * l_bu1526_factor
+
+   }
+
+    if l_code = "BU0380" then
+        begin
+        l_state = bopgeneral:state
+        l_eq_construction = bopendorse:construction
+        access bpsearthquake, set bpsearthquake:company_id = bopgeneral:company_id,
+                                  bpsearthquake:state = l_state,
+                                  bpsearthquake:line_of_business = bopgeneral:line_of_business,
+                                  bpsearthquake:construction = l_eq_construction, generic
+
+        while bpsearthquake:company_id = bopgeneral:company_id and
+              bpsearthquake:state = l_state and
+              bpsearthquake:line_of_business = bopgeneral:line_of_business and
+              bpsearthquake:construction = l_eq_construction
+                begin
+                l_eq_building_rate = bpsearthquake:building_rate
+                switch(bopendorse:rate_class)
+                  case 1  : l_eq_contents_rate = bpsearthquake:contents_rate[1]
+                  case 2  : l_eq_contents_rate = bpsearthquake:contents_rate[2]
+                  default : l_eq_contents_rate = bpsearthquake:contents_rate[3]
+                  end
+                l_deductible_rate = bpsearthquake:deductible_rate
+                l_deductible_per = bpsearthquake:deductible_per
+                l_per = bpsearthquake:per
+                l_eq_deductible = bpsearthquake:deductible
+
+                next bpsearthquake
+                end
+
+        access bopendorse, set bopendorse:policy_no = bopgeneral:policy_no,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopendorse:prem_no = bopgeneral:prem_no,
+                               bopendorse:build_no = bopgeneral:build_no, generic
+
+        if bopendorse:deductible[1] > l_eq_deductible then
+            begin
+            l_eq_deduct_rate   = ((100 - ((((bopendorse:deductible[1] -
+                                 l_eq_deductible) divide l_deductible_per) *
+                                 l_deductible_rate) * 100)) divide 100)
+            l_eq_building_rate = l_eq_building_rate * l_eq_deduct_rate
+            l_eq_contents_rate = l_eq_contents_rate * l_eq_deduct_rate
+            end
+
+        if bopgeneral:building_limit <> 0 then
+            l_eq_building_premium = ((bopgeneral:building_limit divide l_per) *
+                                    l_eq_building_rate)
+        if bopgeneral:property_limit <> 0 then
+            l_eq_contents_premium = ((bopgeneral:property_limit divide l_per) *
+                                    l_eq_contents_rate)
+
+        change bopendorse
+            begin
+            bopendorse:eq_deduct_rate = l_eq_deduct_rate
+            bopendorse:eq_premium[1]  = l_eq_building_premium
+            bopendorse:eq_premium[2]  = l_eq_contents_premium
+            bopendorse:premium        = l_eq_building_premium +
+                                        l_eq_contents_premium
+            end
+
+        access bopendorse, set bopendorse:policy_no = bopgeneral:policy_no,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopendorse:prem_no = bopgeneral:prem_no,
+                               bopendorse:build_no = bopgeneral:build_no, generic
+
+        if bopendorse:premium <> 0 then
+            begin
+            l_update_sfpend_premium = bopendorse:premium
+            end
+        else
+            begin
+            l_update_sfpend_premium = 0
+            while bopendorse:policy_no = g_policy_no and
+                  bopendorse:pol_Year = g_year and
+                  bopendorse:end_sequence = g_End_sequence and
+                  bopendorse:prem_no = g_prem_no and
+                  bopendorse:build_no = g_build_no
+                    begin
+                    if bopendorse:code = l_code then
+                        begin
+                        l_update_sfpend_premium = bopendorse:eq_premium[1] +
+                                                  bopendorse:eq_premium[2] +
+                                                  l_update_sfpend_premium
+                        end
+
+                    next bopendorse
+                    end
+            end
+
+        end
+
+    If L_CODE one of "MIM013", "MIM110", "MIM112", "MIM115", "MIM113", "MIM114",
+                     "MIM116" Then
+        Begin
+        Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                               bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                               bopENDORSE:CODE = L_CODE, Generic
+
+        L_UPDATE_SFPEND_PREMIUM = ((bopENDORSE:LIMIT[1] Divide 100) *
+                                  bopENDORSE:RATE[1])
+        End
+
+    If L_CODE = "MIM103" Then
+        Begin
+        L_UPDATE_SFPEND_PREMIUM = 0
+        Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                               bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                               bopENDORSE:CODE = L_CODE, Generic
+
+        L_UPDATE_SFPEND_PREMIUM = (((bopENDORSE:OCCURRENCE +
+                                  bopENDORSE:AGGREGATE) Divide 100) *
+                                  bopENDORSE:RATE[1])
+        End
+
+    If L_CODE = "MIM011" Then
+        Begin
+        L_UPDATE_SFPEND_PREMIUM = 0
+        Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                               bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                               bopENDORSE:CODE = L_CODE, Generic
+
+        If bopENDORSE:LIMIT[1] <> 0 Then
+            L_UPDATE_SFPEND_PREMIUM = ((bopENDORSE:LIMIT[1] Divide 100) *
+                                      bopENDORSE:RATE[1])
+        If bopENDORSE:LIMIT[2] <> 0 Then
+            L_UPDATE_SFPEND_PREMIUM = (L_UPDATE_SFPEND_PREMIUM +
+                                      ((bopENDORSE:LIMIT[2] Divide 100) *
+                                      bopENDORSE:RATE[2]))
+        If bopENDORSE:LIMIT[3] <> 0 Then
+            L_UPDATE_SFPEND_PREMIUM = (L_UPDATE_SFPEND_PREMIUM +
+                                      ((bopENDORSE:LIMIT[3] Divide 100) *
+                                      bopENDORSE:RATE[3]))
+        If bopENDORSE:LIMIT[4] <> 0 Then
+            L_UPDATE_SFPEND_PREMIUM = (L_UPDATE_SFPEND_PREMIUM +
+                                      ((bopENDORSE:LIMIT[4] Divide 100) *
+                                      bopENDORSE:RATE[4]))
+        If bopENDORSE:LIMIT[5] <> 0 Then
+            L_UPDATE_SFPEND_PREMIUM = (L_UPDATE_SFPEND_PREMIUM +
+                                      ((bopENDORSE:LIMIT[5] Divide 100) *
+                                      bopENDORSE:RATE[5]))
+        If bopENDORSE:LIMIT[6] <> 0 Then
+            L_UPDATE_SFPEND_PREMIUM = (L_UPDATE_SFPEND_PREMIUM +
+                                      ((bopENDORSE:LIMIT[6] Divide 100) *
+                                      bopENDORSE:RATE[6]))
+        If bopENDORSE:LIMIT[7] <> 0 Then
+            L_UPDATE_SFPEND_PREMIUM = (L_UPDATE_SFPEND_PREMIUM +
+                                      ((bopENDORSE:LIMIT[7] Divide 100) *
+                                      bopENDORSE:RATE[7]))
+        If bopENDORSE:LIMIT[8] <> 0 Then
+            L_UPDATE_SFPEND_PREMIUM = (L_UPDATE_SFPEND_PREMIUM +
+                                      ((bopENDORSE:LIMIT[8] Divide 100) *
+                                      bopENDORSE:RATE[8]))
+        End
+
+    If L_CODE = "BU0265" Then
+        Begin
+        Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                               bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                               bopENDORSE:CODE = L_CODE, Generic
+
+        L_EFF_DATE_1 = bopENDORSE:EFF_DATE
+        L_EXP_DATE = bopENDORSE:EXP_DATE
+        L_DAYS = L_EXP_DATE - L_EFF_DATE_1
+        L_UPDATE_SFPEND_PREMIUM = ((bopGENERAL:BUILDING_PREMIUM *
+                                  (L_DAYS Divide 365) *
+                                  L_END_FACTOR))
+        End
+
+    If L_CODE one of "BU0601", "BU0602", "BU0603", "BU0604", "BU0605", "BU0606",
+                     "BU0607", "BU0608", "BU0609", "BU0616", "MCP140", "MCP141",
+                     "BU5008", "BU0282", "BU0194", "BU0192", "BU0191", "BU0140",
+                     "LM0198", "BU0195", "BU0283", "BU0197" then
+        Begin
+        L_UPDATE_SFPEND_PREMIUM = L_END_PREMIUM1
+        End
+
+    If L_CODE = "MCL189" Then
+        Begin
+        Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                               bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                               bopENDORSE:CODE = L_CODE, Generic
+
+        If bopENDORSE:BUYBACK_OPTION = "Y" Then
+            Begin
+            L_BUYBACK = "Y"
+            End
+        End
+
+    If L_CODE = "BU0291" Then
+        Begin
+        Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                               bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                               bopENDORSE:CODE = L_CODE, Generic
+
+        L_UPDATE_SFPEND_PREMIUM = ((bopENDORSE:LIMIT[1] Divide L_END_LIMIT)
+                                   * L_END_PREMIUM1)
+        End
+
+    if l_code = "IM7006" then
+        Begin
+        Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                               bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                               bopENDORSE:CODE = L_CODE, Generic
+
+        l_update_sfpend_premium = 0
+        while bopendorse:policy_no = bopgeneral:policy_no and
+              bopendorse:pol_year = bopgeneral:pol_year and
+              bopendorse:end_sequence = bopgeneral:end_sequence and
+              bopendorse:prem_no = bopgeneral:prem_no and
+              bopendorse:build_no = bopgeneral:build_no and
+              bopendorse:code = l_code
+                begin
+                L_UPDATE_SFPEND_PREMIUM = bopENDORSE:MISC_PREMIUM +
+                                          l_update_sfpend_premium
+                next bopendorse
+                end
+        End
+
+    if l_code = "BU1525" then
+        Begin
+        Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                               bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                               bopENDORSE:CODE = L_CODE, Generic
+
+        l_company_id       = sfpname:company_id
+        l_state            = bopgeneral:state
+        l_line_of_business = bopgeneral:line_of_business
+        l_employee_limit   = bopendorse:limit[1]
+        l_deductible       = bopendorse:deductible[1]
+        l_no_employees     = bopendorse:no_employees
+        l_eff_date         = sfpname:eff_date
+
+        include "bpsemployeerates.pro"
+
+        l_update_sfpend_premium = l_employee_charge *
+                                  l_employee_deduct_factor
+        if l_update_sfpend_premium < l_employee_minimum then
+            l_update_sfpend_premium = l_employee_minimum
+        end
+
+    if l_code one of "BU1510" then
+        begin
+        access bopgaragekeepers, set bopgaragekeepers:policy_no = bopgeneral:policy_no,
+                                     bopgaragekeepers:pol_year = bopgeneral:poL_year,
+                                     bopgaragekeepers:end_sequence = bopgeneral:end_sequence,
+                                     bopgaragekeepers:prem_no  = bopgeneral:prem_no,
+                                     bopgaragekeepers:build_no = bopgeneral:build_no, generic
+
+        l_company_id       = bopgeneral:company_id
+        l_state            = bopgeneral:state
+        l_line_of_business = bopgeneral:line_of_business
+        l_limit            = bopgaragekeepers:limit
+        l_form             = bopgaragekeepers:form
+        l_rate_form        = bopgaragekeepers:rate_form
+        l_eff_date         = sfpname:eff_date
+
+        include "bpsgaragerates.pro"
+
+        l_type             = 1
+        l_deductible       = bopgaragekeepers:comp_deductible
+
+        include "bpsgaragededuct.pro"
+
+        l_update_sfpend_premium = l_garagekeepers_comp_premium *
+                                  l_garagekeepers_deduct_factor
+
+        change bopgaragekeepers
+            begin
+            bopgaragekeepers:comp_premium = l_garagekeepers_comp_premium *
+                                            l_garagekeepers_deduct_factor
+            end
+
+        l_type             = 2
+        l_deductible       = bopgaragekeepers:coll_deductible
+
+        include "bpsgaragededuct.pro"
+
+        l_update_sfpend_premium = (l_update_sfpend_premium +
+                                  (l_garagekeepers_coll_premium *
+                                  l_garagekeepers_deduct_factor))
+
+        change bopgaragekeepers
+            begin
+            bopgaragekeepers:coll_premium = l_garagekeepers_coll_premium *
+                                            l_garagekeepers_deduct_factor
+            end
+
+        end
+
+    If L_CODE = "QP1" Then
+        Begin
+        L_PRINTERS_ERROR = L_END_PREMIUM1
+        End
+
+    If L_CODE = "BU0370" Then
+        Begin
+        Access bopcomputer, Set bopcomputer:policy_NO = bopGENERAL:policy_NO,
+                               bopcomputer:pol_year = bopgeneral:poL_year,
+                               bopcomputer:end_sequence = bopgeneral:end_sequence,
+                               bopcomputer:PREM_NO = bopGENERAL:PREM_NO,
+                               bopcomputer:BUILD_NO = bopGENERAL:BUILD_NO, generic
+
+        -- kept the same local variable name as with peak season rating
+        -- did not want to creat another local variable
+        If SFSLINE_ALIAS:OPTION = "P" Then
+            Begin
+            L_COMPUTER_LIMIT = (bopGENERAL:PROPERTY_LIMIT *
+                               (BPSDEFAULT:COMPUTER_PERCENT Divide 100))
+            If L_COMPUTER_LIMIT < BPSDEFAULT:COMPUTER_LIMIT Then
+                L_COMPUTER_LIMIT = BPSDEFAULT:COMPUTER_LIMIT
+
+            If bopCOMPUTER:LIMIT[1] > L_COMPUTER_LIMIT Then
+                Begin
+                If SFSCOMPANY:COMPUTER_RATING = 1 Then
+                    Begin
+                    L_PEAK_FACTOR = L_PROPERTY_RATE * L_PROPERTY_ADJUSTMENTS
+                    L_UPDATE_SFPEND_PREMIUM = (L_PEAK_FACTOR * ((bopCOMPUTER:LIMIT[1] +
+                                              bopCOMPUTER:LIMIT[2]) Divide L_END_LIMIT))
+                    End
+                If SFSCOMPANY:COMPUTER_RATING = 2 Then
+                    Begin
+                    L_UPDATE_SFPEND_PREMIUM = (((bopCOMPUTER:LIMIT[1] +
+                                              bopCOMPUTER:LIMIT[2]) Divide
+                                              L_END_LIMIT) * L_END_PREMIUM1)
+                    End
+                L_EDP_LIMIT = bopCOMPUTER:LIMIT[1] + bopCOMPUTER:LIMIT[2]
+                End
+            End
+        Else
+            Begin
+            If SFSCOMPANY:COMPUTER_RATING = 1 Then -- salem
+                Begin
+                L_PEAK_FACTOR = L_PROPERTY_RATE * L_PROPERTY_ADJUSTMENTS
+                L_UPDATE_SFPEND_PREMIUM = (L_PEAK_FACTOR * ((bopCOMPUTER:LIMIT[1] +
+                                          bopCOMPUTER:LIMIT[2]) Divide L_END_LIMIT))
+                End
+            If SFSCOMPANY:COMPUTER_RATING = 2 Then
+                Begin
+                L_UPDATE_SFPEND_PREMIUM = (((bopCOMPUTER:LIMIT[1] +
+                                          bopCOMPUTER:LIMIT[2]) Divide
+                                          L_END_LIMIT) * L_END_PREMIUM1)
+                End
+            if sfscompany:computer_rating = 3 then
+                begin
+                l_peak_factor = l_property_rate_1 + l_end_factor
+                L_UPDATE_SFPEND_PREMIUM = (L_PEAK_FACTOR *
+                                          (bopCOMPUTER:LIMIT[1]
+                                          Divide L_END_LIMIT))
+                if bopcomputer:limit[2] <> 0 then
+                    begin
+                    if l_building_Rate = 0 then
+                        do calc_building_prem
+                    l_peak_factor = l_building_rate * l_end_factor_1
+                    l_update_sfpend_premium = (l_update_sfpend_premium +
+                                              (l_peak_factor *
+                                              (bopcomputer:limit[2]
+                                              divide l_end_limit)))
+                    end
+                End
+
+            L_EDP_LIMIT = bopCOMPUTER:LIMIT[1] + bopCOMPUTER:LIMIT[2]
+            End
+        End
+
+    If L_CODE = "BU0375" Then
+        Begin
+        Access bopglass, Set bopglass:policy_NO = bopGENERAL:policy_NO,
+                             bopglass:pol_year = bopgeneral:poL_year,
+                             bopglass:end_sequence = bopgeneral:end_sequence,
+                             bopglass:PREM_NO = bopGENERAL:PREM_NO,
+                             bopglass:BUILD_NO = bopGENERAL:BUILD_NO, generic
+
+        If SFSLINE_ALIAS:OPTION = "P" Then
+            Begin
+            L_INDOOR_GLASS_LIMIT = (bopGENERAL:PROPERTY_LIMIT *
+                                   (BPSDEFAULT:INDOOR_GLASS_PERCENT Divide 100))
+            If L_INDOOR_GLASS_LIMIT < BPSDEFAULT:INDOOR_GLASS_LIMIT Then
+                L_INDOOR_GLASS_LIMIT = BPSDEFAULT:INDOOR_GLASS_LIMIT
+
+            If bopGLASS:LIMIT <> L_INDOOR_GLASS_LIMIT  Then
+                L_UPDATE_SFPEND_PREMIUM = (((bopGLASS:LIMIT - l_indoor_glass_limit)
+                                          Divide L_END_LIMIT) *
+                                          L_END_PREMIUM1)
+            End
+        Else
+            Begin
+            L_UPDATE_SFPEND_PREMIUM = ((bopGLASS:LIMIT Divide L_END_LIMIT) *
+                                      L_END_PREMIUM1)
+            End
+        End
+
+    If L_CODE = "BU0521" Then
+        Begin
+        L_UPDATE_SFPEND_PREMIUM = ((bopGENERAL:PROPERTY_SPECIAL *
+                                  L_END_FACTOR) * -1)
+        End
+
+    If L_CODE = "MCM828" Then
+        Begin
+        L_UPDATE_SFPEND_PREMIUM = 0
+        Access bopUMUIM, Set bopUMUIM:policy_NO = bopGENERAL:policy_NO,
+                             bopumuim:pol_year = bopgeneral:poL_year,
+                             bopumuim:end_sequence = bopgeneral:end_sequence,
+                             bopUMUIM:PREM_NO = bopGENERAL:PREM_NO,
+                             bopUMUIM:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+        Repeat Begin
+            Exit If bopUMUIM:policy_NO <> bopGENERAL:policy_NO Or
+                    bopumuim:pol_Year <> bopgeneral:pol_year or
+                    bopumuim:end_sequence <> bopgeneral:end_sequence or
+                    bopUMUIM:PREM_NO <> bopGENERAL:PREM_NO Or
+                    bopUMUIM:BUILD_NO <> bopGENERAL:BUILD_NO
+
+
+            L_COMPANY_ID = bopgeneral:company_id
+            L_LINE_OF_BUSINESS = bopgeneral:line_of_business
+            l_state = bopgeneral:state
+            Access BPSUMUIM, Set BPSUMUIM:COMPANY_ID = L_COMPANY_ID,
+                                 BPSUMUIM:STATE = l_STATE,
+                                 BPSUMUIM:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS,
+                                 BPSUMUIM:LIMIT = bopUMUIM:LIMIT, Generic
+
+        If BPSUMUIM:CHARGE <> L_END_PREMIUM1 Then
+            Begin
+            If bopGENERAL:STATE = 29 Then
+                Begin
+                Change bopUMUIM
+                    Begin
+                    bopUMUIM:TOTAL = BPSUMUIM:CHARGE_1
+                    End
+                L_UPDATE_SFPEND_PREMIUM = L_UPDATE_SFPEND_PREMIUM +
+                                          BPSUMUIM:CHARGE_1
+
+                End
+            Else
+                begin
+                Change bopUMUIM
+                    Begin
+                    bopUMUIM:TOTAL = BPSUMUIM:CHARGE
+                    End
+                L_UPDATE_SFPEND_PREMIUM = L_UPDATE_SFPEND_PREMIUM +
+                                          BPSUMUIM:CHARGE
+                end
+            End
+        else
+            begin
+            l_update_sfpend_premium = l_end_premium1
+            end
+
+        Next bopUMUIM
+        End
+
+        End
+
+    If L_CODE = "BU0196" Then
+        Begin
+        Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                               bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                               bopENDORSE:CODE = L_CODE, Generic
+
+        if bopendorse:misc_premium <> 0 then
+            L_UPDATE_SFPEND_PREMIUM = bopENDORSE:MISC_PREMIUM
+        else
+            l_update_sfpend_premium = l_end_premium1
+        End
+
+    If L_CODE = "MCL328" Then
+        Begin
+        Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                               bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                               bopENDORSE:CODE = L_CODE, Generic
+
+        L_UPDATE_SFPEND_PREMIUM = bopENDORSE:MISC_PREMIUM
+        End
+
+    if l_code = "MIM012" then
+        begin
+        Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                               bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                               bopENDORSE:CODE = L_CODE, Generic
+
+        l_update_sfpend_premium = 0
+        while bopendorse:policy_no = bopgeneral:policy_no and
+              bopendorse:pol_year = bopgeneral:pol_year and
+              bopendorse:end_sequence = bopgeneral:end_sequence and
+              bopendorse:prem_no = bopgeneral:prem_no and
+              bopendorse:build_no = bopgeneral:build_no and
+              bopendorse:code = l_code
+                begin
+                l_update_sfpend_premium = bopendorse:premium +
+                                          l_update_sfpend_premium
+
+                next bopendorse
+                end
+        end
+
+    If L_CODE = "BU0120" Then
+        begin
+        Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                               bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                               bopENDORSE:CODE = L_CODE, Generic
+
+        if bopendorse:premium <> 0 then
+            l_update_sfpend_premium = bopendorse:premium
+        else
+            L_UPDATE_SFPEND_PREMIUM = L_END_PREMIUM1
+        end
+
+    If L_CODE = "MCL434" Then
+        Begin
+        Access bopprint, Set bopprint:policy_NO = bopGENERAL:policy_NO,
+                             bopprint:pol_year = bopgeneral:poL_year,
+                             bopprint:end_sequence = bopgeneral:end_sequence,
+                             bopprint:PREM_NO = bopGENERAL:PREM_NO,
+                             bopprint:BUILD_NO = bopGENERAL:BUILD_NO, generic
+
+        L_UPDATE_SFPEND_PREMIUM = ((bopPRINT:SALES Divide L_END_LIMIT) *
+                                   L_END_PREMIUM1)
+        If L_UPDATE_SFPEND_PREMIUM < L_END_MINIMUM Then
+            L_UPDATE_SFPEND_PREMIUM = L_END_MINIMUM
+        If bopPRINT:PART_II_PREMIUM <> 0 Then
+            L_UPDATE_SFPEND_PREMIUM = L_UPDATE_SFPEND_PREMIUM + bopPRINT:PART_II_PREMIUM
+        End
+
+    If L_CODE = "BU0281" Then
+        Begin
+        L_UPDATE_SFPEND_PREMIUM = 0
+        Access bopENDORSE, Set bopENDORSE:policy_NO = bopGENERAL:policy_NO,
+                               bopendorse:pol_year = bopgeneral:poL_year,
+                               bopendorse:end_sequence = bopgeneral:end_sequence,
+                               bopENDORSE:PREM_NO = bopGENERAL:PREM_NO,
+                               bopENDORSE:BUILD_NO = bopGENERAL:BUILD_NO,
+                               bopENDORSE:CODE = L_CODE, Generic
+
+        Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = bopGENERAL:policy_NO,
+                                     bopgeneral_alias:pol_year = bopgeneral:poL_year,
+                                     bopgeneral_alias:end_sequence = bopgeneral:end_sequence,
+                                     bopGENERAL_ALIAS:PREM_NO = bopGENERAL:PREM_NO,
+                                     bopGENERAL_ALIAS:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+        L_EFF_DATE_1 = bopENDORSE:EFF_DATE
+        L_EXP_DATE = bopENDORSE:EXP_DATE
+        L_DAYS = ((L_EFF_DATE_1 - L_EXP_DATE) * -1)
+        L_PEAK_FACTOR = L_PROPERTY_RATE * L_PROPERTY_ADJUSTMENTS
+        L_PEAK_BASIC_PLUS_1 = (L_PEAK_FACTOR * (L_DAYS Divide 365) *
+                              (bopENDORSE:LIMIT[1] Divide 1000))
+        If L_FORM = 3 Then
+            Begin
+            L_ADJUSTMENT = ((bopGENERAL_ALIAS:PROPERTY_SPECIAL Divide
+                           (bopGENERAL_ALIAS:PROPERTY_LIMIT
+                           Divide 1000)))
+            L_PEAK_EXPANDED_1 = (L_ADJUSTMENT *
+                                (L_DAYS Divide 365) * (bopENDORSE:LIMIT[1]
+                                Divide 1000))
+            End
+        L_PEAK_PREMIUM_1 = L_PEAK_BASIC_PLUS_1 + L_PEAK_EXPANDED_1
+        If bopENDORSE:EFF_DATE_1 <> 0 Then
+            Begin
+            L_EFF_DATE_1 = bopENDORSE:EFF_DATE_1
+            L_EXP_DATE = bopENDORSE:EXP_DATE_1
+            L_DAYS = ((L_EFF_DATE_1 - L_EXP_DATE) * -1)
+            L_PEAK_FACTOR = L_PROPERTY_RATE * L_PROPERTY_ADJUSTMENTS
+            L_PEAK_BASIC_PLUS_2 = (L_PEAK_FACTOR * (L_DAYS Divide 365) *
+                                  (bopENDORSE:LIMIT[1] Divide 1000))
+            If L_FORM = 3 Then
+                Begin
+                L_ADJUSTMENT = ((bopGENERAL_ALIAS:PROPERTY_SPECIAL Divide
+                               (bopGENERAL_ALIAS:PROPERTY_LIMIT
+                               Divide 1000)))
+                L_PEAK_EXPANDED_2 = (L_ADJUSTMENT *
+                                    (L_DAYS Divide 365) * (bopENDORSE:LIMIT[1]
+                                    Divide 1000))
+                End
+            End
+        L_PEAK_PREMIUM_2 = L_PEAK_BASIC_PLUS_2 + L_PEAK_EXPANDED_2
+        L_UPDATE_SFPEND_PREMIUM = L_PEAK_PREMIUM_1 + L_PEAK_PREMIUM_2
+        End
+
+    If L_CODE = "BU0193" Then
+        Begin
+        Access BPSRATE, Set BPSRATE:COMPANY_ID = bopgeneral:company_id,
+                            BPSRATE:STATE = bopGENERAL:STATE,
+                            BPSRATE:LINE_OF_BUSINESS = bopgeneral:line_of_business, Generic
+
+        Repeat Begin
+            Exit If BPSRATE:COMPANY_ID <> bopgeneral:company_id Or
+                    BPSRATE:STATE <> bopGENERAL:STATE Or
+                    BPSRATE:LINE_OF_BUSINESS <> bopgeneral:line_of_business
+
+        If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+            Begin
+            Switch(L_LIABILITY_CODE)
+              Case 1 : L_MANICURISTS = BPSRATE:MANICURISTS[1]
+              Case 2 : L_MANICURISTS = BPSRATE:MANICURISTS[2]
+              Case 3 : L_MANICURISTS = BPSRATE:MANICURISTS[3]
+              End
+            L_PER = BPSRATE:MANICURISTS_PER
+            End
+
+        Next BPSRATE
+        End
+
+        access bopbshop, set bopbshop:policy_no = g_policy_no,
+                             bopbshop:pol_year = g_year,
+                             bopbshop:end_sequence = g_end_sequence,
+                             bopbshop:prem_no = g_prem_no,
+                             bopbshop:build_no = g_build_no, generic
+
+        If bopBSHOP:BARBER_FULL_TIME > 0 Then
+            L_BARBER_PREMIUM = L_BARBER_PREM_FULL
+
+        If bopBSHOP:BARBER_FULL_TIME > 1 Then
+            L_BARBER_PREMIUM = (L_BARBER_PREMIUM + ((bopBSHOP:BARBER_FULL_TIME - 1) *
+                               L_BARBER_PREM_PART))
+
+        If bopBSHOP:BEAUTY_FULL_TIME > 0 Then
+            L_BEAUTY_FULL_PREMIUM = bopBSHOP:BEAUTY_FULL_TIME * L_BEAUTY_PREM_FULL
+
+        If bopBSHOP:BEAUTY_PART_TIME > 0 Then
+            L_BEAUTY_PART_PREMIUM = bopBSHOP:BEAUTY_PART_TIME * L_BEAUTY_PREM_PART
+
+        If bopBSHOP:MANICURISTS > 0 Then
+            L_MANICURISTS_PREMIUM = bopBSHOP:MANICURISTS * L_MANICURISTS
+
+        L_UPDATE_SFPEND_PREMIUM = L_BARBER_PREMIUM + L_BEAUTY_FULL_PREMIUM +
+                                  L_BEAUTY_PART_PREMIUM + L_MANICURISTS_PREMIUM
+
+        End
+
+End
+
+End

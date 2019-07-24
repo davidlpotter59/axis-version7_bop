@@ -1,0 +1,126 @@
+%%
+Program
+        Name = "bopUP11g" ;
+        Type = "File" ;
+        Padcharacter = Space ;
+        Domain = "FLAT" ;
+
+        Global Unsigned Ascii Number G_policy_no[9] ,
+                                     g_year[4],
+                                     g_end_sequence[4] ;
+
+        local string l_company_id[10] ;
+
+        Local Signed Ascii Number l_epl_premium[8]=0;
+
+        local date l_eff_date[8] ;
+
+        local unsigned ascii number l_epl_percent[3]=0,
+                                    l_epl_mp[4]=0,
+                                    l_epl_prem[8]=0,
+                                    l_state[2],
+                                    l_line_of_business[4] ,
+                                    l_class_code[5],
+                                    l_sub_code[4],
+                                    l_third_party_percent[4]=0/dec=2,
+                                    l_third_party_prem[8] ;
+
+initialisation
+g_policy_no    = val(commandline[1,9])
+g_year         = val(commandline[10,13])
+g_end_sequence = val(commandline[14,17])
+l_epl_premium = val(commandline[18,25])
+
+do epl
+
+access sfpmaster, set sfpmaster:policy_no    = g_policy_no,
+                      sfpmaster:pol_Year     = g_year,
+                      sfpmaster:end_sequence = g_end_sequence, generic
+
+update
+
+Procedure Definition
+
+procedure epl
+begin
+access sfpepl, set sfpepl:policy_no    = g_policy_no,
+                   sfpepl:pol_year     = g_year,
+                   sfpepl:end_sequence = g_end_sequence, generic
+
+access sfpname, set sfpname:policy_no    = g_policy_no,
+                    sfpname:pol_year     = g_year,
+                    sfpname:end_sequence = g_end_sequence, generic
+
+access sfpmaster, set sfpmaster:policy_no    = g_policy_no,
+                      sfpmaster:pol_year     = g_year,
+                      sfpmaster:end_sequence = g_end_sequence, generic
+
+access bopgeneral, set bopgeneral:policy_no    = g_policy_no,
+                       bopgeneral:pol_year     = g_year,
+                       bopgeneral:end_sequence = g_end_sequence, generic
+
+l_company_id       = sfpname:company_id
+l_state            = bopgeneral:state
+l_line_of_business = sfpname:line_of_business
+l_class_code       = bopgeneral:class_code
+l_sub_code         = bopgeneral:sub_code
+l_eff_date         = sfpmaster:trans_eff
+Access BPSEPL, Set BPSEPL:COMPANY_ID       = l_company_id,
+                   BPSEPL:STATE            = l_STATE,
+                   BPSEPL:LINE_OF_BUSINESS = l_line_of_business,
+                   bpsepl:limit            = sfpepl:epl_limit,
+                   bpsepl:deductible       = sfpepl:epl_deductible, Generic
+
+while BPSEPL:COMPANY_ID       = l_company_id and
+      BPSEPL:STATE            = l_STATE and
+      BPSEPL:LINE_OF_BUSINESS = l_line_of_business and
+      bpsepl:limit            = sfpepl:epl_limit and
+      bpsepl:deductible       = sfpepl:epl_deductible
+    begin
+    If L_EFF_DATE >= BPSEPL:EFF_DATE Then
+        Begin
+        l_epl_percent = bpsepl:extend_period_percent
+        End
+
+    Next BPSEPL
+    End
+
+if sfpmaster:total[9] <> 0 then
+    begin
+    l_epl_prem = (sfpmaster:total[9] * (l_epl_percent divide 100))
+    end
+
+access sfpepl_alias, set sfpepl_alias:policy_no    = g_policy_no,
+                         sfpepl_alias:pol_year     = g_year,
+                         sfpepl_alias:end_sequence = g_end_sequence, generic
+
+while sfpepl_alias:policy_no    = g_policy_no and
+      sfpepl_alias:pol_year     = g_year and
+      sfpepl_alias:end_sequence = g_end_sequence
+    begin
+    change sfpepl_alias
+        begin
+        sfpepl_alias:extend_period_percent = l_epl_percent
+        sfpepl_alias:extend_period_premium = l_epl_prem
+        end
+
+    next sfpepl_alias
+    end
+
+access sfpmaster, set sfpmaster:policy_no    = g_policy_no,
+                      sfpmaster:pol_Year     = g_year,
+                      sfpmaster:end_sequence = g_end_sequence, generic
+
+if sfpmaster:policy_no    = g_policy_no and
+   sfpmaster:pol_Year     = g_Year and
+   sfpmaster:end_sequence = g_end_sequence then
+    begin
+    change sfpmaster
+        begin
+        sfpmaster:total[10] = l_epl_prem
+        end
+    end
+
+End
+
+End

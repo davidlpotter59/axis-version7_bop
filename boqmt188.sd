@@ -1,0 +1,123 @@
+%%
+Screen
+        Name            = "boqmt188" ;
+        Type            = "Detail" ;
+        Padcharacter    = Space ;
+        Highlite        = Underscore ;
+        Screensize      = "dynamic" ;
+        Domain          = "boqendorse" ;
+        Windowtitle = "%a     %s Equipment Breakdown Coverage  Ver 7.00  %m" ;
+        iconline        = 0;
+
+        Global Unsigned Ascii Number G_quote_NO[8] ;
+        global unsigned ascii number g_year[4] ;
+        global unsigned ascii number g_end_sequence[4] ;
+        Global Unsigned Ascii Number G_PREM_NO[4] ;
+        Global Unsigned Ascii Number G_BUILD_NO[4] ;
+        global string g_code[7] ;
+
+        Local Unsigned Ascii Number L_SUB_CODE[4] ;
+
+        Access boqendorse,
+           Set boqendorse:quote_NO = G_quote_NO ,
+               boqendorse:PREM_NO = G_PREM_NO ,
+               boqendorse:BUILD_NO = G_BUILD_NO ,
+               boqendorse:code = g_code ;
+
+        Include "STDKEYS7.INC"
+
+style definition
+
+        include "styles.inc"
+
+Functions
+
+        Include "STDFUNC7.INC"
+
+menu definition
+
+        include "stdmenu7.inc"
+
+}
+
+toolbar definition
+
+        include "stdtoolbar7.inc"
+
+}
+
+Access Validation
+If boqendorse:quote_NO <> G_quote_NO Or
+   boqendorse:PREM_NO <> G_PREM_NO Or
+   boqendorse:BUILD_NO <> G_BUILD_NO or
+   boqendorse:code <> g_code Then
+    Error 1000 ;
+
+
+screen at 1,1 to 20,80
+Properties
+        {
+        Layouttype = column
+        }
+{
+Panel
+Properties
+        {
+        Borderstyle     = raised
+        }
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Spoilage: __________                                                         |
+*------------------------------------------------------------------------------*
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext  ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            boqendorse:quote_NO = G_quote_NO
+            boqendorse:PREM_NO = G_PREM_NO
+            boqendorse:BUILD_NO = G_BUILD_NO
+            boqendorse:code = g_code
+            Do SUBCODE
+            boqendorse:sub_code = l_sub_code
+            End
+        End
+        boqendorse:limit[1] ;
+
+}
+
+}
+
+
+Procedure Definition
+
+Procedure SUBCODE
+Begin
+Access boqendorse_ALIAS, Set boqendorse_ALIAS:quote_NO = boqendorse:quote_NO,
+                             boqendorse_ALIAS:PREM_NO = boqendorse:PREM_NO,
+                             boqendorse_ALIAS:BUILD_NO = boqendorse:BUILD_NO,
+                             boqendorse_alias:code = boqendorse:code, Generic
+
+L_SUB_CODE = 0
+Repeat Begin
+    Exit If boqendorse_ALIAS:quote_NO <> boqendorse:quote_NO Or
+            boqendorse_ALIAS:PREM_NO <> boqendorse:PREM_NO Or
+            boqendorse_ALIAS:BUILD_NO <> boqendorse:BUILD_NO or
+            boqendorse_alias:code <> boqendorse:code
+
+    L_SUB_CODE = boqendorse_ALIAS:SUB_CODE
+
+    Next boqendorse_ALIAS
+    End
+
+boqendorse:SUB_CODE = L_SUB_CODE + 10
+
+End
+
+End

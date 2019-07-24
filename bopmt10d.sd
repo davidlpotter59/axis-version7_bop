@@ -1,0 +1,615 @@
+%%
+Screen
+        Name = "bopMT10d";
+        Type = "Detail" ;
+        Highlight=Underscore ;
+        Padcharacter=Space ;
+        Screensize="dynamic";
+        Windowtitle="%a     %s Policy Information - Ver. 7.00    %m";
+        Domain="sfpmastsupp" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+/*
+  Date Written
+
+  White Hall Mutual Insurance Company
+
+  Modify
+  Date      by      Comments
+________________________________________________________________________________
+11/03/2000  dap     This screen is created for rating MSO. MSO rating is different
+                    from ISO. There is 2 separate libraries bopisolib bopmsolib.
+================================================================================
+*/
+
+        Global Unsigned Ascii Number G_policy_NO[9] ,
+                                     g_year[4],
+                                     g_end_sequence[4],
+                                     g_prem_no[4],
+                                     g_build_no[4],
+                                     G_STATE[2],
+                                     G_LINE_OF_BUSINESS[4] ;
+
+        Global String G_COMPANY_ID[10] ,
+                      g_inquiry[1] ;
+
+        local unsigned ascii number l_sub_code[4],
+                                    l_form[2],
+                                    l_remove_form[1],
+                                    l_liability_code[2] ;
+
+        local string l_code[7],
+                     l_code_1[7],
+                     l_code_2[7],
+                     l_system_id[15],
+                     l_username[15],
+                     l_add_endorsement[1],
+                     l_Form_edition[18],
+                     l_description[55] ;
+
+        Access sfpmastsupp, Set sfpmastsupp:policy_NO        = G_policy_NO,
+                                sfpmastsupp:pol_year         = g_year,
+                                sfpmastsupp:end_sequence     = g_end_sequence,
+                                sfpmastsupp:line_of_business = g_line_of_business ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        "redisplay" display/noreturn "bopmt10d" ;
+        "update_totals" display/noreturn "bopmt010" ;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen entry
+access sfsemail, set sfsemail:company_id = sfpname:company_id,
+                     sfsemail:user_id    = username, generic
+
+if g_inquiry = "Y" then
+    begin
+    disable(add_fn)
+    disable(delete_fn)
+    disable(change_fn)
+    end
+
+l_username  = username
+l_system_id = "bop"
+access sfssecurity_rating, set sfssecurity_rating:company_id = sfpname:company_id,
+                               sfssecurity_rating:user_id    = l_username,
+                               sfssecurity_rating:system_id  = l_system_id, generic
+
+Access Validation
+If sfpmastsupp:policy_NO <> G_policy_NO or
+   sfpmastsupp:pol_year <> g_year or
+   sfpmastsupp:end_sequence <> g_end_sequence or
+   sfpmastsupp:line_of_business <> g_line_of_business Then
+    Error 1000 ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Form:       _  _______________    Liability Limit:    _        __________    |
+| Deductible: _____                 Medical Limit:               __________    |
+| Delete Nonowned:       _          Personal Advertising Injury: __________    |
+| Extend Hired Nonowned: _          General Aggregate:           __________    |
+| Property Off Premises: ________   Exclude Terrorism:  _                      |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext;
+301     Begin
+        access bpsdefault_alias, set bpsdefault_alias:company_id       = sfpname:company_id,
+                                     bpsdefault_alias:line_of_business = g_line_of_business, generic
+
+        If FUNCTION = "ADD" Then
+            Begin
+            sfpmastsupp:policy_NO  = G_policy_NO
+            sfpmastsupp:pol_Year = g_year
+            sfpmastsupp:end_sequence = g_end_sequence
+            sfpmastsupp:line_of_business = g_line_of_business
+            sfpmastsupp:DELETE_HIRED_NONOWNED = "N"
+            sfpmastsupp:EXTEND_HIRED_NONOWNED = "N"
+            sfpmastsupp:FORM = BPSDEFAULT_ALIAS:FORM
+            sfpmastsupp:state = g_state
+            End
+        access sfsform_alias, set sfsform_alias:company_id       = sfpname:company_id,
+                                  sfsform_alias:state            = g_state,
+                                  sfsform_alias:line_of_business = g_line_of_business, generic
+
+        if sfssecurity_rating:auto_activehelp = 1 and
+           function = "ADD" then
+            activehelp()
+        if function one of "ADD" then
+            sfpmastsupp:form = 3
+        End
+        sfpmastsupp:FORM/default
+        l_form  = sfpmastsupp:form
+        access sfsform, set sfsform:company_id       = sfpname:company_id,
+                            sfsform:state            = g_state,
+                            sfsform:line_of_business = g_line_of_business,
+                            sfsform:policy_form      = l_form, generic
+
+        if sfpmastsupp:form <> sfsform:policy_form or
+           sfpmastsupp:form = 0 then
+            error 1205
+
+        activehelp sfsform_alias:policy_form,
+                   sfsform_alias:description ;
+302     begin
+        l_form  = sfpmastsupp:form
+        access sfsform, set sfsform:company_id       = sfpname:company_id,
+                            sfsform:state            = g_state,
+                            sfsform:line_of_business = g_line_of_business,
+                            sfsform:policy_form      = l_form, generic
+        end
+        sfsform:description ;
+401     Begin
+        access bpsdefault, set bpsdefault:company_id       = sfpname:company_id,
+                               bpsdefault:line_of_business = g_line_of_business,  generic
+
+        If FUNCTION = "ADD" Then
+            sfpmastsupp:DEDUCTIBLE = BPSDEFAULT:DEDUCTIBLE
+        access sfsdeductible_alias, set sfsdeductible_alias:company_id = sfpname:company_id,
+                                        sfsdeductible_alias:state      = g_state,
+                                        sfsdeductible_alias:line_of_business = g_line_of_business, generic
+
+        if sfssecurity_rating:auto_activehelp = 1 and
+           function = "ADD" then
+            activehelp()
+        End
+        sfpmastsupp:DEDUCTIBLE/default
+        access sfsdeductible, set sfsdeductible:company_id       = sfpname:company_id,
+                                  sfsdeductible:state            = g_state,
+                                  sfsdeductible:line_of_business = g_line_of_business,
+                                  sfsdeductible:deductible       = sfpmastsupp:deductible, generic
+
+        if sfpmastsupp:deductible <> sfsdeductible:deductible then
+            error 1207
+
+        activehelp sfsdeductible_alias:deductible ;
+501     sfpmastsupp:DELETE_HIRED_NONOWNED/checkbox/values="N,Y"
+        If sfpmastsupp:DELETE_HIRED_NONOWNED = "Y" Then
+            sfpmastsupp:EXTEND_HIRED_NONOWNED = "N" ;
+601     sfpmastsupp:EXTEND_HIRED_NONOWNED/checkbox/values="N,Y"
+        Hide If sfpmastsupp:DELETE_HIRED_NONOWNED = "Y" ;
+701     Begin
+        If FUNCTION = "ADD" Then
+            sfpmastsupp:OFF_PREMISES_LIMIT = BPSDEFAULT:OFF_PREMISES_B
+        access bpsoffprem_alias, set bpsoffprem_alias:company_id = sfpname:company_id,
+                                     bpsoffprem_alias:state      = g_state,
+                                     bpsoffprem_alias:line_of_business = g_line_of_business, generic
+
+        if sfssecurity_rating:auto_activehelp = 1 and
+           function = "ADD" then
+            activehelp()
+        End
+        sfpmastsupp:OFF_PREMISES_LIMIT/default
+        access bpsoffprem, set bpsoffprem:company_id       = sfpname:company_id,
+                               bpsoffprem:state            = g_state,
+                               bpsoffprem:line_of_business = g_line_of_business,
+                               bpsoffprem:limit            = sfpmastsupp:off_premises_limit, generic
+        if sfpmastsupp:off_premises_limit <> bpsoffprem:limit then
+            error 1238
+
+        Access SFSPACKAGE, Set SFSPACKAGE:COMPANY_ID       = G_COMPANY_ID,
+                               SFSPACKAGE:STATE            = G_STATE,
+                               SFSPACKAGE:LINE_OF_BUSINESS = G_LINE_OF_BUSINESS, Generic
+
+        while SFSPACKAGE:COMPANY_ID       = G_COMPANY_ID and
+              SFSPACKAGE:STATE            = G_STATE and
+              SFSPACKAGE:LINE_OF_BUSINESS = G_LINE_OF_BUSINESS
+            begin
+            If sfpNAME:EFF_DATE >= SFSPACKAGE:EFF_DATE Then
+                sfpmastsupp:PACKAGE_DEVIATION = SFSPACKAGE:PACKAGE_MOD
+
+            Next SFSPACKAGE
+            End
+
+        activehelp bpsoffprem_alias:limit ;
+
+303     Begin
+        If FUNCTION = "ADD" Then
+            begin
+            sfpmastsupp:LIABILITY_code = BPSDEFAULT:LIABILITY_code
+            end
+        access sfsliability_alias, set sfsliability_alias:company_id       = sfpname:company_id,
+                                       sfsliability_alias:state            = g_state,
+                                       sfsliability_alias:line_of_business = g_line_of_business, generic
+
+        if sfssecurity_rating:auto_activehelp = 1 and
+           function = "ADD" then
+            activehelp()
+        End
+        sfpmastsupp:LIABILITY_code/default
+        l_liability_code = sfpmastsupp:liability_code
+        access sfsliability, set sfsliability:company_id       = sfpname:company_id,
+                                 sfsliability:state            = g_state,
+                                 sfsliability:line_of_business = g_line_of_business,
+                                 sfsliability:liability_code   = l_liability_code, generic
+
+        if sfpmastsupp:liability_code <> sfsliability:liability_code then
+            error 1238
+
+        sfpmastsupp:liability = sfsliability:limit
+
+        activehelp sfsliability_alias:liability_code,
+                   sfsliability_alias:limit ;
+304     begin
+        l_liability_code = sfpmastsupp:liability_code
+        access sfsliability, set sfsliability:company_id       = sfpname:company_id,
+                                 sfsliability:state            = g_state,
+                                 sfsliability:line_of_business = g_line_of_business,
+                                 sfsliability:liability_code   = l_liability_code, generic
+        end
+        sfsliability:limit/displayonly ;
+402     Begin
+        If FUNCTION = "ADD" Or
+           FUNCTION = "CHANGE" Then
+            sfpmastsupp:MEDICAL_LIMIT = BPSDEFAULT:MEDICAL_LIMIT
+        End
+        sfpmastsupp:MEDICAL_LIMIT/displayonly
+        Hide If SFSLINE:OPTION = "P"
+        hide if sfsemail:agent_no <> 0;
+402     Begin
+        If FUNCTION = "ADD" Or
+           FUNCTION = "CHANGE" Then
+            sfpmastsupp:MEDICAL_LIMIT = BPSDEFAULT:MEDICAL_LIMIT
+        End
+        sfpmastsupp:MEDICAL_LIMIT/displayonly
+        Hide If SFSLINE:OPTION <> "P"
+        hide if sfsemail:agent_no <> 0;
+402     Begin
+        If FUNCTION = "ADD" Or
+           FUNCTION = "CHANGE" Then
+            sfpmastsupp:MEDICAL_LIMIT = BPSDEFAULT:MEDICAL_LIMIT
+        End
+        sfpmastsupp:MEDICAL_LIMIT/displayonly
+        hide if sfsemail:agent_no = 0;
+502     Begin
+        If FUNCTION = "ADD" Or
+           FUNCTION = "CHANGE" Then
+            Begin
+            Access SFSLIABILITY, Set SFSLIABILITY:COMPANY_ID = G_COMPANY_ID,
+                                     SFSLIABILITY:STATE = G_STATE,
+                                     SFSLIABILITY:LINE_OF_BUSINESS = G_LINE_OF_BUSINESS,
+                                     SFSLIABILITY:LIABILITY_CODE = sfpmastsupp:LIABILITY_CODE, Generic
+
+            sfpmastsupp:PERSONAL_ADD_INJURY = SFSLIABILITY:LIMIT
+            End
+        End
+        sfpmastsupp:PERSONAL_ADD_INJURY/displayonly/mask="ZZ,ZZZ,ZZ9" ;
+602     Begin
+        If FUNCTION = "ADD" Or
+           FUNCTION = "CHANGE" Then
+            Begin
+            Access SFSLIABILITY, Set SFSLIABILITY:COMPANY_ID = G_COMPANY_ID,
+                                     SFSLIABILITY:STATE = G_STATE,
+                                     SFSLIABILITY:LINE_OF_BUSINESS = G_LINE_OF_BUSINESS,
+                                     SFSLIABILITY:LIABILITY_CODE = sfpmastsupp:LIABILITY_CODE, Generic
+
+            sfpmastsupp:GENERAL_AGGREGATE = SFSLIABILITY:LIMIT * BPSDEFAULT:AGGREGATE_PERCENT
+            End
+        End
+        sfpmastsupp:GENERAL_AGGREGATE/displayonly ;
+702     begin
+        if function one of "ADD", "CHANGE" then
+            begin
+            do update_exclusion
+            if l_remove_form = 1 then
+                sfpmastsupp:exclude_terrorism = 1
+            end
+        end
+        sfpmastsupp:exclude_terrorism/checkbox/values="0,1"/default ;
+
+}
+
+Postupdate
+If UPDATEOK = "YES" And
+   Abort    = "NO" Then
+    Begin
+    if function one of "ADD", "CHANGE" then
+        begin
+        Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = G_policy_NO,
+                                     bopgeneral_alias:pol_year = g_Year,
+                                     bopgeneral_alias:end_sequence = g_end_sequence, generic
+
+        while bopgeneral_alias:policy_no = g_policy_no and
+              bopgeneral_alias:pol_year = g_year and
+              bopgeneral_alias:end_sequence = g_end_sequence
+            begin
+            change bopgeneral_alias
+                begin
+                bopgeneral_alias:remove_terrorism_form = sfpmastsupp:exclude_terrorism
+                end
+
+            next bopgeneral_alias
+            end
+
+        Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = G_policy_NO,
+                                     bopgeneral_alias:pol_year = g_Year,
+                                     bopgeneral_alias:end_sequence = g_end_sequence, generic
+
+        Access bpstrigger, Set bpstrigger:COMPANY_ID       = sfpNAME:COMPANY_ID,
+                               bpstrigger:STATE            = g_STATE,
+                               bpstrigger:LINE_OF_BUSINESS = G_LINE_OF_BUSINESS, Generic
+
+        while bpstrigger:company_id       = sfpname:company_id and
+              bpstrigger:state            = g_state and
+              bpstrigger:line_of_business = g_line_of_business
+            begin
+            If sfpNAME:EFF_DATE >= bpstrigger:RATE_DATE Then
+                Begin
+                L_CODE_1 = bpstrigger:code[5] -- MCL430
+                End
+
+            Next bpstrigger
+            End
+
+        If L_CODE_1 <> "" Then
+            Begin
+            -- LLC form
+            access sfpmaster, set sfpmaster:policy_no = g_policy_no,
+                                  sfpmaster:pol_year = g_year,
+                                  sfpmaster:end_sequence = g_end_sequence,  exact
+
+            L_CODE = L_CODE_1
+            Do ACCESS_sfpEND
+            If L_ADD_ENDORSEMENT = "Y" And
+               sfpmaster:form_of_business one of "L" Then
+                Do ADD_sfpEND
+            If L_ADD_ENDORSEMENT = "N" And
+               sfpmaster:form_of_business not one of "L" Then
+                Do DELETE_sfpEND
+            End
+
+        Access BPSRATE, Set BPSRATE:COMPANY_ID       = sfpNAME:COMPANY_ID,
+                            BPSRATE:STATE            = g_STATE,
+                            BPSRATE:LINE_OF_BUSINESS = G_LINE_OF_BUSINESS, Generic
+
+        l_code_1 = ""
+        while bpsrate:company_id = sfpname:company_id and
+              bpsrate:state = g_state and
+              bpsrate:line_of_business = g_line_of_business
+            begin
+            If sfpNAME:EFF_DATE >= BPSRATE:EFF_DATE Then
+                Begin
+                L_CODE_1 = BPSRATE:HIRED_NONOWNED_CODE[1] -- BU5004
+                L_CODE_2 = BPSRATE:HIRED_NONOWNED_CODE[2] -- BU0140
+                End
+
+            Next BPSRATE
+            End
+
+        If L_CODE_1 <> "" Then
+            Begin
+            -- delete Hired/Nonown
+            L_CODE = L_CODE_1
+            Do ACCESS_sfpEND
+            If L_ADD_ENDORSEMENT = "Y" And
+               sfpmastsupp:DELETE_HIRED_NONOWNED = "Y" Then
+                Do ADD_sfpEND
+            If L_ADD_ENDORSEMENT = "N" And
+               sfpmastsupp:DELETE_HIRED_NONOWNED = "N" Then
+                Do DELETE_sfpEND
+            End
+
+        If L_CODE_2 <> "" Then
+            Begin
+            -- extend hired/nonowned
+            L_CODE = L_CODE_2
+            Do ACCESS_sfpEND
+            If L_ADD_ENDORSEMENT = "Y" And
+               sfpmastsupp:EXTEND_HIRED_NONOWNED = "Y" Then
+                Do ADD_sfpEND
+            If L_ADD_ENDORSEMENT = "N" And
+               sfpmastsupp:EXTEND_HIRED_NONOWNED = "N" Then
+                Do DELETE_sfpEND
+            End
+        end
+
+    If FUNCTION = "CHANGE" Then
+        Begin
+        Access sfpNAME, Set sfpNAME:policy_NO = G_policy_NO,
+                            sfpname:pol_year = g_year,
+                            sfpname:end_sequence = g_end_sequence, Generic
+
+        Access BPSDEFAULT, Set BPSDEFAULT:COMPANY_ID       = sfpNAME:COMPANY_ID,
+                               BPSDEFAULT:LINE_OF_BUSINESS = G_LINE_OF_BUSINESS,
+                               BPSDEFAULT:FORM             = sfpmastsupp:FORM, Generic
+
+        Access bopGENERAL, Set bopGENERAL:policy_NO = G_policy_NO,
+                               bopgeneral:pol_Year = g_year,
+                               bopgeneral:end_sequence = g_end_sequence, Generic
+
+        while bopGENERAL:policy_NO = G_policy_NO and
+              bopgeneral:pol_year = g_year and
+              bopgeneral:end_sequence = g_end_sequence
+            begin
+            If bopGENERAL:PROPERTY_LIMIT <> 0 And
+               sfpmastsupp:FORM = 3 And
+               bopGENERAL:MONEY_LIMIT_ON = 0 Then
+                Change bopGENERAL
+                    Begin
+                    bopGENERAL:MONEY_LIMIT_ON  = BPSDEFAULT:MONEY_LIMIT_ON
+                    bopGENERAL:MONEY_LIMIT_OFF = BPSDEFAULT:MONEY_LIMIT_OFF
+                    End
+
+            If sfpmastsupp:FORM = 1 And
+               bopGENERAL:ATTACH_BU5001 = "N" Then
+                Change bopGENERAL
+                    Begin
+                    bopGENERAL:MONEY_LIMIT_ON = 0
+                    bopGENERAL:MONEY_LIMIT_OFF = 0
+                    End
+
+            If bopGENERAL:DIFFERENT_OFF_PREMISES = 0 Then
+                Change bopGENERAL
+                    Begin
+                    bopGENERAL:OFF_PREMISES_LIMIT = sfpmastsupp:OFF_PREMISES_LIMIT
+                    End
+
+            Next bopGENERAL
+            End
+
+        End
+
+    end
+
+screen exit
+if function one of "EXIT", "BACK" and
+   g_inquiry not one of "Y" then
+    function = "update_totals"
+
+Procedure Definition
+
+procedure update_exclusion
+begin
+access bopgeneral, set bopgeneral:policy_no = g_policy_no,
+                       bopgeneral:pol_Year = g_year,
+                       bopgeneral:end_sequence = g_end_sequence, Generic
+
+l_remove_form = 0
+while bopgeneral:policy_no = g_policy_no and
+      bopgeneral:pol_Year = g_year and
+      bopgeneral:end_sequence = g_end_sequence
+        begin
+        if bopgeneral:remove_terrorism_Form = 1 then
+            l_remove_form = 1
+
+        next bopgeneral
+        end
+
+end
+
+Procedure ACCESS_sfpEND
+Begin
+Access sfpEND, Set sfpEND:policy_NO = G_policy_NO ,
+                   sfpend:pol_year = g_year,
+                   sfpend:end_sequence = g_end_sequence,
+                   sfpEND:PREM_NO  = 0,
+                   sfpEND:BUILD_NO = 0, Generic
+
+L_ADD_ENDORSEMENT = "Y"
+while sfpEND:policy_NO = G_policy_NO and
+      sfpend:pol_year = g_year and
+      sfpend:end_sequence = g_end_sequence and
+      sfpEND:PREM_NO  = 0 and
+      sfpEND:BUILD_NO = 0
+    begin
+    If sfpEND:CODE = L_CODE Then
+        L_ADD_ENDORSEMENT = "N"
+
+    Next sfpEND
+    End
+
+End
+
+Procedure ADD_sfpEND
+Begin
+Access sfpEND, Set sfpEND:policy_NO = G_policy_NO ,
+                   sfpend:pol_year = g_year,
+                   sfpend:end_sequence = g_end_sequence,
+                   sfpEND:PREM_NO  = 0,
+                   sfpEND:BUILD_NO = 0, Generic
+
+L_SUB_CODE = 0
+while sfpEND:policy_NO = G_policy_NO and
+      sfpend:pol_year = g_year and
+      sfpend:end_sequence = g_end_sequence and
+      sfpEND:PREM_NO  = 0 and
+      sfpEND:BUILD_NO = 0
+        begin
+        L_SUB_CODE = sfpEND:SUB_CODE
+
+        Next sfpEND
+        End
+
+L_SUB_CODE = L_SUB_CODE + 10
+
+Access bopGENERAL_ALIAS, Set bopGENERAL_ALIAS:policy_NO = G_policy_NO,
+                             bopgeneral_alias:pol_year = g_year,
+                             bopgeneral_alias:end_sequence = g_End_sequence,
+                             bopGENERAL_ALIAS:PREM_NO  = G_PREM_NO,
+                             bopGENERAL_ALIAS:BUILD_NO = G_BUILD_NO, Generic
+
+Access SFSOPTEND, Set SFSOPTEND:COMPANY_ID       = sfpNAME:COMPANY_ID,
+                      SFSOPTEND:STATE            = g_STATE,
+                      SFSOPTEND:LINE_OF_BUSINESS = G_LINE_OF_BUSINESS,
+                      SFSOPTEND:CODE             = L_CODE, Generic
+
+while SFSOPTEND:COMPANY_ID       = sfpNAME:COMPANY_ID and
+      SFSOPTEND:STATE            = g_STATE and
+      SFSOPTEND:LINE_OF_BUSINESS = g_LINE_OF_BUSINESS and
+      SFSOPTEND:CODE             = L_CODE
+        begin
+        If sfpNAME:EFF_DATE >= SFSOPTEND:EFF_DATE Then
+            Begin
+            L_FORM_EDITION = SFSOPTEND:FORM_EDITION
+            L_DESCRIPTION  = SFSOPTEND:DESCRIPTION
+            End
+
+        Next SFSOPTEND
+        End
+
+Add sfpEND
+    Begin
+    sfpEND:policy_NO            =       G_policy_NO
+    sfpend:pol_year             =       g_year
+    sfpend:end_sequence         =       g_end_sequence
+    sfpEND:PREM_NO              =       0
+    sfpEND:BUILD_NO             =       0
+    sfpEND:SUB_CODE             =       L_SUB_CODE
+    sfpEND:CODE                 =       L_CODE
+    sfpEND:FORM_EDITION         =       L_FORM_EDITION
+    sfpEND:DESCRIPTION          =       L_DESCRIPTION
+    sfpEND:PREMIUM              =       0
+    sfpend:lob_end_code         =       "X"
+    End
+
+End
+
+Procedure DELETE_sfpEND
+Begin
+Access sfpEND, Set sfpEND:policy_NO = G_policy_NO ,
+                   sfpend:pol_year = g_year,
+                   sfpend:end_sequence = g_end_sequence,
+                   sfpEND:PREM_NO  = 0,
+                   sfpEND:BUILD_NO = 0, Generic
+
+while sfpEND:policy_NO = G_policy_NO and
+      sfpend:pol_year = g_year and
+      sfpend:end_sequence = g_end_sequence and
+      sfpEND:PREM_NO  = 0 and
+      sfpEND:BUILD_NO = 0
+        begin
+        If sfpEND:CODE = L_CODE Then
+            Delete sfpEND
+
+        Next sfpEND
+        End
+
+End
+
+End

@@ -1,0 +1,592 @@
+%%
+Program
+        Name = "BOPCV400" ;
+        Type = "File" ;
+        Domain = "FLAT" ;
+        Padcharacter = Space ;
+
+    Global Unsigned Ascii Number G_POLICY_NO[9] ,
+                                 G_YEAR[4] ,
+                                 G_END_SEQUENCE[4] ,
+                                 G_PREM_NO[4] ,
+                                 G_BUILD_NO[4] ;
+
+    Local String L_PROCEDURE[50] ;
+
+Initialisation
+G_POLICY_NO = Val(COMMANDLINE[1,9])
+G_YEAR = Val(COMMANDLINE[11,14])
+G_END_SEQUENCE = Val(COMMANDLINE[16,19])
+G_PREM_NO = Val(COMMANDLINE[21,24])
+G_BUILD_NO = Val(COMMANDLINE[26,29])
+
+/* bopgeneral FILE UPDATE LOGIC */
+
+L_PROCEDURE = "bopgeneral FILE UPDATE"
+
+Access BOPGENERAL, Set BOPGENERAL:POLICY_NO = G_POLICY_NO,
+                       BOPGENERAL:POL_YEAR = G_YEAR,
+                       BOPGENERAL:END_SEQUENCE = G_END_SEQUENCE,
+                       BOPGENERAL:PREM_NO = G_PREM_NO,
+                       BOPGENERAL:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPGENERAL:POLICY_NO <> G_POLICY_NO Or
+            BOPGENERAL:POL_YEAR <> G_YEAR Or
+            BOPGENERAL:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPGENERAL:PREM_NO <> G_PREM_NO Or
+            BOPGENERAL:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPGENERAL
+
+    Next BOPGENERAL
+    End
+
+/* bopgeneral1 FILE UPDATE LOGIC */
+
+L_PROCEDURE = "bopgeneral1 FILE UPDATE"
+
+Access BOPgeneral1, Set BOPgeneral1:POLICY_NO = G_POLICY_NO,
+                       BOPgeneral1:POL_YEAR = G_YEAR,
+                       BOPgeneral1:END_SEQUENCE = G_END_SEQUENCE,
+                       BOPgeneral1:PREM_NO = G_PREM_NO,
+                       BOPgeneral1:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPgeneral1:POLICY_NO <> G_POLICY_NO Or
+            BOPgeneral1:POL_YEAR <> G_YEAR Or
+            BOPgeneral1:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPgeneral1:PREM_NO <> G_PREM_NO Or
+            BOPgeneral1:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPgeneral1
+
+    Next BOPgeneral1
+    End
+
+/* BOPADDIN FILE UPDATE LOGIC */
+
+L_PROCEDURE = "BOPADDIN FILE UPDATE"
+
+Access BOPADDIN, Set BOPADDIN:POLICY_NO = G_POLICY_NO,
+                     BOPADDIN:POL_YEAR = G_YEAR,
+                     BOPADDIN:END_SEQUENCE = G_END_SEQUENCE,
+                     BOPADDIN:PREM_NO = G_PREM_NO,
+                     BOPADDIN:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPADDIN:POLICY_NO <> G_POLICY_NO Or
+            BOPADDIN:POL_YEAR <> G_YEAR Or
+            BOPADDIN:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPADDIN:PREM_NO <> G_PREM_NO Or
+            BOPADDIN:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPADDIN
+
+    Next BOPADDIN
+    End
+
+/* BOPBSHOP FILE UPDATE LOGIC */
+
+L_PROCEDURE = "BOPBSHOP FILE UPDATE"
+
+Access BOPBSHOP, Set BOPBSHOP:POLICY_NO = G_POLICY_NO,
+                     BOPBSHOP:POL_YEAR = G_YEAR,
+                     BOPBSHOP:END_SEQUENCE = G_END_SEQUENCE,
+                     BOPBSHOP:PREM_NO = G_PREM_NO,
+                     BOPBSHOP:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPBSHOP:POLICY_NO <> G_POLICY_NO Or
+            BOPBSHOP:POL_YEAR <> G_YEAR Or
+            BOPBSHOP:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPBSHOP:PREM_NO <> G_PREM_NO Or
+            BOPBSHOP:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPBSHOP
+
+    Next BOPBSHOP
+    End
+
+/* bopfuneral FILE UPDATE LOGIC */
+
+L_PROCEDURE = "bopfuneral FILE UPDATE"
+
+Access BOPFUNERAL, Set BOPFUNERAL:POLICY_NO = G_POLICY_NO,
+                       BOPFUNERAL:POL_YEAR = G_YEAR,
+                       BOPFUNERAL:END_SEQUENCE = G_END_SEQUENCE,
+                       BOPFUNERAL:PREM_NO = G_PREM_NO,
+                       BOPFUNERAL:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPFUNERAL:POLICY_NO <> G_POLICY_NO Or
+            BOPFUNERAL:POL_YEAR <> G_YEAR Or
+            BOPFUNERAL:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPFUNERAL:PREM_NO <> G_PREM_NO Or
+            BOPFUNERAL:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPFUNERAL
+
+    Next BOPFUNERAL
+    End
+
+/* BOPPRINT FILE UPDATE LOGIC */
+
+L_PROCEDURE = "BOPPRINT FILE UPDATE"
+
+Access BOPPRINT, Set BOPPRINT:POLICY_NO = G_POLICY_NO,
+                     BOPPRINT:POL_YEAR = G_YEAR,
+                     BOPPRINT:END_SEQUENCE = G_END_SEQUENCE,
+                     BOPPRINT:PREM_NO = G_PREM_NO,
+                     BOPPRINT:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPPRINT:POLICY_NO <> G_POLICY_NO Or
+            BOPPRINT:POL_YEAR <> G_YEAR Or
+            BOPPRINT:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPPRINT:PREM_NO <> G_PREM_NO Or
+            BOPPRINT:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPPRINT
+
+    Next BOPPRINT
+    End
+
+-- BOPSAFEGUARD
+
+L_PROCEDURE = "BOPSAFEGUARD FILE UPDATE"
+
+Access BOPSAFEGUARD, Set BOPSAFEGUARD:POLICY_NO = G_POLICY_NO,
+                         BOPSAFEGUARD:POL_YEAR = G_YEAR,
+                         BOPSAFEGUARD:END_SEQUENCE = G_END_SEQUENCE,
+                         BOPSAFEGUARD:PREM_NO = G_PREM_NO,
+                         BOPSAFEGUARD:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPSAFEGUARD:POLICY_NO <> G_POLICY_NO Or
+            BOPSAFEGUARD:POL_YEAR <> G_YEAR Or
+            BOPSAFEGUARD:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPSAFEGUARD:PREM_NO <> G_PREM_NO Or
+            BOPSAFEGUARD:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPSAFEGUARD
+
+    Next BOPSAFEGUARD
+    End
+
+-- BOPGLASS
+
+L_PROCEDURE = "BOPGLASS FILE UPDATE"
+
+Access BOPGLASS, Set BOPGLASS:POLICY_NO = G_POLICY_NO,
+                     BOPGLASS:POL_YEAR = G_YEAR,
+                     BOPGLASS:END_SEQUENCE = G_END_SEQUENCE,
+                     BOPGLASS:PREM_NO = G_PREM_NO,
+                     BOPGLASS:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPGLASS:POLICY_NO <> G_POLICY_NO Or
+            BOPGLASS:POL_YEAR <> G_YEAR Or
+            BOPGLASS:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPGLASS:PREM_NO <> G_PREM_NO Or
+            BOPGLASS:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPGLASS
+
+    Next BOPGLASS
+    End
+
+-- BOPUMUIM FILE UPDATE LOGIC
+
+L_PROCEDURE = "BOPUMUIM FILE UPDATE"
+
+Access BOPUMUIM, Set BOPUMUIM:POLICY_NO = G_POLICY_NO,
+                     BOPUMUIM:POL_YEAR = G_YEAR,
+                     BOPUMUIM:END_SEQUENCE = G_END_SEQUENCE,
+                     BOPUMUIM:PREM_NO = G_PREM_NO,
+                     BOPUMUIM:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPUMUIM:POLICY_NO <> G_POLICY_NO Or
+            BOPUMUIM:POL_YEAR <> G_YEAR Or
+            BOPUMUIM:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPUMUIM:PREM_NO <> G_PREM_NO Or
+            BOPUMUIM:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPUMUIM
+
+    Next BOPUMUIM
+    End
+
+-- BOPgaragekeepers FILE UPDATE LOGIC
+
+L_PROCEDURE = "BOPgaragekeepers FILE UPDATE"
+
+Access BOPgaragekeepers, Set BOPgaragekeepers:POLICY_NO = G_POLICY_NO,
+                     BOPgaragekeepers:POL_YEAR = G_YEAR,
+                     BOPgaragekeepers:END_SEQUENCE = G_END_SEQUENCE,
+                     BOPgaragekeepers:PREM_NO = G_PREM_NO,
+                     BOPgaragekeepers:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPgaragekeepers:POLICY_NO <> G_POLICY_NO Or
+            BOPgaragekeepers:POL_YEAR <> G_YEAR Or
+            BOPgaragekeepers:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPgaragekeepers:PREM_NO <> G_PREM_NO Or
+            BOPgaragekeepers:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPgaragekeepers
+
+    Next BOPgaragekeepers
+    End
+
+-- bopoperations FILE UPDATE LOGIC
+
+L_PROCEDURE = "bopoperations FILE UPDATE"
+
+Access BOPOPERATIONS, Set BOPOPERATIONS:POLICY_NO = G_POLICY_NO,
+                          BOPOPERATIONS:POL_YEAR = G_YEAR,
+                          BOPOPERATIONS:END_SEQUENCE = G_END_SEQUENCE,
+                          BOPOPERATIONS:PREM_NO = G_PREM_NO,
+                          BOPOPERATIONS:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPOPERATIONS:POLICY_NO <> G_POLICY_NO Or
+            BOPOPERATIONS:POL_YEAR <> G_YEAR Or
+            BOPOPERATIONS:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPOPERATIONS:PREM_NO <> G_PREM_NO Or
+            BOPOPERATIONS:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPOPERATIONS
+
+    Next BOPOPERATIONS
+    End
+
+L_PROCEDURE = "bopbu0405 FILE UPDATE"
+
+Access BOPBU0405, Set BOPBU0405:POLICY_NO = G_POLICY_NO,
+                          BOPBU0405:POL_YEAR = G_YEAR,
+                          BOPBU0405:END_SEQUENCE = G_END_SEQUENCE,
+                          BOPBU0405:PREM_NO = G_PREM_NO,
+                          BOPBU0405:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPBU0405:POLICY_NO <> G_POLICY_NO Or
+            BOPBU0405:POL_YEAR <> G_YEAR Or
+            BOPBU0405:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPBU0405:PREM_NO <> G_PREM_NO Or
+            BOPBU0405:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPBU0405
+
+    Next BOPBU0405
+    End
+
+L_PROCEDURE = "boplosspayee FILE UPDATE"
+
+Access BOPLOSSPAYEE, Set BOPLOSSPAYEE:POLICY_NO = G_POLICY_NO,
+                          BOPLOSSPAYEE:POL_YEAR = G_YEAR,
+                          BOPLOSSPAYEE:END_SEQUENCE = G_END_SEQUENCE,
+                          BOPLOSSPAYEE:PREM_NO = G_PREM_NO,
+                          BOPLOSSPAYEE:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPLOSSPAYEE:POLICY_NO <> G_POLICY_NO Or
+            BOPLOSSPAYEE:POL_YEAR <> G_YEAR Or
+            BOPLOSSPAYEE:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPLOSSPAYEE:PREM_NO <> G_PREM_NO Or
+            BOPLOSSPAYEE:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPLOSSPAYEE
+
+    Next BOPLOSSPAYEE
+    End
+
+L_PROCEDURE = "bopcompdesc FILE UPDATE"
+
+Access BOPCOMPDESC, Set BOPCOMPDESC:POLICY_NO = G_POLICY_NO,
+                          BOPCOMPDESC:POL_YEAR = G_YEAR,
+                          BOPCOMPDESC:END_SEQUENCE = G_END_SEQUENCE,
+                          BOPCOMPDESC:PREM_NO = G_PREM_NO,
+                          BOPCOMPDESC:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPCOMPDESC:POLICY_NO <> G_POLICY_NO Or
+            BOPCOMPDESC:POL_YEAR <> G_YEAR Or
+            BOPCOMPDESC:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPCOMPDESC:PREM_NO <> G_PREM_NO Or
+            BOPCOMPDESC:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPCOMPDESC
+
+    Next BOPCOMPDESC
+    End
+
+L_PROCEDURE = "bopcomputer FILE UPDATE"
+
+Access BOPCOMPUTER, Set BOPCOMPUTER:POLICY_NO = G_POLICY_NO,
+                          BOPCOMPUTER:POL_YEAR = G_YEAR,
+                          BOPCOMPUTER:END_SEQUENCE = G_END_SEQUENCE,
+                          BOPCOMPUTER:PREM_NO = G_PREM_NO,
+                          BOPCOMPUTER:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPCOMPUTER:POLICY_NO <> G_POLICY_NO Or
+            BOPCOMPUTER:POL_YEAR <> G_YEAR Or
+            BOPCOMPUTER:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPCOMPUTER:PREM_NO <> G_PREM_NO Or
+            BOPCOMPUTER:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPCOMPUTER
+
+    Next BOPCOMPUTER
+    End
+
+L_PROCEDURE = "bopdishonesty FILE UPDATE"
+
+Access BOPDISHONESTY, Set BOPDISHONESTY:POLICY_NO = G_POLICY_NO,
+                          BOPDISHONESTY:POL_YEAR = G_YEAR,
+                          BOPDISHONESTY:END_SEQUENCE = G_END_SEQUENCE,
+                          BOPDISHONESTY:PREM_NO = G_PREM_NO,
+                          BOPDISHONESTY:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPDISHONESTY:POLICY_NO <> G_POLICY_NO Or
+            BOPDISHONESTY:POL_YEAR <> G_YEAR Or
+            BOPDISHONESTY:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPDISHONESTY:PREM_NO <> G_PREM_NO Or
+            BOPDISHONESTY:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPDISHONESTY
+
+    Next BOPDISHONESTY
+    End
+
+L_PROCEDURE = "bopendorse FILE UPDATE"
+
+Access BOPENDORSE, Set BOPENDORSE:POLICY_NO = G_POLICY_NO,
+                          BOPENDORSE:POL_YEAR = G_YEAR,
+                          BOPENDORSE:END_SEQUENCE = G_END_SEQUENCE,
+                          BOPENDORSE:PREM_NO = G_PREM_NO,
+                          BOPENDORSE:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPENDORSE:POLICY_NO <> G_POLICY_NO Or
+            BOPENDORSE:POL_YEAR <> G_YEAR Or
+            BOPENDORSE:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPENDORSE:PREM_NO <> G_PREM_NO Or
+            BOPENDORSE:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPENDORSE
+
+    Next BOPENDORSE
+    End
+
+L_PROCEDURE = "bopdesc FILE UPDATE"
+
+Access BOPdesc, Set BOPdesc:POLICY_NO = G_POLICY_NO,
+                    BOPdesc:POL_YEAR = G_YEAR,
+                    BOPdesc:END_SEQUENCE = G_END_SEQUENCE,
+                    BOPdesc:PREM_NO = G_PREM_NO,
+                    BOPdesc:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPdesc:POLICY_NO <> G_POLICY_NO Or
+            BOPdesc:POL_YEAR <> G_YEAR Or
+            BOPdesc:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPdesc:PREM_NO <> G_PREM_NO Or
+            BOPdesc:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPdesc
+
+    Next BOPdesc
+    End
+
+L_PROCEDURE = "bopeedp FILE UPDATE"
+
+Access BOPEEDP, Set BOPEEDP:POLICY_NO = G_POLICY_NO,
+                    BOPEEDP:POL_YEAR = G_YEAR,
+                    BOPEEDP:END_SEQUENCE = G_END_SEQUENCE,
+                    BOPEEDP:PREM_NO = G_PREM_NO,
+                    BOPEEDP:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPEEDP:POLICY_NO <> G_POLICY_NO Or
+            BOPEEDP:POL_YEAR <> G_YEAR Or
+            BOPEEDP:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPEEDP:PREM_NO <> G_PREM_NO Or
+            BOPEEDP:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPEEDP
+
+    Next BOPEEDP
+    End
+
+L_PROCEDURE = "bopecona FILE UPDATE"
+
+Access BOPECONA, Set BOPECONA:POLICY_NO = G_POLICY_NO,
+                     BOPECONA:POL_YEAR = G_YEAR,
+                     BOPECONA:END_SEQUENCE = G_END_SEQUENCE,
+                     BOPECONA:PREM_NO = G_PREM_NO,
+                     BOPECONA:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPECONA:POLICY_NO <> G_POLICY_NO Or
+            BOPECONA:POL_YEAR <> G_YEAR Or
+            BOPECONA:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPECONA:PREM_NO <> G_PREM_NO Or
+            BOPECONA:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPECONA
+
+    Next BOPECONA
+    End
+
+L_PROCEDURE = "bopecoal FILE UPDATE"
+
+Access BOPECOAL, Set BOPECOAL:POLICY_NO = G_POLICY_NO,
+                     BOPECOAL:POL_YEAR = G_YEAR,
+                     BOPECOAL:END_SEQUENCE = G_END_SEQUENCE,
+                     BOPECOAL:PREM_NO = G_PREM_NO,
+                     BOPECOAL:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPECOAL:POLICY_NO <> G_POLICY_NO Or
+            BOPECOAL:POL_YEAR <> G_YEAR Or
+            BOPECOAL:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPECOAL:PREM_NO <> G_PREM_NO Or
+            BOPECOAL:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPECOAL
+
+    Next BOPECOAL
+    End
+
+L_PROCEDURE = "bopepral FILE UPDATE"
+
+Access BOPEPRAL, Set BOPEPRAL:POLICY_NO = G_POLICY_NO,
+                     BOPEPRAL:POL_YEAR = G_YEAR,
+                     BOPEPRAL:END_SEQUENCE = G_END_SEQUENCE,
+                     BOPEPRAL:PREM_NO = G_PREM_NO,
+                     BOPEPRAL:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPEPRAL:POLICY_NO <> G_POLICY_NO Or
+            BOPEPRAL:POL_YEAR <> G_YEAR Or
+            BOPEPRAL:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPEPRAL:PREM_NO <> G_PREM_NO Or
+            BOPEPRAL:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPEPRAL
+
+    Next BOPEPRAL
+    End
+
+L_PROCEDURE = "bopephy FILE UPDATE"
+
+Access BOPEPHY, Set BOPEPHY:POLICY_NO = G_POLICY_NO,
+                    BOPEPHY:POL_YEAR = G_YEAR,
+                    BOPEPHY:END_SEQUENCE = G_END_SEQUENCE,
+                    BOPEPHY:PREM_NO = G_PREM_NO,
+                    BOPEPHY:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPEPHY:POLICY_NO <> G_POLICY_NO Or
+            BOPEPHY:POL_YEAR <> G_YEAR Or
+            BOPEPHY:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPEPHY:PREM_NO <> G_PREM_NO Or
+            BOPEPHY:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPEPHY
+
+    Next BOPEPHY
+    End
+
+L_PROCEDURE = "bopetrip FILE UPDATE"
+
+Access BOPETRIP, Set BOPETRIP:POLICY_NO = G_POLICY_NO,
+                     BOPETRIP:POL_YEAR = G_YEAR,
+                     BOPETRIP:END_SEQUENCE = G_END_SEQUENCE,
+                     BOPETRIP:PREM_NO = G_PREM_NO,
+                     BOPETRIP:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPETRIP:POLICY_NO <> G_POLICY_NO Or
+            BOPETRIP:POL_YEAR <> G_YEAR Or
+            BOPETRIP:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPETRIP:PREM_NO <> G_PREM_NO Or
+            BOPETRIP:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPETRIP
+
+    Next BOPETRIP
+    End
+
+L_PROCEDURE = "bopetrna FILE UPDATE"
+
+Access BOPETRNA, Set BOPETRNA:POLICY_NO = G_POLICY_NO,
+                     BOPETRNA:POL_YEAR = G_YEAR,
+                     BOPETRNA:END_SEQUENCE = G_END_SEQUENCE,
+                     BOPETRNA:PREM_NO = G_PREM_NO,
+                     BOPETRNA:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPETRNA:POLICY_NO <> G_POLICY_NO Or
+            BOPETRNA:POL_YEAR <> G_YEAR Or
+            BOPETRNA:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPETRNA:PREM_NO <> G_PREM_NO Or
+            BOPETRNA:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPETRNA
+
+    Next BOPETRNA
+    End
+
+L_PROCEDURE = "bopetral FILE UPDATE"
+
+Access BOPETRAL, Set BOPETRAL:POLICY_NO = G_POLICY_NO,
+                     BOPETRAL:POL_YEAR = G_YEAR,
+                     BOPETRAL:END_SEQUENCE = G_END_SEQUENCE,
+                     BOPETRAL:PREM_NO = G_PREM_NO,
+                     BOPETRAL:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPETRAL:POLICY_NO <> G_POLICY_NO Or
+            BOPETRAL:POL_YEAR <> G_YEAR Or
+            BOPETRAL:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPETRAL:PREM_NO <> G_PREM_NO Or
+            BOPETRAL:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPETRAL
+
+    Next BOPETRAL
+    End
+
+L_PROCEDURE = "bopwh16 FILE UPDATE"
+
+Access BOPWH16, Set BOPWH16:POLICY_NO = G_POLICY_NO,
+                    BOPWH16:POL_YEAR = G_YEAR,
+                    BOPWH16:END_SEQUENCE = G_END_SEQUENCE,
+                    BOPWH16:PREM_NO = G_PREM_NO,
+                    BOPWH16:BUILD_NO = G_BUILD_NO, Generic
+
+Repeat Begin
+    Exit If BOPWH16:POLICY_NO <> G_POLICY_NO Or
+            BOPWH16:POL_YEAR <> G_YEAR Or
+            BOPWH16:END_SEQUENCE <> G_END_SEQUENCE Or
+            BOPWH16:PREM_NO <> G_PREM_NO Or
+            BOPWH16:BUILD_NO <> G_BUILD_NO
+
+    Delete BOPWH16
+
+    Next BOPWH16
+    End
+
+Update
+
+Errors
+Writefile("bopcv400.err","%s<nl>",ERRORTEXT)
+Writefile("bopcv400.err","%n<nl>",ERRORNUMBER)
+Writefile("bopcv400.err","%s<nl>",L_PROCEDURE)
+
+End

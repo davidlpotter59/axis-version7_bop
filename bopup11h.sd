@@ -1,0 +1,313 @@
+%%
+Program
+        Name = "bopUP11H" ;
+        Type = "File" ;
+        Padcharacter = Space ;
+        Domain = "FLAT" ;
+
+        Global Unsigned Ascii Number G_policy_no[9] ,
+                                     g_year[4],
+                                     g_end_sequence[4],
+                                     g_prem_no[4],
+                                     g_build_no[4];
+
+        Local unsigned ascii number l_credit_card_per[5]=0,
+                                    l_credit_card_rate[2],
+                                    l_electronic_data_per[5]=0,
+                                    l_electronic_data_factor[4]=0/dec=3,
+                                    l_loss_income_per_1[5]=0,
+                                    l_loss_income_per_2[5]=0,
+                                    l_loss_income_factor_1[4]=0/dec=3,
+                                    l_loss_income_factor_2[4]=0/dec=3;
+
+        wdate l_bpsdefault2_eff_date ;
+
+        local string l_supplemental_form[7];
+
+initialisation
+g_policy_no   = val(commandline[1,9])
+g_year        = val(commandline[10,13])
+g_end_sequence = val(commandline[14,17])
+g_prem_no     = val(commandline[18,21])
+g_build_no    = val(commandline[22,25])
+
+access sfpmaster, set sfpmaster:policy_no    = g_policy_no,
+                      sfpmaster:pol_year     = g_year,
+                      sfpmaster:end_sequence = g_end_sequence, generic
+
+access sfpname, set sfpname:policy_no    = g_policy_no,
+                    sfpname:pol_year     = g_year,
+                    sfpname:end_sequence = g_end_sequence, generic
+
+access bopgeneral, set bopgeneral:policy_no    = g_policy_no,
+                       bopgeneral:pol_year     = g_year,
+                       bopgeneral:end_sequence = g_end_sequence,
+                       bopgeneral:prem_no      = g_prem_no,
+                       bopgeneral:build_no     = g_build_no, generic
+
+access bopgeneral1, set bopgeneral1:policy_no    = g_policy_no,
+                        bopgeneral1:pol_year     = g_year,
+                        bopgeneral1:end_sequence = g_end_sequence,
+                        bopgeneral1:prem_no      = g_prem_no,
+                        bopgeneral1:build_no     = g_build_no, generic
+
+switch(sfpmaster:form)
+  case 1, 3 : begin
+              if bopgeneral:restaurant = 1 then
+                  l_supplemental_form = "BU0421"/raw
+              else
+                  l_supplemental_form = "BU0403"/raw
+              end
+  default   : begin
+              if bopgeneral:restaurant = 1 then
+                  l_supplemental_form = "BU0424"/raw
+              else
+                  l_supplemental_form = "BU0413"/raw
+              end
+  end
+
+Access BPSDEFAULT2, Set BPSDEFAULT2:COMPANY_ID        = bopgeneral:company_id,
+                        bpsdefault2:state             = bopgeneral:state,
+                        BPSDEFAULT2:LINE_OF_BUSINESS  = bopgeneral:line_of_business,
+                        BPSDEFAULT2:SUPPLEMENTAL_FORM = l_supplemental_form, Generic
+
+l_bpsdefault2_eff_date = 0
+while BPSDEFAULT2:COMPANY_ID        = bopgeneral:company_id and
+      bpsdefault2:state             = bopgeneral:state and
+      BPSDEFAULT2:LINE_OF_BUSINESS  = bopgeneral:line_of_business and
+      BPSDEFAULT2:SUPPLEMENTAL_FORM = l_supplemental_form
+        begin
+        if (sfpname:eff_date >= bpsdefault2:eff_date and
+           (sfpname:eff_date <= bpsdefault2:exp_date or
+           bpsdefault2:exp_date = 0)) then
+            l_bpsdefault2_eff_date = bpsdefault2:eff_date
+
+        next bpsdefault2
+        end
+
+Access BPSDEFAULT2, Set BPSDEFAULT2:COMPANY_ID        = bopgeneral:company_id,
+                        bpsdefault2:state             = bopgeneral:state,
+                        BPSDEFAULT2:LINE_OF_BUSINESS  = bopgeneral:line_of_business,
+                        BPSDEFAULT2:SUPPLEMENTAL_FORM = l_supplemental_form,
+                        bpsdefault2:eff_date          = l_bpsdefault2_eff_date, Generic
+
+do rate_coverages
+
+update
+
+Procedure Definition
+
+procedure rate_coverages
+begin
+do read_bpsrate1
+If bopgeneral1:credit_card <> bpsdefault2:credit_card Then
+    Begin
+    Access bopGENERAL1, Set bopGENERAL1:policy_no    = bopGENERAL:policy_no,
+                            bopgeneral1:pol_year     = bopgeneral:pol_year,
+                            bopgeneral1:end_sequence = bopgeneral:end_sequence,
+                            bopGENERAL1:PREM_NO      = bopGENERAL:PREM_NO,
+                            bopGENERAL1:BUILD_NO     = bopGENERAL:BUILD_NO, Generic
+
+    if bopgeneral1:policy_no    = bopgeneral:policy_no and
+       bopgeneral1:pol_year     = bopgeneral:pol_year and
+       bopgeneral1:end_sequence = bopgeneral:end_sequence and
+       bopgeneral1:prem_no      = bopgeneral:prem_no and
+       bopgeneral1:build_no     = bopgeneral:build_no then
+        begin
+        Change bopGENERAL1
+            Begin
+            bopGENERAL1:credit_card_premium = (((bopgeneral1:credit_card -
+                                              bpsdefault2:credit_card) divide
+                                              l_credit_card_per) *
+                                              l_credit_card_rate)
+            end
+        End
+    End
+Else
+    Begin
+    Access bopGENERAL1, Set bopGENERAL1:policy_no    = bopGENERAL:policy_no,
+                            bopgeneral1:pol_year     = bopgeneral:pol_year,
+                            bopgeneral1:end_sequence = bopgeneral:end_sequence,
+                            bopGENERAL1:PREM_NO      = bopGENERAL:PREM_NO,
+                            bopGENERAL1:BUILD_NO     = bopGENERAL:BUILD_NO, Generic
+
+    if bopgeneral1:policy_no    = bopgeneral:policy_no and
+       bopgeneral1:pol_year     = bopgeneral:pol_year and
+       bopgeneral1:end_sequence = bopgeneral:end_sequence and
+       bopgeneral1:prem_no      = bopgeneral:prem_no and
+       bopgeneral1:build_no     = bopgeneral:build_no then
+        begin
+        Change bopGENERAL1
+            Begin
+            bopGENERAL1:credit_card_premium = 0
+            end
+        End
+    End
+
+If bopgeneral1:electronic_data <> bpsdefault2:electronic_data Then
+    Begin
+    Access bopGENERAL1, Set bopGENERAL1:policy_no = bopGENERAL:policy_no,
+                            bopgeneral1:pol_year     = bopgeneral:pol_year,
+                            bopgeneral1:end_sequence = bopgeneral:end_sequence,
+                            bopGENERAL1:PREM_NO  = bopGENERAL:PREM_NO,
+                            bopGENERAL1:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    if bopgeneral1:policy_no    = bopgeneral:policy_no and
+       bopgeneral1:pol_year     = bopgeneral:pol_year and
+       bopgeneral1:end_sequence = bopgeneral:end_sequence and
+       bopgeneral1:prem_no      = bopgeneral:prem_no and
+       bopgeneral1:build_no     = bopgeneral:build_no then
+        begin
+        Change bopGENERAL1
+            Begin
+            bopGENERAL1:electronic_data_premium = (((bopgeneral1:electronic_data -
+                                                  bpsdefault2:electronic_data) divide
+                                                  l_electronic_data_per) *
+                                                  (l_electronic_data_factor *
+                                                  bopgeneral:property_rate))
+            end
+        End
+    End
+Else
+    Begin
+    Access bopGENERAL1, Set bopGENERAL1:policy_no = bopGENERAL:policy_no,
+                            bopgeneral1:pol_year     = bopgeneral:pol_year,
+                            bopgeneral1:end_sequence = bopgeneral:end_sequence,
+                            bopGENERAL1:PREM_NO  = bopGENERAL:PREM_NO,
+                            bopGENERAL1:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    if bopgeneral1:policy_no    = bopgeneral:policy_no and
+       bopgeneral1:pol_year     = bopgeneral:pol_year and
+       bopgeneral1:end_sequence = bopgeneral:end_sequence and
+       bopgeneral1:prem_no      = bopgeneral:prem_no and
+       bopgeneral1:build_no     = bopgeneral:build_no then
+        begin
+        Change bopGENERAL1
+            Begin
+            bopGENERAL1:electronic_data_premium = 0
+            end
+        End
+    End
+
+If bopgeneral1:dependent_property <> bpsdefault2:loss_of_income_dependent Then
+    Begin
+    Access bopGENERAL1, Set bopGENERAL1:policy_no = bopGENERAL:policy_no,
+                            bopgeneral1:pol_year     = bopgeneral:pol_year,
+                            bopgeneral1:end_sequence = bopgeneral:end_sequence,
+                            bopGENERAL1:PREM_NO  = bopGENERAL:PREM_NO,
+                            bopGENERAL1:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    if bopgeneral1:policy_no    = bopgeneral:policy_no and
+       bopgeneral1:pol_year     = bopgeneral:pol_year and
+       bopgeneral1:end_sequence = bopgeneral:end_sequence and
+       bopgeneral1:prem_no      = bopgeneral:prem_no and
+       bopgeneral1:build_no     = bopgeneral:build_no then
+        begin
+        Change bopGENERAL1
+            Begin
+            bopGENERAL1:dependent_property_premium = (((bopgeneral1:dependent_property -
+                                                     bpsdefault2:loss_of_income_dependent) divide
+                                                     l_loss_income_per_1) *
+                                                     (l_loss_income_factor_1 *
+                                                     bopgeneral:property_rate))
+            end
+        End
+    End
+Else
+    Begin
+    Access bopGENERAL1, Set bopGENERAL1:policy_no = bopGENERAL:policy_no,
+                            bopgeneral1:pol_year     = bopgeneral:pol_year,
+                            bopgeneral1:end_sequence = bopgeneral:end_sequence,
+                            bopGENERAL1:PREM_NO  = bopGENERAL:PREM_NO,
+                            bopGENERAL1:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    if bopgeneral1:policy_no    = bopgeneral:policy_no and
+       bopgeneral1:pol_year     = bopgeneral:pol_year and
+       bopgeneral1:end_sequence = bopgeneral:end_sequence and
+       bopgeneral1:prem_no      = bopgeneral:prem_no and
+       bopgeneral1:build_no     = bopgeneral:build_no then
+        begin
+        Change bopGENERAL1
+            Begin
+            bopGENERAL1:dependent_property_premium = 0
+            end
+        End
+    End
+
+If bopgeneral1:interruption <> bpsdefault2:loss_of_income_interruption Then
+    Begin
+    Access bopGENERAL1, Set bopGENERAL1:policy_no = bopGENERAL:policy_no,
+                            bopgeneral1:pol_year     = bopgeneral:pol_year,
+                            bopgeneral1:end_sequence = bopgeneral:end_sequence,
+                            bopGENERAL1:PREM_NO  = bopGENERAL:PREM_NO,
+                            bopGENERAL1:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    if bopgeneral1:policy_no    = bopgeneral:policy_no and
+       bopgeneral1:pol_year     = bopgeneral:pol_year and
+       bopgeneral1:end_sequence = bopgeneral:end_sequence and
+       bopgeneral1:prem_no      = bopgeneral:prem_no and
+       bopgeneral1:build_no     = bopgeneral:build_no then
+        begin
+        Change bopGENERAL1
+            Begin
+            bopGENERAL1:interruption_premium = (((bopgeneral1:interruption -
+                                                bpsdefault2:loss_of_income_interruption) divide
+                                                l_loss_income_per_2) *
+                                                (l_loss_income_factor_2 *
+                                                bopgeneral:property_rate))
+            end
+        End
+    End
+Else
+    Begin
+    Access bopGENERAL1, Set bopGENERAL1:policy_no = bopGENERAL:policy_no,
+                            bopgeneral1:pol_year     = bopgeneral:pol_year,
+                            bopgeneral1:end_sequence = bopgeneral:end_sequence,
+                            bopGENERAL1:PREM_NO  = bopGENERAL:PREM_NO,
+                            bopGENERAL1:BUILD_NO = bopGENERAL:BUILD_NO, Generic
+
+    if bopgeneral1:policy_no = bopgeneral:policy_no and
+       bopgeneral1:pol_year     = bopgeneral:pol_year and
+       bopgeneral1:end_sequence = bopgeneral:end_sequence and
+       bopgeneral1:prem_no  = bopgeneral:prem_no and
+       bopgeneral1:build_no = bopgeneral:build_no then
+        begin
+        Change bopGENERAL1
+            Begin
+            bopGENERAL1:interruption_premium = 0
+            end
+        End
+    End
+
+End
+
+procedure read_bpsrate1
+begin
+access bpsrate1, set bpsrate1:company_id       = bopgeneral:company_id,
+                     bpsrate1:state            = bopgeneral:state,
+                     bpsrate1:line_of_business = bopgeneral:line_of_business, generic
+
+while bpsrate1:company_id       = bopgeneral:company_id and
+      bpsrate1:state            = bopgeneral:state and
+      bpsrate1:line_of_business = bopgeneral:line_of_business
+        begin
+        if (sfpname:eff_date >= bpsrate1:eff_date and
+           (sfpname:eff_date <= bpsrate1:exp_date or
+           bpsrate1:exp_date = 0)) then
+            begin
+            l_credit_card_per        = bpsrate1:credit_card_per
+            l_credit_card_rate       = bpsrate1:credit_card_rate
+            l_electronic_data_per    = bpsrate1:electronic_data_per
+            l_electronic_data_factor = bpsrate1:electronic_data_factor
+            l_loss_income_per_1      = bpsrate1:loss_income_per[1]
+            l_loss_income_per_2      = bpsrate1:loss_income_per[2]
+            l_loss_income_factor_1   = bpsrate1:loss_income_factor[1]
+            l_loss_income_factor_2   = bpsrate1:loss_income_factor[2]
+            end
+
+        next bpsrate1
+        end
+
+end
+
+End

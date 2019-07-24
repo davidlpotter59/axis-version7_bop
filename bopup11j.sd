@@ -1,0 +1,120 @@
+%%
+Program
+        Name = "bopUP11j" ;
+        Type = "File" ;
+        Padcharacter = Space ;
+        Domain = "FLAT" ;
+
+        Global Unsigned Ascii Number G_policy_no[9] ,
+                                     g_year[4],
+                                     g_end_sequence[4],
+                                     g_prem_no[4],
+                                     g_build_no[4] ;
+
+        Local unsigned ascii number l_liability_code[2],
+                                    l_type[1];
+
+        include "boprate.var"
+
+initialisation
+g_policy_no   = val(commandline[1,9])
+g_year        = val(commandline[10,13])
+g_end_sequence = val(commandline[14,17])
+g_prem_no     = val(commandline[18,21])
+g_build_no    = val(commandline[22,25])
+
+access sfpmaster, set sfpmaster:policy_no    = g_policy_no,
+                      sfpmaster:pol_year     = g_year,
+                      sfpmaster:end_sequence = g_end_sequence, generic
+
+access sfpname, set sfpname:policy_no    = g_policy_no,
+                    sfpname:pol_year     = g_year,
+                    sfpname:end_sequence = g_end_sequence, generic
+
+access bopgeneral, set bopgeneral:policy_no    = g_policy_no,
+                       bopgeneral:pol_year     = g_year,
+                       bopgeneral:end_sequence = g_end_sequence,
+                       bopgeneral:prem_no      = g_prem_no,
+                       bopgeneral:build_no     = g_build_no, generic
+
+do rate_coverages
+
+update
+
+Procedure Definition
+
+procedure rate_coverages
+begin
+access bopgaragekeepers, set bopgaragekeepers:policy_no = bopgeneral:policy_no,
+                             bopgaragekeepers:pol_year = bopgeneral:pol_year,
+                             bopgaragekeepers:end_sequence = bopgeneral:end_sequence,
+                             bopgaragekeepers:prem_no  = bopgeneral:prem_no,
+                             bopgaragekeepers:build_no = bopgeneral:build_no, generic
+
+l_company_id       = sfpname:company_id
+l_state            = bopgeneral:state
+l_line_of_business = bopgeneral:line_of_business
+l_limit_1          = bopgaragekeepers:limit
+l_form             = bopgaragekeepers:form
+l_rate_form        = bopgaragekeepers:rate_form
+l_eff_date         = sfpname:eff_date
+
+include "bpsgaragerates.pro"
+
+l_type             = 1
+l_deductible       = bopgaragekeepers:comp_deductible
+l_deductible_2     = bopgaragekeepers:comp_deductible
+
+include "bpsgaragededuct.pro"
+
+l_update_sfpend_premium = l_garagekeepers_comp_premium *
+                          l_garagekeepers_deduct_factor
+
+change bopgaragekeepers
+    begin
+    bopgaragekeepers:comp_premium = l_garagekeepers_comp_premium *
+                                    l_garagekeepers_deduct_factor
+    end
+
+l_type             = 2
+l_deductible       = bopgaragekeepers:coll_deductible
+l_deductible_2     = bopgaragekeepers:coll_deductible
+
+include "bpsgaragededuct.pro"
+
+l_update_sfpend_premium = (l_update_sfpend_premium +
+                          (l_garagekeepers_coll_premium *
+                          l_garagekeepers_deduct_factor))
+
+change bopgaragekeepers
+    begin
+    bopgaragekeepers:coll_premium = l_garagekeepers_coll_premium *
+                                    l_garagekeepers_deduct_factor
+    end
+
+access sfpend, set sfpend:policy_no = g_policy_no,
+                   sfpend:pol_year = g_year,
+                   sfpend:end_sequence = g_end_sequence,
+                   sfpend:prem_no  = g_prem_no,
+                   sfpend:build_no = g_build_no, generic
+
+while sfpend:policy_no = g_policy_no and
+      sfpend:pol_year = g_year and
+      sfpend:end_sequence = g_end_sequence and
+      sfpend:prem_no  = g_prem_no and
+      sfpend:build_no = g_build_no
+        begin
+        if sfpend:code one of "BU1510", "MGK011" then
+            begin
+            change sfpend
+                begin
+                sfpend:premium = l_update_sfpend_premium
+                end
+            end
+
+        next sfpend
+        end
+
+End
+
+End
